@@ -656,23 +656,154 @@
       }
 
       @media print {
+        @page {
+          size: A5 portrait;
+          margin: 6mm;
+        }
         body {
           background: white;
           padding: 0;
           overflow: visible;
-        }
-        .fiche-container {
-          box-shadow: none;
-          margin: 0;
-          width: 210mm;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
         .toolbar,
-        .sidebar {
+        .sidebar,
+        .chatdice-panel,
+        .empty-state,
+        #dice-modal,
+        #export-modal {
           display: none !important;
+        }
+        .app-layout {
+          display: block;
+          padding-top: 0;
+          height: auto;
         }
         .main-area {
           padding: 0;
           overflow: visible;
+          display: block;
+        }
+        .fiche-container {
+          box-shadow: none;
+          margin: 0 auto;
+          width: 136mm;
+          min-height: 0;
+          padding: 3mm 4mm;
+          font-size: 9px;
+          height: auto;
+          overflow: visible;
+          page-break-after: always;
+        }
+        .fiche-header {
+          padding-bottom: 3px;
+          margin-bottom: 6px;
+        }
+        .fiche-name {
+          font-size: 16px;
+          letter-spacing: 0.5px;
+        }
+        .fiche-type {
+          font-size: 9px;
+          padding: 1px 5px;
+        }
+        .attr-row {
+          gap: 4px;
+          margin-bottom: 5px;
+        }
+        .attr-box {
+          padding: 3px 2px;
+          border-radius: 4px;
+        }
+        .attr-label {
+          font-size: 8px;
+        }
+        .attr-value {
+          font-size: 14px;
+          margin: 1px 0;
+        }
+        .attr-variants {
+          font-size: 7px;
+          min-height: 10px;
+        }
+        .section-box {
+          padding: 4px 6px;
+          margin-bottom: 4px;
+          page-break-inside: avoid;
+        }
+        .section-title {
+          font-size: 10px;
+          margin-bottom: 3px;
+          padding-bottom: 2px;
+        }
+        .comp-item, .comp-sub, .atout-item, .arme-item, .equip-item {
+          font-size: 8px !important;
+          line-height: 1.3;
+        }
+        .comp-bullet {
+          font-size: 10px;
+        }
+        .comp-detail, .atout-desc, .arme-cond, .equip-item {
+          font-size: 8px !important;
+        }
+        .arme-vd {
+          font-size: 9px;
+        }
+        .arme-rr {
+          font-size: 8px;
+          padding: 0 2px;
+        }
+        .desc-section {
+          padding: 4px 6px;
+          margin-bottom: 4px;
+          page-break-inside: avoid;
+        }
+        .desc-content {
+          font-size: 8.5px;
+          line-height: 1.35;
+        }
+        .blessures-section {
+          margin-bottom: 5px;
+          page-break-inside: avoid;
+        }
+        .blessures-table {
+          grid-template-columns: 110px 1fr 1fr 1fr;
+          gap: 2px;
+        }
+        .blessures-header-cell {
+          font-size: 8px;
+          padding-bottom: 2px;
+        }
+        .blessures-label {
+          font-size: 9px;
+        }
+        .blessures-input, .blessures-armor-value {
+          font-size: 11px;
+        }
+        .blessures-armor-input {
+          width: 22px;
+          height: 16px;
+          font-size: 10px;
+        }
+        .circle-small {
+          width: 10px;
+          height: 10px;
+        }
+        .combativite-text {
+          font-size: 8px;
+          margin-bottom: 3px;
+        }
+        .two-cols {
+          gap: 6px;
+        }
+        .cases-config {
+          font-size: 7px;
+        }
+        .cases-config input {
+          width: 20px;
+          height: 14px;
+          font-size: 8px;
         }
       }
 
@@ -1101,6 +1232,7 @@
       </div>
       <div class="toolbar-title">BESTIAIRE ANARCHY 2.0</div>
       <div class="toolbar-right">
+        <button class="toolbar-btn secondary" id="btn-print" onclick="printFiche()" title="Imprimer la fiche active (A5)">PDF</button>
         <button class="toolbar-btn secondary" id="btn-save-json">Sauver</button>
         <button class="toolbar-btn secondary" id="btn-load-json">
           Charger
@@ -41843,7 +41975,7 @@
           html +=
             '<div class="arme-item"><span class="atout-name">• ' +
             escapeHtml(arme.nom) +
-            '</span><span class="arme-vd">' +
+            '</span><span class="arme-vd">' + " "+
             renderVD(arme.vd) +
             '</span><span class="arme-rr">' +
             renderRR(arme.rr) +
@@ -42635,6 +42767,20 @@
 
       function closeExportModal() {
         document.getElementById("export-modal").style.display = "none";
+      }
+
+      function printFiche() {
+        if (!currentCreature) {
+          alert("Sélectionnez une créature dans la liste avant d'imprimer.");
+          return;
+        }
+        // S'assurer que la fiche est visible (pas l'état vide)
+        document.getElementById("empty-state").style.display = "none";
+        document.getElementById("fiche-container").style.display = "block";
+        // Petit délai pour laisser le navigateur rendre avant d'imprimer
+        setTimeout(function() {
+          window.print();
+        }, 100);
       }
 
       function toggleAllExport(state) {
