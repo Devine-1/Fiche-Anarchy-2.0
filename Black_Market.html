@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Black Market — Shadowrun Anarchy 2.0</title>
+<link rel="stylesheet" href="assets/CSS/Style_v2.css">
+<link rel="icon" type="image/png" href="assets/images/Anarchy.ico">
+<style>
+  .bm-page { width: 210mm; min-height: 297mm; margin: 0 auto 20px; background: var(--paper); padding: 10mm 12mm; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+  .bm-header { text-align: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 3px solid var(--yellow-dark); }
+  .bm-header h1 { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: var(--black); margin-bottom: 4px; }
+  .bm-header h1 span { color: var(--yellow-dark); }
+  .bm-header p { font-family: 'Roboto Condensed', sans-serif; font-size: 12px; color: var(--gray-dark); text-transform: uppercase; letter-spacing: 1px; }
+
+  .bm-filters { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; padding: 10px; background: var(--gray-light); border: 2px solid var(--gray-mid); border-radius: 6px; }
+  .bm-search { flex: 1; min-width: 200px; height: 34px; border: 1.5px solid var(--gray-mid); border-radius: 4px; background: var(--white); font-family: 'Roboto', sans-serif; font-size: 13px; color: var(--black); outline: none; padding: 0 10px; }
+  .bm-search:focus { border-color: var(--yellow-dark); box-shadow: 0 0 0 2px rgba(255,193,7,0.3); }
+  .bm-select { min-width: 220px; height: 34px; border: 1.5px solid var(--gray-mid); border-radius: 4px; background: var(--white); font-family: 'Roboto Condensed', sans-serif; font-size: 12px; font-weight: 700; color: var(--black); outline: none; padding: 0 6px; cursor: pointer; text-transform: uppercase; }
+  .bm-select:focus { border-color: var(--yellow-dark); }
+  .bm-count { font-family: 'Roboto Mono', monospace; font-size: 11px; color: var(--gray-dark); white-space: nowrap; }
+
+  .bm-subcats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .bm-subcat-btn { font-family: 'Roboto Condensed', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 12px; border: 1.5px solid var(--gray-mid); border-radius: 20px; background: var(--white); color: var(--gray-dark); cursor: pointer; transition: all 0.15s; }
+  .bm-subcat-btn:hover { border-color: var(--yellow-dark); color: var(--black); }
+  .bm-subcat-btn.active { background: var(--yellow); border-color: var(--yellow-dark); color: var(--black); }
+
+  .bm-section-title { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; color: var(--black); margin: 18px 0 10px; padding-bottom: 4px; border-bottom: 2px solid var(--yellow-dark); letter-spacing: 1px; }
+  .bm-section-title:first-of-type { margin-top: 0; }
+
+  .bm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  .bm-card { border: 1.5px solid var(--gray-mid); border-radius: 4px; background: var(--white); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s, box-shadow 0.15s; }
+  .bm-card:hover { border-color: var(--yellow-dark); box-shadow: 0 2px 8px rgba(255,193,7,0.15); }
+  .bm-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px solid var(--gray-light); padding-bottom: 6px; }
+  .bm-card-title { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; color: var(--black); line-height: 1.3; flex: 1; }
+  .bm-card-price { font-family: 'Roboto Mono', monospace; font-size: 12px; font-weight: 700; color: var(--yellow-dark); background: var(--black); padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+  .bm-card-cat { font-family: 'Roboto Condensed', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--gray-mid); letter-spacing: 0.5px; }
+  .bm-card-desc { font-family: 'Roboto', sans-serif; font-size: 11px; color: var(--gray-dark); line-height: 1.4; }
+  .bm-card-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+  .bm-tag { font-family: 'Roboto Condensed', sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; background: var(--gray-light); color: var(--gray-dark); }
+  .bm-tag.essence { background: #ffebee; color: #c62828; }
+  .bm-tag.prereq { background: #e3f2fd; color: #1565c0; }
+  .bm-tag.type { background: #f3e5f5; color: #6a1b9a; }
+  .bm-tag.score { background: #e8f5e9; color: #2e7d32; }
+
+  .bm-empty { text-align: center; padding: 40px; font-family: 'Oswald', sans-serif; font-size: 16px; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 1px; grid-column: 1 / -1; }
+
+  .bm-tatouage-btn { font-family: 'Roboto Condensed', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 10px; border: 1.5px solid #ff9800; border-radius: 20px; background: #fff3e0; color: #e65100; cursor: pointer; transition: all 0.15s; align-self: flex-start; margin-top: 4px; }
+  .bm-tatouage-btn:hover { background: #ffe0b2; }
+  .bm-tatouage-btn.active { background: #e65100; border-color: #bf360c; color: #fff; }
+
+  @media (max-width: 900px) { .bm-page { width: 100%; padding: 8mm; } .bm-grid { grid-template-columns: 1fr; } }
+  @media print { body { background: white; padding: 0; } .bm-page { box-shadow: none; margin: 0; width: 210mm; } .toolbar, .bm-filters, .bm-subcats { display: none; } }
+
+/* ====== BOUTON PIMP MY RIDE ====== */
+.pimp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #7B1FA2 0%, #4A148C 100%);
+  color: white;
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 14px;
+  border: 2px solid #4A148C;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+.pimp-btn:hover {
+  background: linear-gradient(135deg, #8E24AA 0%, #6A1B9A 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(123, 31, 162, 0.4);
+}
+.pimp-btn:active {
+  transform: translateY(0);
+}
+.pimp-btn .pimp-icon {
+  font-size: 14px;
+}
+
+/* ====== MODAL PIMP MY RIDE ====== */
+.pimp-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.pimp-modal {
+  background: #FFFFFF;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 85vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+}
+.pimp-modal-header {
+  background: linear-gradient(135deg, #7B1FA2 0%, #4A148C 100%);
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pimp-modal-header h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+}
+.pimp-modal-header .pimp-close {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.pimp-modal-header .pimp-close:hover {
+  background: rgba(255,255,255,0.4);
+}
+.pimp-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+.pimp-modal-footer {
+  padding: 12px 24px;
+  background: #E0E0E0;
+  border-top: 2px solid #9E9E9E;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pimp-vehicle-info {
+  background: #F3E5F5;
+  border: 2px solid #CE93D8;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.pimp-vehicle-info .pimp-vehicle-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #4A148C;
+  text-transform: uppercase;
+}
+.pimp-vehicle-info .pimp-vehicle-type {
+  font-size: 12px;
+  color: #7B1FA2;
+  margin-top: 4px;
+}
+
+/* ====== LISTE DES UPGRADES ====== */
+.pimp-upgrade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pimp-upgrade-item {
+  background: #E0E0E0;
+  border: 2px solid #9E9E9E;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.pimp-upgrade-item:hover {
+  border-color: #7B1FA2;
+  background: #F3E5F5;
+}
+.pimp-upgrade-item.selected {
+  border-color: #7B1FA2;
+  background: #F3E5F5;
+  outline: 2px solid #4A148C;
+  outline-offset: -2px;
+}
+.pimp-upgrade-item .pimp-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #9E9E9E;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.15s;
+}
+.pimp-upgrade-item.selected .pimp-checkbox {
+  background: #7B1FA2;
+  border-color: #7B1FA2;
+}
+.pimp-upgrade-item.selected .pimp-checkbox::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+.pimp-upgrade-content {
+  flex: 1;
+  min-width: 0;
+}
+.pimp-upgrade-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #212121;
+  margin-bottom: 4px;
+}
+.pimp-upgrade-cost {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 11px;
+  color: #E5AC00;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.pimp-upgrade-desc {
+  font-size: 11px;
+  color: #424242;
+  line-height: 1.4;
+}
+.pimp-upgrade-negative {
+  color: #388E3C;
+  font-weight: 700;
+}
+
+/* ====== UPGRADES APPLIQUÉES (affichage compact) ====== */
+.pimp-applied {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #9E9E9E;
+}
+.pimp-applied-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #7B1FA2;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.pimp-applied-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.pimp-applied-tag {
+  background: #F3E5F5;
+  color: #4A148C;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #CE93D8;
+}
+.pimp-applied-tag .pimp-remove {
+  margin-left: 4px;
+  cursor: pointer;
+  color: #D32F2F;
+  font-weight: 700;
+}
+.pimp-applied-tag .pimp-remove:hover {
+  color: #B71C1C;
+}
+
+/* ====== LISTE DÉTAILLÉE DES UPGRADES (copiable) ====== */
+.pimp-applied-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.pimp-applied-item {
+  background: #F3E5F5;
+  border: 1px solid #CE93D8;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+.pimp-applied-item-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4A148C;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.pimp-applied-item-cost {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 10px;
+  color: #E5AC00;
+  background: #212121;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+.pimp-applied-item-desc {
+  font-size: 11px;
+  color: #424242;
+  line-height: 1.5;
+}
+
+/* ====== LISTE DÉTAILLÉE DES UPGRADES (copiable) ====== *
+
+/* ====== BARRE DE COÛT PIMP MY RIDE ====== */
+.pimp-cost-bar {
+  background: #E0E0E0;
+  border: 2px solid #9E9E9E;
+  border-radius: 8px;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.pimp-cost-bar .pimp-cost-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.pimp-cost-bar .pimp-cost-value {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #7B1FA2;
+}
+
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="index.html" class="toolbar-btn" style="font-weight: bold;">Fiche</a>
+  <div style="flex:1;"></div>
+  <span id="bm-nuyen-display" style="color:var(--yellow);font-family:'Roboto Mono',monospace;font-size:13px;font-weight:700;margin-right:12px;display:none;"></span>
+  <span style="color:var(--yellow);font-family:'Oswald',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:1px;">Black Market</span>
+  <div style="flex:1;"></div>
+</div>
+
+<div class="bm-page">
+  <div class="bm-header">
+    <h1>Black <span>Market</span></h1>
+    <p>Catalogue complet — Prix en Nuyen uniquement</p>
+  </div>
+
+  <div class="bm-filters">
+    <input type="text" class="bm-search" id="bm-search" placeholder="Rechercher...">
+    <select class="bm-select" id="bm-maincat">
+      <option value="">— Toutes les boutiques —</option>
+    </select>
+    <span class="bm-count" id="bm-count">Chargement...</span>
+  </div>
+
+  <div class="bm-subcats" id="bm-subcats"></div>
+  <div id="bm-content"></div>
+</div>
+<script src="assets/JS/shadowrun-matos-2.0.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ===== FOCUS TATOUABLES =====
+  var FOCUS_TATOUABLES = [
+    "Focus du feu majeur", "Focus sorcier", "Focus d'illusion majeur",
+    "Focus de conjuration", "Focus de manipulation", "Focus de contresort",
+    "Focus des bêtes", "Focus de bannissement", "Focus de contrôle",
+    "Focus de détection mineur", "Focus de maintien", "Focus de l'air mineur"
+  ];
+
+  // ===== DONNÉES ARMURE (hardcodées) =====
+  var ARMURE_DATA = [
+    { nom: "Vêtements pare-balles légers", prix: "2 500¥", score: "1", desc: "Armure légère" },
+    { nom: "Vêtements pare-balles avec manteau", prix: "5 000¥", score: "2", desc: "Armure légère avec manteau" },
+    { nom: "Protections légères", prix: "7 500¥", score: "3", desc: "gilet pare-balles, veste pare-balles, manteau renforcé, etc." },
+    { nom: "Armure intégrales", prix: "10 000¥", score: "4", desc: "gilet pare-balles complet, blindage SWAT, etc." },
+    { nom: "Armure militaire", prix: "12 500¥", score: "5", desc: "Armure militaire" },
+    { nom: "Bouclier balistique", prix: "2 500¥", score: "+1", desc: "S'ajoute à l'armure" },
+    { nom: "Casque Masque balistique", prix: "2 500¥", score: "+1", desc: "N'a aucun effet significatif si le personnage porte déjà une protection légère ou supérieure (3+)" },
+    { nom: "Costume Actioneer", prix: "12 500¥", score: "1", desc: "RR 1 Influence (étiquette)" },
+    { nom: "Costume ou robe Armante", prix: "37 500¥", score: "1", desc: "RR 1 Influence, RR 1 Influence (étiquette)" },
+    { nom: "Combinaison NBC", prix: "7 500¥", score: "1", desc: "Protège contre les risques NBC. Permet de respirer dans des environnements toxiques." },
+    { nom: "Combinaison de camouflage", prix: "17 500¥", score: "3", desc: "RR 2 Furtivité (discrétion physique)" },
+    { nom: "Combinaison caméléon", prix: "27 500¥", score: "3", desc: "RR 1 Furtivité (discrétion physique)" },
+    { nom: "SecureTech Invisi-shield", prix: "7 500¥", score: "+1", desc: "Armure moulante qui se cumule à une armure." },
+    { nom: "Zoé seconde peau", prix: "27 500¥", score: "+1", desc: "Armure moulante qui se cumule à une armure. Recouvert de ruthénium : RR 2 Furtivité (discrétion physique) si portée seul." }
+  ];
+
+  // ===== MAPPING DES BOUTIQUES =====
+  var CATEGORY_MAP = {
+    "Faire un tour chez le charcudoc": {
+      sections: ["2_cephaloware","3_cyberyeux","4_cyberoreilles","5_somatoware","6_bioware"],
+      subcats: {
+        "Cyberware": ["2_cephaloware","3_cyberyeux","4_cyberoreilles","5_somatoware"],
+        "Bioware": ["6_bioware"]
+      }
+    },
+    "Matos de decker": {
+      sections: ["7_cyberdek","10_programmes_illegaux","31_ccr"],
+      subcats: {
+        "Cyberdecks": ["7_cyberdek"],
+        "Programmes": ["10_programmes_illegaux"],
+        "CCR": ["31_ccr"]
+      }
+    },
+    "Matos": {
+      sections: ["8_equipement"],
+      subcats: {
+        "Infiltration": ["8_equipement"],
+        "Surveillance": ["8_equipement"],
+        "Drogues chimiques": ["8_equipement"],
+        "Drogues éveillées": ["8_equipement"],
+        "Drogues BTL": ["8_equipement"],
+        "Medtech": ["8_equipement"],
+        "Matériel magique": ["8_equipement"]
+      },
+      filterByField: "Catégorie"
+    },
+    "Cracheur": {
+      sections: ["33_arme","34_améliorationarme"],
+      subcats: {}, // dynamique selon le champ Catégorie
+      dynamicSubcatField: "Catégorie"
+    },
+    "Les fringues": {
+      hardcoded: ARMURE_DATA,
+      subcats: { "Armures": true }
+    },
+    "Véhicules": {
+      sections: ["22_deux_roues","23_voitures","24_vehicules_divers"],
+      subcats: {
+        "Deux roues": ["22_deux_roues"],
+        "Voitures": ["23_voitures"],
+        "Véhicules divers": ["24_vehicules_divers"]
+      }
+    },
+    "Drones": {
+      sections: ["25_microdrones","26_minidrones","27_petits_drones","28_drones_moyens","29_grands_drones","30_drones_anthropomorphes"],
+      subcats: {
+        "Microdrones": ["25_microdrones"],
+        "Minidrones": ["26_minidrones"],
+        "Petits drones": ["27_petits_drones"],
+        "Drones moyens": ["28_drones_moyens"],
+        "Grands drones": ["29_grands_drones"],
+        "Drones anthropomorphes": ["30_drones_anthropomorphes"]
+      }
+    },
+    "Formation": {
+      sections: ["1_traits"],
+      subcats: { "Traits": ["1_traits"] }
+    },
+    "Technomancien": {
+      sections: ["11_constructs","12_formes_complexes"],
+      subcats: {
+        "Constructs": ["11_constructs"],
+        "Formes complexes": ["12_formes_complexes"]
+      }
+    },
+    "Loge des arcanes": {
+      sections: ["16_idoles","17_sorts_combat","18_sorts_detection","19_sorts_sante","20_sorts_illusion","21_sorts_manipulation","14_pouvoirs_adepte","15_voies_adepte","13_materiel_magique"],
+      subcats: {
+        "Idoles": ["16_idoles"],
+        "Sorts de combat": ["17_sorts_combat"],
+        "Sorts de détection": ["18_sorts_detection"],
+        "Sorts de santé": ["19_sorts_sante"],
+        "Sorts d'illusion": ["20_sorts_illusion"],
+        "Sorts de manipulation": ["21_sorts_manipulation"],
+        "Pouvoirs d'adepte": ["14_pouvoirs_adepte"],
+        "Voies d'adepte": ["15_voies_adepte"],
+        "Matériel magique": ["13_materiel_magique"]
+      }
+    }
+  };
+  // Affichage des Nuyen transmis depuis la fiche
+  var urlParams = new URLSearchParams(window.location.search);
+  var nuyenParam = urlParams.get('nuyen');
+  if (nuyenParam) {
+    var nuyenDisplay = document.getElementById('bm-nuyen-display');
+    if (nuyenDisplay) {
+      var formatted = parseInt(nuyenParam, 10).toLocaleString('fr-FR') + ' ¥';
+      nuyenDisplay.textContent = formatted;
+      nuyenDisplay.style.display = 'inline';
+    }
+  }
+  // ===== HELPERS =====
+  function norm(str) {
+    if (!str) return '';
+    return str.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u030f]/g, '');
+  }
+  function esc(text) {
+    if (!text) return '';
+    var d = document.createElement('div'); d.textContent = text; return d.innerHTML;
+  }
+  function parseYen(yenStr) {
+    if (!yenStr) return null;
+    var n = parseInt(yenStr.replace(/[^0-9]/g, ''), 10);
+    return isNaN(n) ? null : n;
+  }
+
+  // ===== EXTRACTION =====
+  var allItems = [];
+  var dynamicSubcats = {}; // mainCat -> Set de sous-catégories découvertes
+
+  if (typeof SHADOWRUN_GEAR === 'undefined') {
+    document.getElementById('bm-content').innerHTML = '<div class="bm-empty">Erreur : shadowrun-matos-2.0.js non chargé</div>';
+    return;
+  }
+
+  var nextId = 0;
+
+  for (var mainCat in CATEGORY_MAP) {
+    if (!CATEGORY_MAP.hasOwnProperty(mainCat)) continue;
+    var cfg = CATEGORY_MAP[mainCat];
+    dynamicSubcats[mainCat] = new Set();
+
+    // Données hardcodées (armures)
+    if (cfg.hardcoded) {
+      cfg.hardcoded.forEach(function(raw) {
+        allItems.push({
+          id: nextId++,
+          mainCat: mainCat,
+          subCat: "Armures",
+          nom: raw.nom,
+          prix: raw.prix,
+          prixNum: parseYen(raw.prix),
+          desc: raw.desc,
+          prerequis: '',
+          essence: '',
+          type: '',
+          seuil: '',
+          score: raw.score
+        });
+        dynamicSubcats[mainCat].add("Armures");
+      });
+      continue;
+    }
+
+    // Données du fichier JS
+    cfg.sections.forEach(function(secKey) {
+      var sec = SHADOWRUN_GEAR[secKey];
+      if (!sec || !sec.donnees) return;
+      sec.donnees.forEach(function(raw) {
+        var yenStr = raw.COUT_Yen || raw['COUT_Yen'] || '';
+        if (!yenStr.toString().trim()) return;
+
+        var subCat = null;
+        if (cfg.dynamicSubcatField && raw[cfg.dynamicSubcatField]) {
+          subCat = raw[cfg.dynamicSubcatField];
+        } else if (cfg.filterByField && raw[cfg.filterByField]) {
+          subCat = raw[cfg.filterByField];
+        } else {
+          for (var sc in cfg.subcats) {
+            if (cfg.subcats[sc].indexOf(secKey) !== -1) { subCat = sc; break; }
+          }
+        }
+        if (!subCat) subCat = sec.nom || secKey;
+
+        // Exclure Munitions et Accessoires (gérés par le système d'améliorations d'armes)
+        var subCatNorm = norm(subCat);
+        if (subCatNorm === 'munitions' || subCatNorm === 'accessoires' || 
+            subCatNorm === 'munition' || subCatNorm === 'accessoire') return;
+
+        dynamicSubcats[mainCat].add(subCat);
+
+        var item = {
+          id: nextId++,
+          mainCat: mainCat,
+          subCat: subCat,
+          sectionKey: secKey,
+          nom: raw.Atout || raw.Nom || 'Sans nom',
+          prix: yenStr.toString().trim(),
+          prixNum: parseYen(yenStr),
+          desc: raw.EFFETS || raw.Description || '',
+          prerequis: raw.Pré_requis || raw['Pré-requis'] || '',
+          essence: raw.Perte_essence || '',
+          type: raw.Type || '',
+          seuil: raw.Seuil || ''
+        };
+
+        if (secKey === '33_arme') {
+          item.ameliorable = String(raw.amélioraion || '').toUpperCase() === 'OUI';
+        }
+
+        if (secKey === "13_materiel_magique") {
+          var focusName = raw.Atout || raw.Nom || '';
+          if (FOCUS_TATOUABLES.indexOf(focusName) !== -1) {
+            item.isFocus = true;
+            item.basePrixNum = item.prixNum;
+          }
+        }
+
+        allItems.push(item);
+      });
+    });
+  }
+
+  // Trier par prix décroissant
+  allItems.sort(function(a,b){ return (b.prixNum||0) - (a.prixNum||0); });
+
+  // ===== UI =====
+  var searchInput = document.getElementById('bm-search');
+  var mainSelect = document.getElementById('bm-maincat');
+  var subcatsDiv = document.getElementById('bm-subcats');
+  var contentDiv = document.getElementById('bm-content');
+  var countLabel = document.getElementById('bm-count');
+  var activeSubcat = '';
+
+  Object.keys(CATEGORY_MAP).forEach(function(cat) {
+    var opt = document.createElement('option');
+    opt.value = cat; opt.textContent = cat;
+    mainSelect.appendChild(opt);
+  });
+
+  
+  // ===== PIMP MY RIDE =====
+  var PIMP_ELIGIBLE_SECTIONS = ['22_deux_roues','23_voitures','24_vehicules_divers','25_microdrones','26_minidrones','27_petits_drones','28_drones_moyens','29_grands_drones','30_drones_anthropomorphes'];
+
+  function isPimpEligible(item) {
+    return item.sectionKey && PIMP_ELIGIBLE_SECTIONS.indexOf(item.sectionKey) !== -1;
+  }
+
+  function getPimpUpgrades() {
+    if (typeof SHADOWRUN_GEAR === 'undefined' || !SHADOWRUN_GEAR['32_pimpmyride']) return [];
+    return SHADOWRUN_GEAR['32_pimpmyride'].donnees || [];
+  }
+
+  function getVehicleUpgrades(itemId) {
+    var item = null;
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i].id === itemId) { item = allItems[i]; break; }
+    }
+    return item && item.upgrades ? item.upgrades : [];
+  }
+
+  function calculateVehicleUpgradeCost(itemId) {
+    var upgrades = getVehicleUpgrades(itemId);
+    var allUpgrades = getPimpUpgrades();
+    var total = 0;
+    upgrades.forEach(function(upgIdx) {
+      var upg = allUpgrades[upgIdx];
+      if (!upg) return;
+      var nuyenStr = String(upg.COUT_Yen || '').replace(/[^0-9]/g, '');
+      var val = parseInt(nuyenStr) || 0;
+      total += val;
+    });
+    return total;
+  }
+
+  function openPimpModal(itemId) {
+    var item = null;
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i].id === itemId) { item = allItems[i]; break; }
+    }
+    if (!item || !isPimpEligible(item)) return;
+
+    var upgrades = getPimpUpgrades();
+    var appliedUpgrades = getVehicleUpgrades(itemId);
+    var currentCost = calculateVehicleUpgradeCost(itemId);
+
+    var modalHtml = '<div class="pimp-modal-overlay" id="pimpModalOverlay" onclick="if(event.target===this)closePimpModal()">' +
+      '<div class="pimp-modal">' +
+        '<div class="pimp-modal-header">' +
+          '<h3>Pimp My Ride — ' + esc(item.nom) + '</h3>' +
+          '<button class="pimp-close" onclick="closePimpModal()">×</button>' +
+        '</div>' +
+        '<div class="pimp-modal-body">' +
+          '<div class="pimp-vehicle-info">' +
+            '<div class="pimp-vehicle-name">' + esc(item.nom) + '</div>' +
+            '<div class="pimp-vehicle-type">' + esc(item.subCat) + ' — ' + esc(item.mainCat) + '</div>' +
+          '</div>' +
+          '<div class="pimp-cost-bar">' +
+            '<span class="pimp-cost-label">Coût upgrades: ' + currentCost.toLocaleString('fr-FR') + ' ¥</span>' +
+            '<span class="pimp-cost-value">' + appliedUpgrades.length + ' upgrade' + (appliedUpgrades.length !== 1 ? 's' : '') + '</span>' +
+          '</div>' +
+          '<div class="pimp-upgrade-list">';
+
+    upgrades.forEach(function(upg, idx) {
+      var isSelected = appliedUpgrades.indexOf(idx) !== -1;
+      var nuyenStr = String(upg.COUT_Yen || '').replace(/[^0-9]/g, '');
+      var nuyenVal = parseInt(nuyenStr) || 0;
+      var costDisplay = nuyenVal > 0 ? '+' + nuyenVal.toLocaleString('fr-FR') + ' ¥' : (nuyenVal < 0 ? nuyenVal.toLocaleString('fr-FR') + ' ¥' : '0 ¥');
+      var negativeClass = nuyenVal < 0 ? 'pimp-upgrade-negative' : '';
+
+      modalHtml += '<div class="pimp-upgrade-item ' + (isSelected ? 'selected' : '') + '" onclick="togglePimpUpgrade(' + itemId + ', ' + idx + ')">' +
+        '<div class="pimp-checkbox"></div>' +
+        '<div class="pimp-upgrade-content">' +
+          '<div class="pimp-upgrade-name">' + esc(upg.Atout || upg.Nom || 'Upgrade') + '</div>' +
+          '<div class="pimp-upgrade-cost ' + negativeClass + '">' + costDisplay + '</div>' +
+          '<div class="pimp-upgrade-desc">' + esc(upg.EFFETS || 'Pas de description') + '</div>' +
+        '</div>' +
+      '</div>';
+    });
+
+    modalHtml += '</div></div>' +
+        '<div class="pimp-modal-footer">' +
+          '<span style="font-size:12px;color:#424242;">' + upgrades.length + ' modification' + (upgrades.length !== 1 ? 's' : '') + ' disponible' + (upgrades.length !== 1 ? 's' : '') + '</span>' +
+          '<button class="pimp-btn" style="background:#7B1FA2;color:white;border-color:#4A148C;" onclick="closePimpModal()">Fermer</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    var existingModal = document.getElementById('pimpModalOverlay');
+    if (existingModal) existingModal.remove();
+
+    var modalDiv = document.createElement('div');
+    modalDiv.innerHTML = modalHtml;
+    document.body.appendChild(modalDiv.firstElementChild);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePimpModal() {
+    var modal = document.getElementById('pimpModalOverlay');
+    if (modal) {
+      modal.remove();
+      document.body.style.overflow = '';
+    }
+    render();
+  }
+
+  function togglePimpUpgrade(itemId, upgradeIdx) {
+    var item = null;
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i].id === itemId) { item = allItems[i]; break; }
+    }
+    if (!item) return;
+    if (!item.upgrades) item.upgrades = [];
+
+    var idx = item.upgrades.indexOf(upgradeIdx);
+    if (idx >= 0) {
+      item.upgrades.splice(idx, 1);
+    } else {
+      item.upgrades.push(upgradeIdx);
+    }
+    openPimpModal(itemId);
+  }
+
+  function renderPimpButton(itemId) {
+    var upgrades = getVehicleUpgrades(itemId);
+    var count = upgrades.length;
+    return '<button class="pimp-btn" onclick="event.stopPropagation(); openPimpModal(' + itemId + ');">' +
+      '<span class="pimp-icon">⚙️</span>' +
+      '<span>Pimp My Ride' + (count > 0 ? ' (' + count + ')' : '') + '</span>' +
+    '</button>';
+  }
+
+  function renderAppliedUpgrades(itemId) {
+    var upgrades = getVehicleUpgrades(itemId);
+    if (upgrades.length === 0) return '';
+
+    var allUpgrades = getPimpUpgrades();
+
+    var html = '<div class="pimp-applied">' +
+      '<div class="pimp-applied-label">⚙️ Modifications appliquées</div>' +
+      '<div class="pimp-applied-list">';
+
+    upgrades.forEach(function(upgIdx) {
+      var upg = allUpgrades[upgIdx];
+      if (!upg) return;
+      var nuyenStr = String(upg.COUT_Yen || '').replace(/[^0-9]/g, '');
+      var nuyenVal = parseInt(nuyenStr) || 0;
+      var costDisplay = nuyenVal > 0 ? '+' + nuyenVal.toLocaleString('fr-FR') + ' ¥' : (nuyenVal < 0 ? nuyenVal.toLocaleString('fr-FR') + ' ¥' : '');
+      html += '<div class="pimp-applied-item">' +
+        '<div class="pimp-applied-item-name">' + esc(upg.Atout || upg.Nom || 'Upgrade') +
+        (costDisplay ? ' <span class="pimp-applied-item-cost">' + costDisplay + '</span>' : '') +
+        ' <span class="pimp-remove" onclick="event.stopPropagation(); window.removePimpUpgrade(' + itemId + ', ' + upgIdx + ')" title="Retirer">×</span></div>' +
+        '<div class="pimp-applied-item-desc">' + esc(upg.EFFETS || upg.Description || 'Pas de description') + '</div>' +
+      '</div>';
+    });
+
+    html += '</div></div>';
+    return html;
+  }
+
+  function removePimpUpgrade(itemId, upgradeIdx) {
+    var item = null;
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i].id === itemId) { item = allItems[i]; break; }
+    }
+    if (!item || !item.upgrades) return;
+    var idx = item.upgrades.indexOf(upgradeIdx);
+    if (idx >= 0) {
+      item.upgrades.splice(idx, 1);
+      render();
+    }
+  }
+
+
+
+  // ===== AMÉLIORATIONS D'ARMES (cat 34) =====
+  function isArmeAmeliorable(item) {
+    return item.sectionKey === '33_arme' && item.ameliorable === true;
+  }
+
+  function getArmeUpgrades() {
+    if (typeof SHADOWRUN_GEAR === 'undefined' || !SHADOWRUN_GEAR['34_améliorationarme']) return [];
+    return SHADOWRUN_GEAR['34_améliorationarme'].donnees || [];
+  }
+
+  function getArmeAppliedUpgrades(itemId) {
+    var item = null;
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i].id === itemId) { item = allItems[i]; break; }
+    }
+    return item && item.ameliorations ? item.ameliorations : [];
+  }
+
+  function calculateArmeUpgradeCost(itemId) {
+    var upgrades = getArmeAppliedUpgrades(itemId);
+    var allUpgrades = getArmeUpgrades();
+    var total = 0;
+    upgrades.forEach(function(upgIdx) {
+      var upg = allUpgrades[upgIdx];
+      if (!upg) return;
+      var nuyenStr = String(upg.COUT_Yen || '').replace(/[^0-9]/g, '');
+      var val = parseInt(nuyenStr) || 0;
+      total += val;
+    });
+    return total;
+  }
+
+  function openArmeUpgradeModal(itemId) {
+    var item = null;
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i].id === itemId) { item = allItems[i]; break; }
+    }
+    if (!item || !isArmeAmeliorable(item)) return;
+
+    var upgrades = getArmeUpgrades();
+    var appliedUpgrades = getArmeAppliedUpgrades(itemId);
+    var currentCost = calculateArmeUpgradeCost(itemId);
+
+    var modalHtml = '<div class="pimp-modal-overlay" id="armeUpgradeModalOverlay" onclick="if(event.target===this)closeArmeUpgradeModal()">' +
+      '<div class="pimp-modal">' +
+        '<div class="pimp-modal-header" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);">' +
+          '<h3>Améliorations — ' + esc(item.nom) + '</h3>' +
+          '<button class="pimp-close" onclick="closeArmeUpgradeModal()">×</button>' +
+        '</div>' +
+        '<div class="pimp-modal-body">' +
+          '<div class="pimp-vehicle-info" style="background: #FFEBEE; border-color: #EF9A9A;">' +
+            '<div class="pimp-vehicle-name" style="color: #B71C1C;">' + esc(item.nom) + '</div>' +
+            '<div class="pimp-vehicle-type">' + esc(item.subCat) + ' — ' + esc(item.desc) + '</div>' +
+          '</div>' +
+          '<div class="pimp-cost-bar" style="border-color: #EF9A9A;">' +
+            '<span class="pimp-cost-label" style="color: #B71C1C;">Coût améliorations: ' + currentCost.toLocaleString('fr-FR') + ' ¥</span>' +
+            '<span class="pimp-cost-value" style="color: #B71C1C;">' + appliedUpgrades.length + ' amélioration' + (appliedUpgrades.length !== 1 ? 's' : '') + '</span>' +
+          '</div>' +
+          '<div class="pimp-upgrade-list">';
+
+    upgrades.forEach(function(upg, idx) {
+      var isSelected = appliedUpgrades.indexOf(idx) !== -1;
+      var nuyenStr = String(upg.COUT_Yen || '').replace(/[^0-9]/g, '');
+      var nuyenVal = parseInt(nuyenStr) || 0;
+      var costDisplay = nuyenVal > 0 ? '+' + nuyenVal.toLocaleString('fr-FR') + ' ¥' : (nuyenVal < 0 ? nuyenVal.toLocaleString('fr-FR') + ' ¥' : '0 ¥');
+      var negativeClass = nuyenVal < 0 ? 'pimp-upgrade-negative' : '';
+
+      modalHtml += '<div class="pimp-upgrade-item ' + (isSelected ? 'selected' : '') + '" onclick="toggleArmeUpgrade(' + itemId + ', ' + idx + ')">' +
+        '<div class="pimp-checkbox"></div>' +
+        '<div class="pimp-upgrade-content">' +
+          '<div class="pimp-upgrade-name">' + esc(upg.Atout || upg.Nom || 'Amélioration') + '</div>' +
+          '<div class="pimp-upgrade-cost ' + negativeClass + '">' + costDisplay + '</div>' +
+          '<div class="pimp-upgrade-desc">' + esc(upg.EFFETS || 'Pas de description') + '</div>' +
+        '</div>' +
+      '</div>';
+    });
+
+    modalHtml += '</div></div>' +
+        '<div class="pimp-modal-footer">' +
+          '<span style="font-size:12px;color:#424242;">' + upgrades.length + ' amélioration' + (upgrades.length !== 1 ? 's' : '') + ' disponible' + (upgrades.length !== 1 ? 's' : '') + '</span>' +
+          '<button class="pimp-btn" style="background:#D32F2F;color:white;border-color:#B71C1C;" onclick="closeArmeUpgradeModal()">Fermer</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    var existingModal = document.getElementById('armeUpgradeModalOverlay');
+    if (existingModal) existingModal.remove();
+
+    var modalDiv = document.createElement('div');
+    modalDiv.innerHTML = modalHtml;
+    document.body.appendChild(modalDiv.firstElementChild);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeArmeUpgradeModal() {
+    var modal = document.getElementById('armeUpgradeModalOverlay');
+    if (modal) {
+      modal.remove();
+      document.body.style.overflow = '';
+    }
+    render();
+  }
+
+  function toggleArmeUpgrade(itemId, upgradeIdx) {
+    var item = null;
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i].id === itemId) { item = allItems[i]; break; }
+    }
+    if (!item) return;
+    if (!item.ameliorations) item.ameliorations = [];
+
+    var idx = item.ameliorations.indexOf(upgradeIdx);
+    if (idx >= 0) {
+      item.ameliorations.splice(idx, 1);
+    } else {
+      item.ameliorations.push(upgradeIdx);
+    }
+    openArmeUpgradeModal(itemId);
+  }
+
+  function renderArmeUpgradeButton(itemId) {
+    var upgrades = getArmeAppliedUpgrades(itemId);
+    var count = upgrades.length;
+    return '<button class="pimp-btn" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%); border-color: #B71C1C;" onclick="event.stopPropagation(); window.openArmeUpgradeModal(' + itemId + ');">' +
+      '<span>⚙️</span>' +
+      '<span>Améliorer' + (count > 0 ? ' (' + count + ')' : '') + '</span>' +
+    '</button>';
+  }
+
+  function renderAppliedArmeUpgrades(itemId) {
+    var upgrades = getArmeAppliedUpgrades(itemId);
+    if (upgrades.length === 0) return '';
+
+    var allUpgrades = getArmeUpgrades();
+
+    var html = '<div class="pimp-applied">' +
+      '<div class="pimp-applied-label" style="color: #B71C1C;">⚙️ Améliorations appliquées</div>' +
+      '<div class="pimp-applied-list">';
+
+    upgrades.forEach(function(upgIdx) {
+      var upg = allUpgrades[upgIdx];
+      if (!upg) return;
+      var nuyenStr = String(upg.COUT_Yen || '').replace(/[^0-9]/g, '');
+      var nuyenVal = parseInt(nuyenStr) || 0;
+      var costDisplay = nuyenVal > 0 ? '+' + nuyenVal.toLocaleString('fr-FR') + ' ¥' : (nuyenVal < 0 ? nuyenVal.toLocaleString('fr-FR') + ' ¥' : '');
+      html += '<div class="pimp-applied-item" style="background: #FFEBEE; border-color: #EF9A9A;">' +
+        '<div class="pimp-applied-item-name" style="color: #B71C1C;">' + esc(upg.Atout || upg.Nom || 'Amélioration') +
+        (costDisplay ? ' <span class="pimp-applied-item-cost">' + costDisplay + '</span>' : '') +
+        ' <span class="pimp-remove" onclick="event.stopPropagation(); window.removeArmeUpgrade(' + itemId + ', ' + upgIdx + ')" title="Retirer">×</span></div>' +
+        '<div class="pimp-applied-item-desc">' + esc(upg.EFFETS || 'Pas de description') + '</div>' +
+      '</div>';
+    });
+
+    html += '</div></div>';
+    return html;
+  }
+
+  function removeArmeUpgrade(itemId, upgradeIdx) {
+    var item = null;
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i].id === itemId) { item = allItems[i]; break; }
+    }
+    if (!item || !item.ameliorations) return;
+    var idx = item.ameliorations.indexOf(upgradeIdx);
+    if (idx >= 0) {
+      item.ameliorations.splice(idx, 1);
+      render();
+    }
+  }
+
+  function renderSubcats(mainCat) {
+    subcatsDiv.innerHTML = '';
+    activeSubcat = '';
+    if (!mainCat) return;
+
+    var allBtn = document.createElement('button');
+    allBtn.className = 'bm-subcat-btn active';
+    allBtn.textContent = 'Tout';
+    allBtn.onclick = function() { activeSubcat = ''; updateActiveSubcat(); render(); };
+    subcatsDiv.appendChild(allBtn);
+
+    var cats = dynamicSubcats[mainCat] || new Set();
+    // Ajouter aussi les subcats statiques définies dans le mapping
+    var cfg = CATEGORY_MAP[mainCat];
+    if (cfg && cfg.subcats) {
+      Object.keys(cfg.subcats).forEach(function(sc) { cats.add(sc); });
+    }
+
+    Array.from(cats).sort().forEach(function(sc) {
+      var btn = document.createElement('button');
+      btn.className = 'bm-subcat-btn';
+      btn.textContent = sc;
+      btn.onclick = function() { activeSubcat = sc; updateActiveSubcat(); render(); };
+      subcatsDiv.appendChild(btn);
+    });
+  }
+
+  function updateActiveSubcat() {
+    var btns = subcatsDiv.querySelectorAll('.bm-subcat-btn');
+    btns.forEach(function(b) {
+      b.classList.toggle('active', (activeSubcat === '' && b.textContent === 'Tout') || b.textContent === activeSubcat);
+    });
+  }
+
+  function buildCard(item) {
+    var meta = '';
+    if (item.essence) meta += '<span class="bm-tag essence">Essence ' + esc(item.essence) + '</span>';
+    if (item.prerequis) meta += '<span class="bm-tag prereq">' + esc(item.prerequis) + '</span>';
+    if (item.type) meta += '<span class="bm-tag type">' + esc(item.type) + (item.seuil ? ' | Seuil ' + esc(item.seuil) : '') + '</span>';
+    if (item.score) meta += '<span class="bm-tag score">Armure ' + esc(item.score) + '</span>';
+
+    var tatouageBtn = '';
+    if (item.isFocus) {
+      var isActive = item.tatouageActive;
+      var btnClass = isActive ? 'bm-tatouage-btn active' : 'bm-tatouage-btn';
+      var btnLabel = isActive ? 'Tatouage ✓ (+15 000¥)' : 'Tatouage +15 000¥';
+      tatouageBtn = '<button class="' + btnClass + '" data-id="' + item.id + '">' + btnLabel + '</button>';
+    }
+
+    var pimpBtn = '';
+    var appliedUpgrades = '';
+    if (isPimpEligible(item)) {
+      pimpBtn = renderPimpButton(item.id);
+      appliedUpgrades = renderAppliedUpgrades(item.id);
+    }
+
+    var armeBtn = '';
+    var armeUpgrades = '';
+    if (isArmeAmeliorable(item)) {
+      armeBtn = renderArmeUpgradeButton(item.id);
+      armeUpgrades = renderAppliedArmeUpgrades(item.id);
+    }
+
+    // Prix avec upgrades (Pimp My Ride + Améliorations d'armes)
+    var prixTotal = item.prixNum || 0;
+    if (isPimpEligible(item)) {
+      prixTotal += calculateVehicleUpgradeCost(item.id);
+    }
+    if (isArmeAmeliorable(item)) {
+      prixTotal += calculateArmeUpgradeCost(item.id);
+    }
+    var prixDisplay = prixTotal > 0 ? prixTotal.toLocaleString('fr-FR') + '¥' : item.prix;
+
+    return '<div class="bm-card">' +
+      '<div class="bm-card-header"><div class="bm-card-title">' + esc(item.nom) + '</div><div class="bm-card-price">' + esc(prixDisplay) + '</div></div>' +
+      '<div class="bm-card-cat">' + esc(item.subCat) + '</div>' +
+      '<div class="bm-card-desc">' + esc(item.desc) + '</div>' +
+      (meta ? '<div class="bm-card-meta">' + meta + '</div>' : '') +
+      tatouageBtn +
+      pimpBtn +
+      appliedUpgrades +
+      armeBtn +
+      armeUpgrades +
+      '</div>';
+  }
+
+  function render() {
+    var q = norm(searchInput.value);
+    var mainCat = mainSelect.value;
+
+    var filtered = allItems.filter(function(it) {
+      if (mainCat && it.mainCat !== mainCat) return false;
+      if (activeSubcat && it.subCat !== activeSubcat) return false;
+      if (q) {
+        var txt = norm(it.nom + ' ' + it.desc + ' ' + it.subCat + ' ' + it.mainCat + ' ' + it.prerequis);
+        return txt.indexOf(q) !== -1;
+      }
+      return true;
+    });
+
+    countLabel.textContent = filtered.length + ' article' + (filtered.length > 1 ? 's' : '');
+
+    if (filtered.length === 0) {
+      contentDiv.innerHTML = '<div class="bm-empty">Aucun résultat</div>';
+      return;
+    }
+
+    var groups = {};
+    filtered.forEach(function(it) {
+      if (!groups[it.subCat]) groups[it.subCat] = [];
+      groups[it.subCat].push(it);
+    });
+
+    var html = '';
+    Object.keys(groups).sort().forEach(function(sub) {
+      html += '<div class="bm-section-title">' + esc(sub) + ' <span style="font-size:11px;color:var(--gray-mid);font-family:\'Roboto Mono\',monospace;">(' + groups[sub].length + ')</span></div>';
+      html += '<div class="bm-grid">';
+      groups[sub].forEach(function(it) { html += buildCard(it); });
+      html += '</div>';
+    });
+    contentDiv.innerHTML = html;
+  }
+
+  contentDiv.addEventListener('click', function(e) {
+    var btn = e.target.closest('.bm-tatouage-btn');
+    if (!btn) return;
+    e.stopPropagation();
+    var id = parseInt(btn.getAttribute('data-id'), 10);
+    var item = null;
+    for (var i = 0; i < allItems.length; i++) {
+      if (allItems[i].id === id) { item = allItems[i]; break; }
+    }
+    if (!item || !item.isFocus) return;
+    item.tatouageActive = !item.tatouageActive;
+    if (item.tatouageActive) {
+      item.prixNum = item.basePrixNum + 15000;
+    } else {
+      item.prixNum = item.basePrixNum;
+    }
+    item.prix = item.prixNum.toLocaleString('fr-FR') + '¥';
+    render();
+  });
+
+  searchInput.addEventListener('input', render);
+  mainSelect.addEventListener('change', function() {
+    renderSubcats(mainSelect.value);
+    render();
+  });
+
+  renderSubcats('');
+  render();
+
+  // Exposer les fonctions Pimp My Ride au scope global pour les onclick inline
+  window.openPimpModal = openPimpModal;
+  window.closePimpModal = closePimpModal;
+  window.togglePimpUpgrade = togglePimpUpgrade;
+  window.removePimpUpgrade = removePimpUpgrade;
+  window.openArmeUpgradeModal = openArmeUpgradeModal;
+  window.closeArmeUpgradeModal = closeArmeUpgradeModal;
+  window.toggleArmeUpgrade = toggleArmeUpgrade;
+  window.removeArmeUpgrade = removeArmeUpgrade;
+})();
+</script>
+
+</body>
+<footer style="
+  color: #666;
+  font-family: inherit;
+  font-size: 0.7rem;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  margin-top: 2rem;
+  border-top: 1px solid #ddd;
+  background: transparent;
+">
+  <p style="margin: 0 0 0.3rem 0;">
+    <strong>Shadowrun</strong> est une marque déposée de <em>Topps Company, Inc.</em> / <em>Catalyst Game Labs</em>.
+  </p>
+  <p style="margin: 0; opacity: 0.8;">
+    Ce projet est un outil de fan <strong>non officiel</strong>, sans affiliation.
+  </p>
+  <p style="margin: 0.5rem 0 0 0; font-size: 0.65rem; opacity: 0.6;">
+    © 2026 — Projet communautaire francophone Shadowrun Anarchy
+  </p>
+</footer>
+</html>

@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche Personnage - Shadowrun Anarchy 2.0</title>
+<script src="assets/JS/shadowrun-data-2.0.js"></script>
+<link rel="stylesheet" href="assets/CSS/Style_v2.css">
+<link rel="icon" type="IMAGE/png" href="assets/images/Anarchy.ico">
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="creation2.0.html" class="toolbar-btn">Engager un runner</a>
+  <a href="Black_Market.html" class="toolbar-btn">Black Market</a>
+  <a href="carte_interactive_cybermonde.html" class="toolbar-btn">Carte Interactive</a>
+  <a href="bestiaire.html" class="toolbar-btn">Compendium</a>
+  <div style="flex:1;"></div>
+  <button class="toolbar-btn" id="btn-save">Sauvegarder</button>
+  <button class="toolbar-btn secondary" id="btn-load">Charger</button>
+  <input type="file" id="file-input" accept=".json" style="display:none;">
+</div>
+
+<!-- ==================== PAGE UNIQUE ==================== -->
+<div class="page">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header-row">
+    <div class="pseudo-area">
+      <span class="pseudo-label">PSEUDO :</span>
+      <input type="text" class="pseudo-input" data-field="pseudo" placeholder="">
+    </div>
+    <div class="logo-area">
+      <div class="logo-text">Shadowrun <span>Anarchy</span> 2.0</div>
+    </div>
+  </div>
+
+  <!-- ===== TOP LAYOUT: Illustration (left) + Attributes (right) ===== -->
+  <div class="top-layout">
+    <div class="illustration-zone" id="illustration-zone">
+      <img id="illustration-img" src="" alt="Illustration" style="display:none; max-width:100%; max-height:100%; object-fit:contain;">
+      <span id="illustration-placeholder">Cliquez ou glissez une image ici</span>
+      <input type="file" id="illustration-input" accept="image/*" style="display:none;">
+    </div>
+    <div class="attributes-area">
+      <div class="attributes-row">
+        <div class="attr-box">
+          <span class="label-big">FORCE</span>
+          <input type="number" class="input-box" data-field="force" min="1" max="15">
+        </div>
+        <div class="attr-box">
+          <span class="label-big">AGILITÉ</span>
+          <input type="number" class="input-box" data-field="agilite" min="1" max="15">
+        </div>
+        <div class="attr-box">
+          <span class="label-big">VOLONTÉ</span>
+          <input type="number" class="input-box" data-field="volonte" min="1" max="15">
+        </div>
+        <div class="attr-box">
+          <span class="label-big">LOGIQUE</span>
+          <input type="number" class="input-box" data-field="logique" min="1" max="15">
+        </div>
+        <div class="attr-box">
+          <span class="label-big">CHARISME</span>
+          <input type="number" class="input-box" data-field="charisme" min="1" max="15">
+        </div>
+        <div class="attr-box">
+          <span class="label-big">ANARCHY</span>
+          <input type="number" class="input-box" data-field="anarchy" min="1" max="15">
+        </div>
+      </div>
+      <div class="nuyen-row">
+        <span class="nuyen-label">Nuyen (¥) disponible</span>
+        <input type="text" class="nuyen-input" data-field="nuyen-disponible" placeholder="0 000 ¥" autocomplete="off">
+        <span class="nuyen-sep">/ Total</span>
+        <input type="text" class="nuyen-input" data-field="nuyen-total" placeholder="0 000 ¥" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main-content">
+
+      <!-- THREE COLS: MOTS-CLÉS / RÉPLIQUES / COMPORTEMENTS -->
+      <div class="three-cols">
+        <div>
+          <div class="col-header">MOTS-CLÉS</div>
+          <div class="col-lines">
+            <input type="text" class="input-long" data-field="motcle-1" placeholder="">
+            <input type="text" class="input-long" data-field="motcle-2" placeholder="">
+            <input type="text" class="input-long" data-field="motcle-3" placeholder="">
+            <input type="text" class="input-long" data-field="motcle-4" placeholder="">
+            <input type="text" class="input-long" data-field="motcle-5" placeholder="">
+          </div>
+        </div>
+        <div>
+          <div class="col-header">RÉPLIQUES</div>
+          <div class="col-lines">
+            <input type="text" class="input-long" data-field="replique-1" placeholder="">
+            <input type="text" class="input-long" data-field="replique-2" placeholder="">
+            <input type="text" class="input-long" data-field="replique-3" placeholder="">
+            <input type="text" class="input-long" data-field="replique-4" placeholder="">
+            <input type="text" class="input-long" data-field="replique-5" placeholder="">
+          </div>
+        </div>
+        <div>
+          <div class="col-header">COMPORTEMENTS</div>
+          <div class="col-lines">
+            <input type="text" class="input-long" data-field="comportement-1" placeholder="">
+            <input type="text" class="input-long" data-field="comportement-2" placeholder="">
+            <input type="text" class="input-long" data-field="comportement-3" placeholder="">
+            <input type="text" class="input-long" data-field="comportement-4" placeholder="">
+            <input type="text" class="input-long" data-field="comportement-5" placeholder="">
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPETENCES -->
+      <div class="competences-section">
+        <div class="comp-header">
+          <span class="comp-header-cell"></span>
+          <span class="comp-header-cell">COMPÉTENCES</span>
+          <span class="comp-header-cell">INDICE</span>
+          <span class="comp-header-cell">+ ATT.</span>
+          <span class="comp-header-cell">= DP</span>
+          <span class="comp-header-cell">RR</span>
+          </div>
+        <div id="competences-rows">
+        <div class="comp-row" data-comp-row="1">
+          <div class="comp-move-btns">
+            <button type="button" class="btn-move-row" data-action="move-comp-up" title="Monter">↑</button>
+            <button type="button" class="btn-move-row" data-action="move-comp-down" title="Descendre">↓</button>
+          </div>
+          <input type="text" class="comp-name" data-field="comp-1-name" placeholder="" list="competences-datalist">
+          <input type="text" class="comp-val" data-field="comp-1-indice" placeholder="">
+          <select class="comp-att-select" data-field="comp-1-att">
+            <option value=""></option>
+            <option value="FOR">FOR</option>
+            <option value="AGI">AGI</option>
+            <option value="VOL">VOL</option>
+            <option value="LOG">LOG</option>
+            <option value="CHA">CHA</option>
+          </select>
+          <input type="text" class="comp-val comp-rd" data-field="comp-1-rd" placeholder="" readonly>
+          <div class="comp-rr">
+            <div class="rr-circle" data-field="comp-1-rr-0"></div>
+            <div class="rr-circle" data-field="comp-1-rr-1"></div>
+            <div class="rr-circle" data-field="comp-1-rr-2"></div>
+          </div>
+          <button type="button" class="btn-del-row" data-action="remove-comp" title="Supprimer">🗑</button>
+        </div>
+      </div>
+      </div>
+      <button type="button" class="toolbar-btn secondary add-row-btn" id="btn-add-comp" style="margin-top:6px;font-size:12px;">+ Ajouter une compétence</button>
+
+      <!-- ATOUTS -->
+      <div class="simple-section">
+        <div class="section-title-yellow">ATOUTS</div>
+        <div class="simple-lines" id="atouts-lines">
+          <div class="atout-row" data-atout-row="1">
+            <textarea class="input-long auto-resize" data-field="atout-1" placeholder="" rows="1"></textarea>
+            <button type="button" class="btn-del-row" data-action="remove-atout" title="Supprimer">🗑</button>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="toolbar-btn secondary add-row-btn" id="btn-add-atout" style="margin-top:6px;font-size:12px;">+ Ajouter un atout</button>
+
+      <!-- CONNAISSANCES + ESSENCE -->
+      <div class="connaissances-essence-row" style="align-items: stretch;">
+        <div class="ce-left-col">
+          <div class="simple-section" style="flex:1;">
+            <div class="section-title-yellow">CONNAISSANCES</div>
+            <div class="simple-lines">
+              <textarea class="input-long auto-resize" data-field="connaissance-1" placeholder="" rows="1"></textarea>
+            </div>
+          </div>
+          <div class="mains-nues-block">
+            <div class="mains-nues-inner">
+              <span class="mains-nues-title">MAINS NUES</span>
+              <span class="mains-nues-sep">|</span>
+              <span class="mains-nues-label">Dégâts</span>
+              <span class="mains-nues-val" id="mains-nues-degats">0</span>
+              <span class="mains-nues-sep">|</span>
+              <span class="mn-lvl mn-ok">OK</span><span class="mn-sep">/</span><span class="mn-lvl">-</span><span class="mn-sep">/</span><span class="mn-lvl">-</span><span class="mn-sep">/</span><span class="mn-lvl">-</span>
+            </div>
+          </div>
+        </div>
+        <div class="essence-block">
+          <div class="section-title-yellow">ESSENCE</div>
+          <input type="number" class="input-box" id="essence-input" data-field="essence" min="0" max="6" step="0.25" value="6">
+          <div class="essence-desc" id="essence-desc">Pas d'effet négatif</div>
+        </div>
+      </div>
+
+                  <!-- ARMES ET SORTS -->
+      <div class="armes-section">
+        <div class="armes-header">
+          <span class="armes-header-cell">ARMES ET SORTS</span>
+          <span class="armes-header-cell">TYPE</span>
+          </div>
+        <div id="armes-rows">
+        <div class="arme-row" data-arme-row="1">
+          <textarea class="arme-name" data-field="arme-1-name" placeholder="" rows="1"></textarea>
+          <select class="arme-type-select" data-field="arme-1-type">
+            <option value="">-- Choisir --</option>
+            <option value="Arme">Arme</option>
+            <option value="Sort">Sort</option>
+          </select>
+          <button type="button" class="btn-del-row" data-action="remove-arme" title="Supprimer">🗑</button>
+        </div>
+      </div>
+      </div>
+      <button type="button" class="toolbar-btn secondary add-row-btn" id="btn-add-arme" style="margin-top:6px;font-size:12px;">+ Ajouter une arme/sort</button>
+
+      <!-- ÉQUIPEMENT -->
+      <div class="simple-section">
+        <div class="section-title-yellow">ÉQUIPEMENT</div>
+        <div class="simple-lines" id="equipement-lines">
+          <div class="equip-row" data-equip-row="1">
+            <textarea class="input-long auto-resize" data-field="equip-1" placeholder="" rows="1"></textarea>
+            <button type="button" class="btn-del-row" data-action="remove-equip" title="Supprimer">🗑</button>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="toolbar-btn secondary add-row-btn" id="btn-add-equip" style="margin-top:6px;font-size:12px;">+ Ajouter un équipement</button>
+
+      <!-- CONTACTS -->
+      <div class="simple-section" id="contacts-section">
+        <div class="section-title-yellow">CONTACTS</div>
+        <div class="simple-lines" id="contacts-lines">
+          <div class="contact-row" data-contact-row="1">
+            <textarea class="input-long auto-resize" data-field="contact-1" placeholder="" rows="1"></textarea>
+            <button type="button" class="btn-del-row" data-action="remove-contact" title="Supprimer">🗑</button>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="toolbar-btn secondary add-row-btn" id="btn-add-contact" style="margin-top:6px;font-size:12px;">+ Ajouter un contact</button>
+  <!-- ===== BOTTOM: BLESSURES + NIVEAU DE RISQUE ===== -->
+  <div class="bottom-row">
+
+    <!-- BLESSURES -->
+    <div class="blessures-section">
+      <div class="blessures-header-row">
+        <div class="section-title-yellow">BLESSURES</div>
+      </div>
+      <div class="blessures-table">
+        <div class="blessures-header">
+          <span class="blessures-header-cell">Seuils</span>
+          <span class="blessures-header-cell">Légère</span>
+          <span class="blessures-header-cell">Grave</span>
+          <span class="blessures-header-cell">Incap.</span>
+        </div>
+        <div class="blessures-circles-row">
+          <span></span>
+          <div class="circles-group">
+            <div class="circle-small" data-field="legere-1"></div>
+            <div class="circle-small" data-field="legere-2"></div>
+            <div class="circle-small" data-field="legere-3"></div>
+          </div>
+          <div class="circles-group">
+            <div class="circle-small" data-field="grave-1"></div>
+            <div class="circle-small" data-field="grave-2"></div>
+          </div>
+          <div class="circles-group">
+            <div class="circle-small" data-field="incap-1"></div>
+          </div>
+        </div>
+        <div class="blessures-row">
+          <span class="blessures-label">Sans armure</span>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-sans-legere" placeholder="" readonly>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-sans-grave" placeholder="" readonly>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-sans-incap" placeholder="" readonly>
+        </div>
+        <div class="blessures-row armure-row">
+          <span class="blessures-label">Armure principale :<input type="number" class="blessures-armor-input" data-field="armure-princ" placeholder="0" min="0"></span>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-princ-legere" placeholder="" readonly>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-princ-grave" placeholder="" readonly>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-princ-incap" placeholder="" readonly>
+        </div>
+        <div class="blessures-row armure-row">
+          <span class="blessures-label">Armure secondaire :<input type="number" class="blessures-armor-input" data-field="armure-sec" placeholder="0" min="0"></span>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-sec-legere" placeholder="" readonly>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-sec-grave" placeholder="" readonly>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-sec-incap" placeholder="" readonly>
+        </div>
+        <div class="blessures-row armure-row">
+          <span class="blessures-label">Mental :<input type="number" class="blessures-armor-input" data-field="protection-mentale" placeholder="0" min="0"></span>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-mental-legere" placeholder="" readonly>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-mental-grave" placeholder="" readonly>
+          <input type="text" class="blessures-input bless-calc" data-field="bless-mental-incap" placeholder="" readonly>
+        </div>
+      </div>
+    </div>
+
+    <!-- NIVEAU DE RISQUE -->
+    <div class="risque-section">
+      <div class="section-title-yellow">Réduction de Risque</div>
+      <div class="risque-title">NIVEAU DE RISQUE</div>
+      <div class="risque-table">
+        <div class="risque-header">
+          <span class="risque-h-cell">RR</span>
+          <span class="risque-h-cell">FAIBLE</span>
+          <span class="risque-h-cell">NORMAL</span>
+          <span class="risque-h-cell">FORT</span>
+          <span class="risque-h-cell">EXTRÊME</span>
+        </div>
+        <div class="risque-row">
+          <span class="risque-cell">0</span>
+          <span class="risque-cell">1 dé</span>
+          <span class="risque-cell">2 dés</span>
+          <span class="risque-cell">4 dés</span>
+          <span class="risque-cell">6+ dés</span>
+        </div>
+        <div class="risque-row">
+          <span class="risque-cell">1</span>
+          <span class="risque-cell">3 dés</span>
+          <span class="risque-cell">5 dés</span>
+          <span class="risque-cell">7 dés</span>
+          <span class="risque-cell">10+ dés</span>
+        </div>
+        <div class="risque-row">
+          <span class="risque-cell">2</span>
+          <span class="risque-cell">5 dés</span>
+          <span class="risque-cell">8 dés</span>
+          <span class="risque-cell">11 dés</span>
+          <span class="risque-cell">13+ dés</span>
+        </div>
+        <div class="risque-row">
+          <span class="risque-cell">3</span>
+          <span class="risque-cell">8 dés</span>
+          <span class="risque-cell">12 dés</span>
+          <span class="risque-cell">15 dés</span>
+          <span class="risque-cell">N/A</span>
+        </div>
+      </div>
+      <div class="risque-extra">
+        <div class="risque-extra-row">
+          <span class="risque-extra-label"># dés risque min (piratage)</span>
+          <input type="text" class="risque-extra-input" data-field="risque-min-piratage" placeholder="">
+        </div>
+        <div class="risque-extra-row">
+          <span class="risque-extra-label">Augmentation seuil piratage</span>
+          <input type="text" class="risque-extra-input" data-field="seuil-piratage" placeholder="">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== SECTION VÉHICULES ==================== -->
+  <div class="vehicules-section" id="vehicules-section">
+    <div class="section-title-yellow">VÉHICULES</div>
+    <div id="vehicules-container"></div>
+    <button type="button" class="toolbar-btn secondary add-row-btn" id="btn-add-vehicule" style="margin-top:6px;font-size:12px;">+ Ajouter un véhicule</button>
+  </div>
+
+  <!-- ==================== SECTION DRONES ==================== -->
+  <div class="drones-section" id="drones-section">
+    <div class="section-title-yellow">DRONES</div>
+    <div id="drones-container"></div>
+    <button type="button" class="toolbar-btn secondary add-row-btn" id="btn-add-drone" style="margin-top:6px;font-size:12px;">+ Ajouter un drone</button>
+  </div>
+
+    <!-- ==================== SECTION CYBERDECK ==================== -->
+  <div class="cyberdeck-section" id="cyberdeck-section">
+    <div class="section-title-yellow">CYBERDECK</div>
+    <div id="cyberdeck-container"></div>
+    <button type="button" class="toolbar-btn secondary add-row-btn" id="btn-add-cyberdeck" style="margin-top:6px;font-size:12px;">+ Ajouter un cyberdeck</button>
+  </div>
+
+    <!-- ==================== SECTION BACKGROUND ==================== -->
+  <div class="background-section" id="background-section">
+    <div class="section-title">Mon histoire commence là</div>
+    <div class="editor-toolbar">
+    </div>
+    <div class="background-editor" id="background-editor" contenteditable="true" data-field="background-text" placeholder="Raconte l'histoire de ton runner... Origines, motivations, allégeances, secrets..."></div>
+    <div class="editor-hint">Astuce : Ctrl+G pour mettre en gras, Ctrl+I pour italique, Ctrl+U pour souligné</div>
+  </div>
+
+  <!-- ==================== SECTION NOTES ==================== -->
+  <div class="notes-section" id="notes-section">
+    <div class="section-title">Notes</div>
+    <div class="editor-toolbar">
+    </div>
+    <div class="notes-editor" id="notes-editor" contenteditable="true" data-field="notes-text" placeholder="Prends des notes sur tes runs, les PNJs rencontrés, les indices, les objectifs..."></div>
+    <div class="editor-hint">Astuce : Ctrl+G pour mettre en gras, Ctrl+I pour italique, Ctrl+U pour souligné</div>
+  </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // --- Cercles cliquables (individuels) ---
+  // Délégation d'événements pour les cercles cliquables (dynamiques inclus)
+  document.body.addEventListener('click', function(e) {
+    if (e.target.classList.contains('rr-circle') || e.target.classList.contains('circle-small')) {
+      e.target.classList.toggle('filled');
+    }
+  });
+  // Délégation d'événements pour les boutons de suppression et déplacement
+  document.body.addEventListener('click', function(e) {
+    var btn = e.target.closest('.btn-del-row, .btn-move-row');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+    if (action === 'remove-comp') {
+      var row = btn.closest('.comp-row');
+      if (row) row.remove();
+    } else if (action === 'remove-atout') {
+      var row = btn.closest('.atout-row');
+      if (row) row.remove();
+    } else if (action === 'remove-arme') {
+      var row = btn.closest('.arme-row');
+      if (row) row.remove();
+    } else if (action === 'remove-equip') {
+      var row = btn.closest('.equip-row');
+      if (row) row.remove();
+    } else if (action === 'remove-contact') {
+      var row = btn.closest('.contact-row');
+      if (row) row.remove();
+    } else if (action === 'remove-vehicule') {
+      removeVehiculeBlock(btn);
+    } else if (action === 'remove-drone') {
+      removeDroneBlock(btn);
+    } else if (action === 'remove-cyberdeck') {
+      removeCyberdeckBlock(btn);
+    } else if (action === 'remove-programme') {
+      removeProgrammeRow(btn);
+    } else if (action === 'move-comp-up') {
+      moveCompUp(btn);
+    } else if (action === 'move-comp-down') {
+      moveCompDown(btn);
+    }
+  });
+
+  // ============ SAUVEGARDE ============
+  document.getElementById('btn-save').addEventListener('click', function() {
+    const data = {};
+    document.querySelectorAll('[data-field]').forEach(function(el) {
+      const field = el.dataset.field;
+      if (el.type === 'checkbox') {
+        data[field] = { type: 'checkbox', value: el.checked };
+      } else if (el.tagName === 'SELECT') {
+        data[field] = { type: 'select', value: el.value };
+      } else if (el.tagName === 'TEXTAREA') {
+        data[field] = { type: 'textarea', value: el.value };
+      } else if (el.tagName === 'INPUT') {
+        data[field] = { type: 'input', value: el.value };
+      } else if (el.isContentEditable || el.getAttribute('contenteditable') === 'true') {
+        data[field] = { type: 'contenteditable', value: el.innerHTML };
+      } else if (el.classList.contains('rr-circle') || el.classList.contains('circle-small')) {
+        data[field] = { type: 'circle', value: el.classList.contains('filled') };
+      }
+    });
+    // Sauvegarder l'ordre des compétences
+    var compOrder = [];
+    document.querySelectorAll('.comp-row').forEach(function(row) {
+      var id = row.getAttribute('data-comp-row');
+      if (id) compOrder.push(parseInt(id, 10));
+    });
+    data['__comp_order__'] = { type: 'meta', value: compOrder };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const today = new Date();
+    const dateStr = today.getFullYear().toString() +
+                    String(today.getMonth() + 1).padStart(2, '0') +
+                    String(today.getDate()).padStart(2, '0');
+    const pseudoInput = document.querySelector('[data-field="pseudo"]');
+    const pseudo = pseudoInput && pseudoInput.value.trim() ? pseudoInput.value.trim().replace(/\s+/g, '_') : 'shadowrun';
+    a.download = pseudo + '_' + dateStr + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // ============ CHARGEMENT ============
+  document.getElementById('btn-load').addEventListener('click', function() {
+    document.getElementById('file-input').click();
+  });
+
+  document.getElementById('file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      try {
+        const data = JSON.parse(event.target.result);
+
+        // === RECONSTRUCTION DES ÉLÉMENTS MANQUANTS ===
+        var maxComp = 0, maxAtout = 0, maxArme = 0, maxEquip = 0;
+        var maxVehicule = 0, maxDrone = 0, maxCyberdeck = 0, maxContact = 0;
+        var cyberdeckProgrammes = {};
+
+        Object.keys(data).forEach(function(key) {
+          var m;
+          m = key.match(/^comp-(\d+)-/);
+          if (m) maxComp = Math.max(maxComp, parseInt(m[1]));
+          m = key.match(/^atout-(\d+)$/);
+          if (m) maxAtout = Math.max(maxAtout, parseInt(m[1]));
+          m = key.match(/^arme-(\d+)-/);
+          if (m) maxArme = Math.max(maxArme, parseInt(m[1]));
+          m = key.match(/^equip-(\d+)$/);
+          if (m) maxEquip = Math.max(maxEquip, parseInt(m[1]));
+          m = key.match(/^contact-(\d+)$/);
+          if (m) maxContact = Math.max(maxContact, parseInt(m[1]));
+          m = key.match(/^vehicule-(\d+)-/);
+          if (m) maxVehicule = Math.max(maxVehicule, parseInt(m[1]));
+          m = key.match(/^drone-(\d+)-/);
+          if (m) maxDrone = Math.max(maxDrone, parseInt(m[1]));
+          m = key.match(/^cyberdeck-(\d+)-/);
+          if (m) {
+            var cid = parseInt(m[1]);
+            maxCyberdeck = Math.max(maxCyberdeck, cid);
+            var pm = key.match(/^cyberdeck-(\d+)-programme-(\d+)$/);
+            if (pm) {
+              var cId = parseInt(pm[1]);
+              var pId = parseInt(pm[2]);
+              if (!cyberdeckProgrammes[cId]) cyberdeckProgrammes[cId] = 0;
+              cyberdeckProgrammes[cId] = Math.max(cyberdeckProgrammes[cId], pId);
+            }
+          }
+        });
+
+        // Créer les lignes de compétences manquantes
+        while (nextCompId <= maxComp) { addCompRow(); }
+        // Réorganiser les compétences selon l'ordre sauvegardé
+        if (data['__comp_order__'] && data['__comp_order__'].value) {
+          var container = document.getElementById('competences-rows');
+          var order = data['__comp_order__'].value;
+          var rows = Array.from(container.querySelectorAll('.comp-row'));
+          order.forEach(function(id) {
+            var row = rows.find(function(r) { return r.getAttribute('data-comp-row') == id; });
+            if (row) container.appendChild(row);
+          });
+        }
+        // Créer les lignes d'atouts manquantes
+        while (nextAtoutId <= maxAtout) { addAtoutRow(); }
+        // Créer les lignes d'armes manquantes
+        while (nextArmeId <= maxArme) { addArmeRow(); }
+        // Créer les lignes d'équipement manquantes
+        while (nextEquipId <= maxEquip) { addEquipRow(); }
+        // Créer les lignes de contacts manquantes
+        while (nextContactId <= maxContact) { addContactRow(); }
+        // Créer les véhicules manquants
+        while (nextVehiculeId <= maxVehicule) { addVehiculeBlock(); }
+        // Créer les drones manquants
+        while (nextDroneId <= maxDrone) { addDroneBlock(); }
+        // Créer les cyberdecks manquants
+        while (nextCyberdeckId <= maxCyberdeck) { addCyberdeckBlock(); }
+        // Créer les programmes manquants pour chaque cyberdeck
+        Object.keys(cyberdeckProgrammes).forEach(function(cid) {
+          var maxProg = cyberdeckProgrammes[cid];
+          var existing = document.querySelectorAll('[data-cyberdeck-prog="' + cid + '"] .programme-row').length;
+          var toCreate = Math.max(0, maxProg - existing);
+          for (var i = 0; i < toCreate; i++) {
+            addProgrammeRow(cid);
+          }
+        });
+
+        // === REMPLISSAGE DES VALEURS ===
+        Object.keys(data).forEach(function(key) {
+          const item = data[key];
+          const el = document.querySelector('[data-field="' + key + '"]');
+          if (!el) return;
+
+          if (item.type === 'checkbox') {
+            el.checked = item.value;
+          } else if (item.type === 'select') {
+            el.value = item.value;
+          } else if (item.type === 'input') {
+            el.value = item.value;
+          } else if (item.type === 'textarea') {
+            el.value = item.value;
+          } else if (item.type === 'contenteditable') {
+            el.innerHTML = item.value;
+          } else if (item.type === 'circle') {
+            if (item.value) el.classList.add('filled');
+            else el.classList.remove('filled');
+          }
+        });
+
+        // Redimensionner tous les textarea auto-resize après chargement
+        document.querySelectorAll('.arme-name, .auto-resize').forEach(function(el) {
+          if (window.autoResizeTextarea) window.autoResizeTextarea(el);
+        });
+
+        window.recalcAllCompDP();
+        updateBlessures();
+        updateEssenceDesc();
+        updateMainsNues();
+        // Recalculer les armures des véhicules/drones/cyberdecks
+        document.querySelectorAll('.vehicule-block').forEach(function(block) {
+          var id = block.getAttribute('data-vehicule-id');
+          if (id) updateVehiculeArmure(id);
+        });
+        document.querySelectorAll('.drone-block').forEach(function(block) {
+          var id = block.getAttribute('data-drone-id');
+          if (id) updateDroneArmure(id);
+        });
+        document.querySelectorAll('.cyberdeck-block').forEach(function(block) {
+          var id = block.getAttribute('data-cyberdeck-id');
+          if (id) updateCyberdeckProtection(id);
+        });
+
+        alert('Fiche chargée avec succès !');
+      } catch (err) {
+        console.error(err);
+        alert('Erreur lors du chargement du fichier JSON');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // --- Illustration ---
+  const zone = document.getElementById('illustration-zone');
+  const input = document.getElementById('illustration-input');
+  const img = document.getElementById('illustration-img');
+  const placeholder = document.getElementById('illustration-placeholder');
+
+  zone.addEventListener('click', () => input.click());
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = '#f5c518'; });
+  zone.addEventListener('dragleave', () => { zone.style.borderColor = '#ccc'; });
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.style.borderColor = '#ccc';
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) loadImage(file);
+  });
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) loadImage(file);
+  });
+
+  function loadImage(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      img.src = e.target.result;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+  // Bouton Black Market — transmission des Nuyen disponibles
+  document.getElementById('btn-blackmarket').addEventListener('click', function() {
+    var nuyenInput = document.querySelector('[data-field="nuyen-disponible"]');
+    var nuyenVal = '';
+    if (nuyenInput) {
+      nuyenVal = nuyenInput.value.replace(/[^0-9]/g, '');
+    }
+    var url = 'Black_Market.html' + (nuyenVal ? '?nuyen=' + nuyenVal : '');
+    window.open(url, '_blank');
+  });
+  // ============ FONCTIONS D'ÉDITION RICHE ============
+  function formatText(editorId, command) {
+    const editor = document.getElementById(editorId);
+    if (!editor) return;
+    editor.focus();
+    document.execCommand(command, false, null);
+    editor.focus();
+  }
+
+  // --- Gestion de l'Essence ---
+  var essenceInput = document.getElementById('essence-input');
+  var essenceDesc = document.getElementById('essence-desc');
+  var essenceEffects = {
+    '6': "Pas d'effet négatif",
+    '5.': "Pas d'effet négatif",
+    '5.5': "Pas d'effet négatif",
+    '5.25': "Pas d'effet négatif",
+    '5': "Annule 1 réussite sur tous les tests liés à la magie",
+    '4.75': "Annule 1 réussite sur tous les tests liés à la magie",
+    '4.5': "Annule 1 réussite sur tous les tests liés à la magie",
+    '4.25': "Annule 1 réussite sur tous les tests liés à la magie",
+    '4': "Annule 1 réussite sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage",
+    '3.75': "Annule 1 réussite sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage",
+    '3.5': "Annule 1 réussite sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage",
+    '3.25': "Annule 1 réussite sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage",
+    '3': "Annule 2 réussites sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage",
+    '2.75': "Annule 2 réussites sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage",
+    '2.5': "Annule 2 réussites sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage",
+    '2.25': "Annule 2 réussites sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage",
+    '2': "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage",
+    '1.75': "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage",
+    '1.5': "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage",
+    '1.25': "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage",
+    '1': "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage + Désavantage sur la plupart des tests sociaux",
+    '0.75': "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage + Désavantage sur la plupart des tests sociaux",
+    '0.5': "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage + Désavantage sur la plupart des tests sociaux",
+    '0.25': "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage + Désavantage sur la plupart des tests sociaux",
+    '0': "Le personnage meurt"
+  };
+
+  function updateEssenceDesc() {
+    if (!essenceInput || !essenceDesc) return;
+    var val = essenceInput.value.replace(',', '.');
+    var numVal = parseFloat(val);
+    var text = "";
+    if (numVal >= 5.25) {
+      text = "Pas d'effet négatif";
+    } else if (numVal >= 4.25) {
+      text = "Annule 1 réussite sur tous les tests liés à la magie";
+    } else if (numVal >= 3.25) {
+      text = "Annule 1 réussite sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage";
+    } else if (numVal >= 2.25) {
+      text = "Annule 2 réussites sur tous les tests liés à la magie + Annule 1 réussite sur tous les tests visant à soigner le personnage";
+    } else if (numVal >= 1.25) {
+      text = "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage";
+    } else if (numVal > 0) {
+      text = "Annule 2 réussites sur tous les tests liés à la magie + Annule 2 réussites sur tous les tests visant à soigner le personnage + Désavantage sur la plupart des tests sociaux";
+    } else {
+      text = "Le personnage meurt";
+    }
+    essenceDesc.textContent = text;
+  }
+
+  if (essenceInput) {
+    essenceInput.addEventListener('input', updateEssenceDesc);
+    essenceInput.addEventListener('change', updateEssenceDesc);
+    updateEssenceDesc();
+  }
+
+  // ============ CALCUL AUTO BLESSURES ============
+  function updateBlessures() {
+    var force = parseInt(document.querySelector('[data-field="force"]')?.value, 10) || 0;
+    var volonte = parseInt(document.querySelector('[data-field="volonte"]')?.value, 10) || 0;
+    var armureP = parseInt(document.querySelector('[data-field="armure-princ"]')?.value, 10) || 0;
+    var armureS = parseInt(document.querySelector('[data-field="armure-sec"]')?.value, 10) || 0;
+    var protec = parseInt(document.querySelector('[data-field="protection-mentale"]')?.value, 10) || 0;
+
+    // Sans armure
+    var sL = document.querySelector('[data-field="bless-sans-legere"]');
+    var sG = document.querySelector('[data-field="bless-sans-grave"]');
+    var sI = document.querySelector('[data-field="bless-sans-incap"]');
+    if (sL) sL.value = force;
+    if (sG) sG.value = force + 3;
+    if (sI) sI.value = force + 6;
+
+    // Armure principale
+    var pL = document.querySelector('[data-field="bless-princ-legere"]');
+    var pG = document.querySelector('[data-field="bless-princ-grave"]');
+    var pI = document.querySelector('[data-field="bless-princ-incap"]');
+    if (pL) pL.value = force + armureP;
+    if (pG) pG.value = force + armureP + 3;
+    if (pI) pI.value = force + armureP + 6;
+
+    // Armure secondaire
+    var seL = document.querySelector('[data-field="bless-sec-legere"]');
+    var seG = document.querySelector('[data-field="bless-sec-grave"]');
+    var seI = document.querySelector('[data-field="bless-sec-incap"]');
+    if (seL) seL.value = force + armureS;
+    if (seG) seG.value = force + armureS + 3;
+    if (seI) seI.value = force + armureS + 6;
+
+    // Mental
+    var mL = document.querySelector('[data-field="bless-mental-legere"]');
+    var mG = document.querySelector('[data-field="bless-mental-grave"]');
+    var mI = document.querySelector('[data-field="bless-mental-incap"]');
+    if (mL) mL.value = volonte + protec;
+    if (mG) mG.value = volonte + protec + 3;
+    if (mI) mI.value = volonte + protec + 6;
+  }
+
+  ['force', 'volonte', 'armure-princ', 'armure-sec', 'protection-mentale'].forEach(function(field) {
+    var el = document.querySelector('[data-field="' + field + '"]');
+    if (el) {
+      el.addEventListener('input', updateBlessures);
+    }
+  });
+  updateBlessures();
+
+  // ============ DÉGÂTS MAINS NUES ============
+  function updateMainsNues() {
+    var forceInput = document.querySelector('[data-field="force"]');
+    var degatsSpan = document.getElementById('mains-nues-degats');
+    if (forceInput && degatsSpan) {
+      var force = parseInt(forceInput.value, 10) || 0;
+      degatsSpan.textContent = force;
+    }
+  }
+  var forceInput = document.querySelector('[data-field="force"]');
+  if (forceInput) {
+    forceInput.addEventListener('input', updateMainsNues);
+    updateMainsNues();
+  }
+
+
+  // ============ CALCUL AUTO DP (Dés de Pool) ============
+  const attrMap = {
+    'FOR': 'force',
+    'AGI': 'agilite',
+    'VOL': 'volonte',
+    'LOG': 'logique',
+    'CHA': 'charisme'
+  };
+
+  function updateCompDP(rowNum) {
+    const indiceInput = document.querySelector('[data-field="comp-' + rowNum + '-indice"]');
+    const attSelect = document.querySelector('[data-field="comp-' + rowNum + '-att"]');
+    const rdInput = document.querySelector('[data-field="comp-' + rowNum + '-rd"]');
+
+    if (!indiceInput || !attSelect || !rdInput) return;
+
+    const indice = parseInt(indiceInput.value, 10) || 0;
+    const attKey = attrMap[attSelect.value];
+    let attrVal = 0;
+
+    if (attKey) {
+      const attrInput = document.querySelector('[data-field="' + attKey + '"]');
+      if (attrInput) {
+        attrVal = parseInt(attrInput.value, 10) || 0;
+      }
+    }
+
+    const dp = indice + attrVal;
+    rdInput.value = dp > 0 ? dp : '';
+  }
+
+  function attachCompListeners(rowNum) {
+    const indiceInput = document.querySelector('[data-field="comp-' + rowNum + '-indice"]');
+    const attSelect = document.querySelector('[data-field="comp-' + rowNum + '-att"]');
+
+    if (indiceInput) {
+      indiceInput.addEventListener('input', function() { updateCompDP(rowNum); });
+    }
+    if (attSelect) {
+      attSelect.addEventListener('change', function() { updateCompDP(rowNum); });
+    }
+  }
+
+  // Attach listeners to all comp rows and attribute inputs
+  for (var r = 1; r <= 11; r++) {
+    attachCompListeners(r);
+  }
+
+  // Listen to attribute changes to update all comp rows
+  ['force', 'agilite', 'volonte', 'logique', 'charisme'].forEach(function(attr) {
+    const attrInput = document.querySelector('[data-field="' + attr + '"]');
+    if (attrInput) {
+      attrInput.addEventListener('input', function() {
+        for (var r = 1; r <= 11; r++) {
+          updateCompDP(r);
+        }
+      });
+    }
+  });
+
+  // Also need to update when loading data
+  // We'll add a function to recalculate all after load
+  window.recalcAllCompDP = function() {
+    for (var r = 1; r <= 11; r++) {
+      updateCompDP(r);
+    }
+  };
+
+  // Raccourcis clavier
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && (e.key === 'g' || e.key === 'G')) {
+      e.preventDefault();
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.id === 'background-editor' || activeEl.id === 'notes-editor')) {
+        document.execCommand('bold', false, null);
+      }
+    }
+  });
+
+  // ============ DATALIST COMPETENCES INTELLIGENT ============
+  (function() {
+    var attrMapping = {
+      'Force': 'FOR',
+      'Agilité': 'AGI',
+      'Volonté': 'VOL',
+      'Logique': 'LOG',
+      'Charisme': 'CHA',
+      'Logique ou Charisme': 'LOG'
+    };
+
+    // Créer le datalist s'il n'existe pas déjà
+    if (!document.getElementById('competences-datalist')) {
+      const datalist = document.createElement('datalist');
+      datalist.id = 'competences-datalist';
+
+      if (typeof getCompetences === 'function') {
+        const competences = getCompetences();
+        competences.forEach(function(comp) {
+          const option = document.createElement('option');
+          const attr = comp.Attribut || '';
+          const nom = comp.Nom || '';
+          const cat = comp.Categorie || '';
+          option.value = cat + ';' + nom + ';' + attr;
+          datalist.appendChild(option);
+        });
+      }
+      document.body.appendChild(datalist);
+    }
+
+    // Attacher les datalists aux inputs de compétences
+    for (var i = 1; i <= 11; i++) {
+      (function(rowNum) {
+        var nameInput = document.querySelector('[data-field="comp-' + rowNum + '-name"]');
+        if (nameInput) {
+          nameInput.setAttribute('list', 'competences-datalist');
+
+          nameInput.addEventListener('input', function() {
+            var val = this.value;
+            var parts = val.split(';');
+            if (parts.length >= 3) {
+              var cat = parts[0];
+              var nom = parts[1];
+              var attr = parts[2];
+              if (attrMapping[attr]) {
+                this.value = nom;
+                var attSelect = document.querySelector('[data-field="comp-' + rowNum + '-att"]');
+                if (attSelect) {
+                  attSelect.value = attrMapping[attr];
+                  updateCompDP(rowNum);
+                }
+              }
+            }
+          });
+        }
+      })(i);
+    }
+  })();
+
+  // ============ LIGNES MODULAIRES ============
+  var nextCompId = 2;
+  var nextAtoutId = 2;
+  var nextArmeId = 2;
+  var nextEquipId = 2;
+  var nextContactId = 2;
+
+  var attrMapping = {
+    'Force': 'FOR',
+    'Agilité': 'AGI',
+    'Volonté': 'VOL',
+    'Logique': 'LOG',
+    'Charisme': 'CHA',
+    'Logique ou Charisme': 'LOG'
+  };
+
+  function addCompRow() {
+    var container = document.getElementById('competences-rows');
+    if (!container) return;
+    var id = nextCompId++;
+    var row = document.createElement('div');
+    row.className = 'comp-row';
+    row.setAttribute('data-comp-row', id);
+    row.innerHTML = 
+      '<div class="comp-move-btns">' +
+        '<button type="button" class="btn-move-row" data-action="move-comp-up" title="Monter">↑</button>' +
+        '<button type="button" class="btn-move-row" data-action="move-comp-down" title="Descendre">↓</button>' +
+      '</div>' +
+      '<input type="text" class="comp-name" data-field="comp-' + id + '-name" placeholder="" list="competences-datalist">' +
+      '<input type="text" class="comp-val" data-field="comp-' + id + '-indice" placeholder="">' +
+      '<select class="comp-att-select" data-field="comp-' + id + '-att">' +
+        '<option value=""></option>' +
+        '<option value="FOR">FOR</option>' +
+        '<option value="AGI">AGI</option>' +
+        '<option value="VOL">VOL</option>' +
+        '<option value="LOG">LOG</option>' +
+        '<option value="CHA">CHA</option>' +
+      '</select>' +
+      '<input type="text" class="comp-val comp-rd" data-field="comp-' + id + '-rd" placeholder="" readonly>' +
+      '<div class="comp-rr">' +
+        '<div class="rr-circle" data-field="comp-' + id + '-rr-0"></div>' +
+        '<div class="rr-circle" data-field="comp-' + id + '-rr-1"></div>' +
+        '<div class="rr-circle" data-field="comp-' + id + '-rr-2"></div>' +
+      '</div>' +
+      '<button type="button" class="btn-del-row" data-action="remove-comp" title="Supprimer">🗑</button>';
+    container.appendChild(row);
+    attachCompListeners(id);
+    // Listener datalist intelligent
+    var nameInput = row.querySelector('.comp-name');
+    if (nameInput) {
+      nameInput.addEventListener('input', function() {
+        var val = this.value;
+        var parts = val.split(';');
+        if (parts.length >= 3) {
+          var nom = parts[1];
+          var attr = parts[2];
+          if (attrMapping[attr]) {
+            this.value = nom;
+            var attSelect = document.querySelector('[data-field="comp-' + id + '-att"]');
+            if (attSelect) {
+              attSelect.value = attrMapping[attr];
+              updateCompDP(id);
+            }
+          }
+        }
+      });
+    }
+  }
+
+  
+  function moveCompUp(btn) {
+    var row = btn.closest('.comp-row');
+    if (!row) return;
+    var prev = row.previousElementSibling;
+    if (prev && prev.classList.contains('comp-row')) {
+      row.parentNode.insertBefore(row, prev);
+    }
+  }
+  function moveCompDown(btn) {
+    var row = btn.closest('.comp-row');
+    if (!row) return;
+    var next = row.nextElementSibling;
+    if (next && next.classList.contains('comp-row')) {
+      row.parentNode.insertBefore(next, row);
+    }
+  }
+  function removeCompRow(btn) {
+    var row = btn.closest('.comp-row');
+    if (row) {
+      row.remove();
+    }
+  }
+
+  function addAtoutRow() {
+    var container = document.getElementById('atouts-lines');
+    if (!container) return;
+    var id = nextAtoutId++;
+    var row = document.createElement('div');
+    row.className = 'atout-row';
+    row.setAttribute('data-atout-row', id);
+    row.innerHTML = 
+      '<textarea class="input-long auto-resize" data-field="atout-' + id + '" placeholder="" rows="1"></textarea>' +
+      '<button type="button" class="btn-del-row" data-action="remove-atout" title="Supprimer">🗑</button>';
+    container.appendChild(row);
+  }
+
+  function removeAtoutRow(btn) {
+    var row = btn.closest('.atout-row');
+    if (row) row.remove();
+  }
+
+  function addArmeRow() {
+    var container = document.getElementById('armes-rows');
+    if (!container) return;
+    var id = nextArmeId++;
+    var row = document.createElement('div');
+    row.className = 'arme-row';
+    row.setAttribute('data-arme-row', id);
+    row.innerHTML = 
+      '<textarea class="arme-name" data-field="arme-' + id + '-name" placeholder="" rows="1"></textarea>' +
+      '<select class="arme-type-select" data-field="arme-' + id + '-type">' +
+        '<option value="">-- Choisir --</option>' +
+        '<option value="Arme">Arme</option>' +
+        '<option value="Sort">Sort</option>' +
+      '</select>' +
+      '<button type="button" class="btn-del-row" data-action="remove-arme" title="Supprimer">🗑</button>';
+    container.appendChild(row);
+  }
+
+  function removeArmeRow(btn) {
+    var row = btn.closest('.arme-row');
+    if (row) row.remove();
+  }
+
+  function addEquipRow() {
+    var container = document.getElementById('equipement-lines');
+    if (!container) return;
+    var id = nextEquipId++;
+    var row = document.createElement('div');
+    row.className = 'equip-row';
+    row.setAttribute('data-equip-row', id);
+    row.innerHTML = 
+      '<textarea class="input-long auto-resize" data-field="equip-' + id + '" placeholder="" rows="1"></textarea>' +
+      '<button type="button" class="btn-del-row" data-action="remove-equip" title="Supprimer">🗑</button>';
+    container.appendChild(row);
+  }
+
+
+  function addContactRow() {
+    var container = document.getElementById('contacts-lines');
+    if (!container) return;
+    var id = nextContactId++;
+    var row = document.createElement('div');
+    row.className = 'contact-row';
+    row.setAttribute('data-contact-row', id);
+    row.innerHTML = 
+      '<textarea class="input-long auto-resize" data-field="contact-' + id + '" placeholder="" rows="1"></textarea>' +
+      '<button type="button" class="btn-del-row" data-action="remove-contact" title="Supprimer">🗑</button>';
+    container.appendChild(row);
+  }
+
+  function removeContactRow(btn) {
+    var row = btn.closest('.contact-row');
+    if (row) row.remove();
+  }
+
+  function removeEquipRow(btn) {
+    var row = btn.closest('.equip-row');
+    if (row) row.remove();
+  }
+
+  // Boutons
+  var btnAddComp = document.getElementById('btn-add-comp');
+  if (btnAddComp) btnAddComp.addEventListener('click', addCompRow);
+  var btnAddAtout = document.getElementById('btn-add-atout');
+  if (btnAddAtout) btnAddAtout.addEventListener('click', addAtoutRow);
+  var btnAddArme = document.getElementById('btn-add-arme');
+  if (btnAddArme) btnAddArme.addEventListener('click', addArmeRow);
+  var btnAddEquip = document.getElementById('btn-add-equip');
+  if (btnAddEquip) btnAddEquip.addEventListener('click', addEquipRow);
+  var btnAddContact = document.getElementById('btn-add-contact');
+  if (btnAddContact) btnAddContact.addEventListener('click', addContactRow);
+
+  // Recalcul global dynamique
+  window.recalcAllCompDP = function() {
+    document.querySelectorAll('.comp-row').forEach(function(row) {
+      var rowNum = row.getAttribute('data-comp-row');
+      if (rowNum) {
+        updateCompDP(parseInt(rowNum, 10));
+      }
+    });
+  };
+
+  // ============ VÉHICULES & DRONES ============
+  var nextVehiculeId = 1;
+  var nextDroneId = 1;
+
+  function createVehiculeBlock(id) {
+    var block = document.createElement('div');
+    block.className = 'vehicule-block';
+    block.setAttribute('data-vehicule-id', id);
+    block.innerHTML =
+      '<button type="button" class="btn-del-row" data-action="remove-vehicule" title="Supprimer">🗑</button>' +
+      '<div class="vehicule-header">' +
+        '<input type="text" class="vehicule-model" data-field="vehicule-' + id + '-modele" placeholder="Modèle de véhicule">' +
+      '</div>' +
+      '<div class="vehicule-stats">' +
+        '<div class="stat-box"><span class="stat-label">Autopilote</span><input type="number" class="stat-input vehicule-stat" data-field="vehicule-' + id + '-autopilote" min="0" max="20" placeholder="0"></div>' +
+        '<div class="stat-box"><span class="stat-label">Structure</span><input type="number" class="stat-input vehicule-stat" data-field="vehicule-' + id + '-structure" min="0" max="20" placeholder="0"></div>' +
+        '<div class="stat-box"><span class="stat-label">Maniabilité</span><input type="number" class="stat-input vehicule-stat" data-field="vehicule-' + id + '-maniabilite" min="0" max="20" placeholder="0"></div>' +
+        '<div class="stat-box"><span class="stat-label">Vitesse</span><input type="number" class="stat-input vehicule-stat" data-field="vehicule-' + id + '-vitesse" min="0" max="20" placeholder="0"></div>' +
+        '<div class="stat-box"><span class="stat-label">Blindage</span><input type="number" class="stat-input vehicule-stat" data-field="vehicule-' + id + '-blindage" min="0" max="20" placeholder="0"></div>' +
+      '</div>' +
+      '<div class="vehicule-armure">' +
+        '<span class="armure-label">Résitance</span>' +
+        '<span class="armure-val" data-field="vehicule-' + id + '-armure-legere">—</span>' +
+        '<span class="armure-val" data-field="vehicule-' + id + '-armure-grave">—</span>' +
+        '<span class="armure-val" data-field="vehicule-' + id + '-armure-incap">—</span>' +
+      '</div>' +
+      '<textarea class="vehicule-desc" data-field="vehicule-' + id + '-desc" placeholder="Description..."></textarea>';
+    return block;
+  }
+
+  function createDroneBlock(id) {
+    var block = document.createElement('div');
+    block.className = 'drone-block';
+    block.setAttribute('data-drone-id', id);
+    block.innerHTML =
+      '<button type="button" class="btn-del-row" data-action="remove-drone" title="Supprimer">🗑</button>' +
+      '<div class="drone-header">' +
+        '<input type="text" class="drone-model" data-field="drone-' + id + '-modele" placeholder="Modèle de drone">' +
+        '<select class="drone-taille-select" data-field="drone-' + id + '-taille">' +
+          '<option value="">-- Taille --</option>' +
+          '<option value="Microdrone">Microdrone</option>' +
+          '<option value="Minidrone">Minidrone</option>' +
+          '<option value="Petit drone">Petit drone</option>' +
+          '<option value="Drone moyen">Drone moyen</option>' +
+          '<option value="Grand drone">Grand drone</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="drone-stats">' +
+        '<div class="stat-box"><span class="stat-label">Autopilote</span><input type="number" class="stat-input drone-stat" data-field="drone-' + id + '-autopilote" min="0" max="20" placeholder="0"></div>' +
+        '<div class="stat-box"><span class="stat-label">Structure</span><input type="number" class="stat-input drone-stat" data-field="drone-' + id + '-structure" min="0" max="20" placeholder="0"></div>' +
+        '<div class="stat-box"><span class="stat-label">Maniabilité</span><input type="number" class="stat-input drone-stat" data-field="drone-' + id + '-maniabilite" min="0" max="20" placeholder="0"></div>' +
+        '<div class="stat-box"><span class="stat-label">Vitesse</span><input type="number" class="stat-input drone-stat" data-field="drone-' + id + '-vitesse" min="0" max="20" placeholder="0"></div>' +
+        '<div class="stat-box"><span class="stat-label">Blindage</span><input type="number" class="stat-input drone-stat" data-field="drone-' + id + '-blindage" min="0" max="20" placeholder="0"></div>' +
+      '</div>' +
+      '<div class="drone-armure">' +
+        '<span class="armure-label">Résitance</span>' +
+        '<span class="armure-val" data-field="drone-' + id + '-armure-legere">—</span>' +
+        '<span class="armure-val" data-field="drone-' + id + '-armure-grave">—</span>' +
+        '<span class="armure-val" data-field="drone-' + id + '-armure-incap">—</span>' +
+      '</div>' +
+      '<textarea class="drone-desc" data-field="drone-' + id + '-desc" placeholder="Description..."></textarea>';
+    return block;
+  }
+
+  function addVehiculeBlock() {
+    var container = document.getElementById('vehicules-container');
+    if (!container) return;
+    var id = nextVehiculeId++;
+    var block = createVehiculeBlock(id);
+    container.appendChild(block);
+    attachVehiculeListeners(id);
+  }
+
+  function addDroneBlock() {
+    var container = document.getElementById('drones-container');
+    if (!container) return;
+    var id = nextDroneId++;
+    var block = createDroneBlock(id);
+    container.appendChild(block);
+    attachDroneListeners(id);
+  }
+
+  function attachVehiculeListeners(id) {
+    var stats = ['structure', 'blindage'];
+    stats.forEach(function(stat) {
+      var el = document.querySelector('[data-field="vehicule-' + id + '-' + stat + '"]');
+      if (el) el.addEventListener('input', function() { updateVehiculeArmure(id); });
+    });
+    updateVehiculeArmure(id);
+  }
+
+  function attachDroneListeners(id) {
+    var stats = ['structure', 'blindage'];
+    stats.forEach(function(stat) {
+      var el = document.querySelector('[data-field="drone-' + id + '-' + stat + '"]');
+      if (el) el.addEventListener('input', function() { updateDroneArmure(id); });
+    });
+    updateDroneArmure(id);
+  }
+
+  function updateVehiculeArmure(id) {
+    var struct = parseInt(document.querySelector('[data-field="vehicule-' + id + '-structure"]')?.value, 10) || 0;
+    var blind = parseInt(document.querySelector('[data-field="vehicule-' + id + '-blindage"]')?.value, 10) || 0;
+    var l = document.querySelector('[data-field="vehicule-' + id + '-armure-legere"]');
+    var g = document.querySelector('[data-field="vehicule-' + id + '-armure-grave"]');
+    var i = document.querySelector('[data-field="vehicule-' + id + '-armure-incap"]');
+    if (l) l.textContent = struct + blind;
+    if (g) g.textContent = (struct * 2) + blind;
+    if (i) i.textContent = (struct * 3) + blind;
+  }
+
+  function updateDroneArmure(id) {
+    var struct = parseInt(document.querySelector('[data-field="drone-' + id + '-structure"]')?.value, 10) || 0;
+    var blind = parseInt(document.querySelector('[data-field="drone-' + id + '-blindage"]')?.value, 10) || 0;
+    var l = document.querySelector('[data-field="drone-' + id + '-armure-legere"]');
+    var g = document.querySelector('[data-field="drone-' + id + '-armure-grave"]');
+    var i = document.querySelector('[data-field="drone-' + id + '-armure-incap"]');
+    if (l) l.textContent = struct + blind;
+    if (g) g.textContent = (struct * 2) + blind;
+    if (i) i.textContent = (struct * 3) + blind;
+  }
+
+  function removeVehiculeBlock(btn) {
+    var block = btn.closest('.vehicule-block');
+    if (block) block.remove();
+  }
+
+  function removeDroneBlock(btn) {
+    var block = btn.closest('.drone-block');
+    if (block) block.remove();
+  }
+
+  document.getElementById('btn-add-vehicule')?.addEventListener('click', addVehiculeBlock);
+  document.getElementById('btn-add-drone')?.addEventListener('click', addDroneBlock);
+
+  // Créer un bloc par défaut au chargement
+  addVehiculeBlock();
+  addDroneBlock();
+
+  // ============ CYBERDECK ============
+  var nextCyberdeckId = 1;
+  var nextProgrammeId = {};
+
+  var PROGRAMMES_DATA = [
+    {cat:"OPTIONS DE DECK", nom:"Assistant personnel Spinrad Lycos", desc:"Adopte une personnalité artificielle, rédige des messages, gère le planning, assiste les recherches. RR 1 Électronique (recherches matricielles)"},
+    {cat:"OPTIONS DE DECK", nom:"Assistant personnel ETC Nate", desc:"RR 2 Électronique (recherches matricielles)"},
+    {cat:"OPTIONS DE DECK", nom:"Appli eParkour", desc:"Analyse l'environnement et les possibilités de parkour en se basant sur le profil de compétence de l'utilisateur. RR 1 Athlétisme (parkour)"},
+    {cat:"OPTIONS DE DECK", nom:"Linguasoft", desc:"Permet de traduire une langue (au choix) en temps réel."},
+    {cat:"OPTIONS DE DECK", nom:"Mapsoft", desc:"Carte d'un lieu, guidage RA. RR 1 Survie (orientation)"},
+    {cat:"OPTIONS DE DECK", nom:"Programme linguistique", desc:"RR 1 Influence (étiquette)"},
+    {cat:"OPTIONS DE DECK", nom:"Simshare", desc:"Permet de partager un flux simsens avec d'autres utilisateurs"},
+    {cat:"PROGRAMME LEGAUX", nom:"Assistant personnel Spinrad Lycos", desc:"Adopte une personnalité artificielle, rédige des messages, gère le planning, assiste les recherches. RR 1 Électronique (recherches matricielles)"},
+    {cat:"PROGRAMME LEGAUX", nom:"Assistant personnel ETC Nate", desc:"RR 2 Électronique (recherches matricielles)"},
+    {cat:"PROGRAMME LEGAUX", nom:"Appli eParkour", desc:"Analyse l'environnement et les possibilités de parkour en se basant sur le profil de compétence de l'utilisateur. RR 1 Athlétisme (parkour)"},
+    {cat:"PROGRAMME LEGAUX", nom:"Linguasoft", desc:"Permet de traduire une langue (au choix) en temps réel."},
+    {cat:"PROGRAMME LEGAUX", nom:"Mapsoft", desc:"Carte d'un lieu, guidage RA. RR 1 Survie (orientation)"},
+    {cat:"PROGRAMME LEGAUX", nom:"Programme linguistique", desc:"RR 1 Influence (étiquette)"},
+    {cat:"PROGRAMME LEGAUX", nom:"Simshare", desc:"Permet de partager un flux simsens avec d'autres utilisateurs"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Biofeedback", desc:"Permet d'infliger des dommages de biofeedback au lieu de dommages matriciels"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Blackout", desc:"Permet d'infliger des dommages de biofeedback au lieu de dommages matriciels, mais uniquement étourdissants, même face à un decker en Hot-sim"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Evasion", desc:"RR 2 Piratage (cybercombat), uniquement pour se défendre et seulement si le decker utilise une action pour se défendre"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Bibliothèque de scripts", desc:"RR 1 Piratage (force brute)"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Contournement", desc:"RR 1 Piratage (backdoor)"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Exploitation", desc:"RR 1 Piratage"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Intruder", desc:"RR 1 Piratage, RR 1 Piratage (force brute), RR 1 Piratage (backdoor)"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Invisibilité", desc:"RR 1 Furtivité (matricielle)"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Marteau", desc:"RR 1 Piratage (cybercombat)"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Debug", desc:"Autorise un test de Logique + Électronique (appareil personnel) pour réparer un dommage léger infligé à un appareil par une attaque matricielle. Peut être réalisé en ligne en une action en échange d'un point d'Anarchy."},
+    {cat:"PROGRAMME ILLEGALE", nom:"Mouchard", desc:"Permet de charger un spyware sur un appareil (droit admin nécessaire) qui rapporte toute activité matricielle au decker qui l'a posé"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Nettoyeur de signal", desc:"Permet d'annuler le désavantage dû au bruit contre un point d'Anarchy"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Pic à glace", desc:"RR 2 Piratage (cybercombat), uniquement pour attaquer des GLACE"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Scan", desc:"RR 1 Perception (matricielle)"},
+    {cat:"PROGRAMME ILLEGALE", nom:"Verrouillage de connexion", desc:"Empêche une cible en RV de se déconnecter pendant un tour"}
+  ];
+
+
+
+  function createCyberdeckBlock(id) {
+    var block = document.createElement('div');
+    block.className = 'cyberdeck-block';
+    block.setAttribute('data-cyberdeck-id', id);
+    block.innerHTML =
+      '<button type="button" class="btn-del-row" data-action="remove-cyberdeck" title="Supprimer">🗑</button>' +
+      '<div class="cyberdeck-header">' +
+        '<input type="text" class="cyberdeck-model" data-field="cyberdeck-' + id + '-modele" placeholder="Modèle de cyberdeck">' +
+      '</div>' +
+      '<div class="cyberdeck-stats">' +
+        '<div class="cyberdeck-fw-box">' +
+          '<span class="stat-label">Fireware</span>' +
+          '<input type="number" class="stat-input cyberdeck-fw" data-field="cyberdeck-' + id + '-fireware" min="0" max="20" placeholder="0">' +
+        '</div>' +
+        '<div class="cyberdeck-fw-box">' +
+          '<span class="stat-label">Attaque</span>' +
+          '<input type="number" class="stat-input cyberdeck-fw" data-field="cyberdeck-' + id + '-attaque" min="0" max="20" placeholder="0">' +
+        '</div>' +
+        '<div class="cyberdeck-protection">' +
+          '<span class="armure-label">Protection</span>' +
+          '<span class="armure-val" data-field="cyberdeck-' + id + '-prot-legere">—</span>' +
+          '<span class="armure-val" data-field="cyberdeck-' + id + '-prot-grave">—</span>' +
+          '<span class="armure-val" data-field="cyberdeck-' + id + '-prot-incap">—</span>' +
+        '</div>' +
+      '</div>' +
+      '<textarea class="cyberdeck-desc" data-field="cyberdeck-' + id + '-desc" placeholder="Description..."></textarea>' +
+      '<div class="programme-section">' +
+        '<div class="programme-header">Programmes</div>' +
+        '<div class="programme-rows" data-cyberdeck-prog="' + id + '"></div>' +
+        '<button type="button" class="toolbar-btn secondary add-row-btn" data-action="add-programme" data-cyberdeck-id="' + id + '" style="margin-top:4px;font-size:11px;">+ Ajouter un programme</button>' +
+      '</div>';
+    return block;
+  }
+
+  function addCyberdeckBlock() {
+    var container = document.getElementById('cyberdeck-container');
+    if (!container) return;
+    var id = nextCyberdeckId++;
+    var block = createCyberdeckBlock(id);
+    container.appendChild(block);
+    attachCyberdeckListeners(id);
+    addProgrammeRow(id);
+  }
+
+  function attachCyberdeckListeners(id) {
+    var fw = document.querySelector('[data-field="cyberdeck-' + id + '-fireware"]');
+    if (fw) fw.addEventListener('input', function() { updateCyberdeckProtection(id); });
+    updateCyberdeckProtection(id);
+  }
+
+  function updateCyberdeckProtection(id) {
+    var fw = parseInt(document.querySelector('[data-field="cyberdeck-' + id + '-fireware"]')?.value, 10) || 0;
+    var l = document.querySelector('[data-field="cyberdeck-' + id + '-prot-legere"]');
+    var g = document.querySelector('[data-field="cyberdeck-' + id + '-prot-grave"]');
+    var i = document.querySelector('[data-field="cyberdeck-' + id + '-prot-incap"]');
+    if (l) l.textContent = fw;
+    if (g) g.textContent = fw + 3;
+    if (i) i.textContent = fw + 6;
+  }
+
+  function addProgrammeRow(cyberdeckId) {
+    var container = document.querySelector('[data-cyberdeck-prog="' + cyberdeckId + '"]');
+    if (!container) return;
+    if (!nextProgrammeId[cyberdeckId]) nextProgrammeId[cyberdeckId] = 1;
+    var pid = nextProgrammeId[cyberdeckId]++;
+    var row = document.createElement('div');
+    row.className = 'programme-row';
+    row.setAttribute('data-programme-id', pid);
+    row.innerHTML =
+      '<div class="programme-dropdown-container">' +
+      '<input type="text" class="programme-input" data-field="cyberdeck-' + cyberdeckId + '-programme-' + pid + '" placeholder="" autocomplete="off">' +
+      '<div class="programme-dropdown"></div>' +
+      '</div>' +
+      '<button type="button" class="btn-del-row" data-action="remove-programme" title="Supprimer">🗑</button>';
+    container.appendChild(row);
+
+    var inp = row.querySelector('.programme-input');
+    var dd = row.querySelector('.programme-dropdown');
+    if (inp && dd) {
+      attachProgrammeDropdown(inp, dd);
+    }
+  }
+
+  function attachProgrammeDropdown(input, dropdown) {
+    var highlightedIndex = -1;
+    var filtered = [];
+
+    function renderDropdown(filterText) {
+      filterText = (filterText || '').toLowerCase();
+      filtered = PROGRAMMES_DATA.filter(function(p) {
+        var search = (p.nom + ' ' + p.cat + ' ' + p.desc).toLowerCase();
+        return search.indexOf(filterText) !== -1;
+      });
+      if (filtered.length === 0) {
+        dropdown.innerHTML = '<div class="programme-dropdown-item" style="opacity:0.6;cursor:default;"><span class="programme-dropdown-nom">Aucun résultat</span></div>';
+        dropdown.classList.add('active');
+        highlightedIndex = -1;
+        return;
+      }
+      dropdown.innerHTML = '';
+      filtered.forEach(function(p, idx) {
+        var item = document.createElement('div');
+        item.className = 'programme-dropdown-item';
+        item.setAttribute('data-index', idx);
+        item.innerHTML =
+          '<div class="programme-dropdown-cat">' + escapeHtml(p.cat) + '</div>' +
+          '<div class="programme-dropdown-nom">' + escapeHtml(p.nom) + '</div>' +
+          '<div class="programme-dropdown-desc">' + escapeHtml(p.desc) + '</div>';
+        item.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          input.value = p.nom + '" : "' + p.desc;
+          dropdown.classList.remove('active');
+          highlightedIndex = -1;
+        });
+        dropdown.appendChild(item);
+      });
+      dropdown.classList.add('active');
+      highlightedIndex = 0;
+      updateHighlight();
+    }
+
+    function updateHighlight() {
+      var items = dropdown.querySelectorAll('.programme-dropdown-item');
+      items.forEach(function(it) { it.classList.remove('highlighted'); });
+      if (highlightedIndex >= 0 && items[highlightedIndex]) {
+        items[highlightedIndex].classList.add('highlighted');
+        items[highlightedIndex].scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    input.addEventListener('focus', function() {
+      renderDropdown(input.value);
+    });
+
+    input.addEventListener('input', function() {
+      renderDropdown(input.value);
+    });
+
+    input.addEventListener('keydown', function(e) {
+      var items = dropdown.querySelectorAll('.programme-dropdown-item');
+      if (!dropdown.classList.contains('active')) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        highlightedIndex = (highlightedIndex + 1) % items.length;
+        updateHighlight();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
+        updateHighlight();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (highlightedIndex >= 0 && filtered[highlightedIndex]) {
+          var sel = filtered[highlightedIndex];
+          input.value = sel.nom + '" : "' + sel.desc;
+        }
+        dropdown.classList.remove('active');
+        highlightedIndex = -1;
+      } else if (e.key === 'Escape') {
+        dropdown.classList.remove('active');
+        highlightedIndex = -1;
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('active');
+        highlightedIndex = -1;
+      }
+    });
+  }
+
+  function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function removeCyberdeckBlock(btn) {
+    var block = btn.closest('.cyberdeck-block');
+    if (block) block.remove();
+  }
+
+  function removeProgrammeRow(btn) {
+    var row = btn.closest('.programme-row');
+    if (row) row.remove();
+  }
+
+  document.getElementById('btn-add-cyberdeck')?.addEventListener('click', addCyberdeckBlock);
+
+  // Délégation pour les boutons + programme
+  document.body.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-action="add-programme"]');
+    if (btn) {
+      var cid = btn.getAttribute('data-cyberdeck-id');
+      if (cid) addProgrammeRow(cid);
+    }
+  });
+
+  // Créer un bloc par défaut
+  addCyberdeckBlock();
+
+  // ============ FORMATAGE NUYEN ============
+  function formatNuyen(input) {
+    var raw = input.value.replace(/[^0-9]/g, '');
+    if (!raw) { input.value = ''; return; }
+    var num = parseInt(raw, 10);
+    if (isNaN(num)) { input.value = ''; return; }
+    var formatted = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    input.value = formatted + ' ¥';
+  }
+
+  function unformatNuyen(input) {
+    var raw = input.value.replace(/[^0-9]/g, '');
+    input.value = raw;
+  }
+
+  document.querySelectorAll('[data-field^="nuyen-"]').forEach(function(input) {
+    input.addEventListener('focus', function() { unformatNuyen(this); });
+    input.addEventListener('blur', function() { formatNuyen(this); });
+    input.addEventListener('input', function() {
+      var val = this.value.replace(/[^0-9]/g, '');
+      this.value = val;
+    });
+  });
+});
+
+  // ============ AUTO-RESIZE TEXTAREA ARMES ET SORTS / ATOUTS / CONNAISSANCES / ÉQUIPEMENT ============
+  window.autoResizeTextarea = function(el) {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  };
+  document.querySelectorAll('.arme-name, .auto-resize').forEach(window.autoResizeTextarea);
+  document.body.addEventListener('input', function(e) {
+    if (e.target.classList.contains('arme-name') || e.target.classList.contains('auto-resize')) {
+      window.autoResizeTextarea(e.target);
+    }
+  });
+
+</script>
+<!-- Chatdice Panel -->
+<aside class="chatdice-panel" id="chatdice-panel">
+  <div class="chatdice-header">
+    <div class="chatdice-title">Lancer de dés</div>
+    <button class="btn-clear-chat" id="btn-clear-chat" title="Vider l'historique">Vider</button>
+  </div>
+  <div class="chatdice-history" id="chatdice-history">
+    <div class="chatdice-empty" id="chatdice-empty">
+      Double-cliquez sur une compétence dans la fiche pour lancer les dés.
+    </div>
+  </div>
+  <div class="chatdice-legend">
+    <div class="chatdice-legend-item"><div class="chatdice-legend-box" style="background:var(--yellow);border-color:var(--yellow-dark)"></div> Succès</div>
+    <div class="chatdice-legend-item"><div class="chatdice-legend-box" style="background:var(--success);border-color:#1b5e20"></div> Double</div>
+    <div class="chatdice-legend-item"><div class="chatdice-legend-box" style="background:var(--danger);border-color:#8e0000"></div> Glitch</div>
+    <div class="chatdice-legend-item"><div class="chatdice-legend-box" style="background:var(--gray-light);border-color:var(--gray-mid)"></div> Échec</div>
+  </div>
+</aside>
+
+<!-- Dice Modal -->
+<div id="dice-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>Configuration du jet</span>
+      <button class="btn-icon" onclick="window.closeDiceModal()" style="font-size:14px;padding:2px 6px;">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="comp-hint">
+        <strong id="modal-creature">Créature</strong> lance <strong id="modal-skill">Compétence</strong><br>
+        Attribut : <span id="modal-attr">AGI 3</span> | Indice : <span id="modal-indice">2</span> | RR : <span id="modal-rr">0</span>
+      </div>
+      <div class="dice-form-row">
+        <div class="dice-form-group">
+          <label>État du jet</label>
+          <select id="dice-state">
+            <option value="normal">Normal (5-6)</option>
+            <option value="advantage">Avantage (4-5-6)</option>
+            <option value="disadvantage">Désavantage (6)</option>
+          </select>
+        </div>
+        <div class="dice-form-group">
+          <label>Modificateur (±dés)</label>
+          <input type="number" id="dice-mod" value="0" min="-10" max="10">
+        </div>
+      </div>
+      <div class="dice-form-row">
+        <div class="dice-form-group">
+          <label>Dés de risque</label>
+          <input type="number" id="dice-risk" value="0" min="0" max="15">
+        </div>
+        <div class="dice-form-group">
+          <label>Pool total</label>
+          <div class="dice-pool-preview">
+            <div class="pool-num" id="modal-pool">5</div>
+            <div class="pool-lbl" id="modal-pool-detail">5 normal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="toolbar-btn secondary" id="btn-cancel-dice">Annuler</button>
+      <button class="toolbar-btn" id="btn-roll-dice">Lancer</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ========== CHATDICE MODULE (globales) ==========
+window.rollD6 = function() { return Math.floor(Math.random() * 6) + 1; };
+
+window.openDiceModal = function(data) {
+  document.getElementById('modal-creature').textContent = data.creature;
+  document.getElementById('modal-skill').textContent = data.skill;
+  document.getElementById('modal-attr').textContent = data.attrName + ' ' + data.attrVal;
+  document.getElementById('modal-indice').textContent = data.indice;
+  document.getElementById('modal-rr').textContent = data.rr;
+  document.getElementById('dice-state').value = 'normal';
+  document.getElementById('dice-mod').value = '0';
+  document.getElementById('dice-risk').value = '0';
+  document.getElementById('dice-modal').style.display = 'flex';
+  window._diceData = data;
+  window.updateModalPool();
+};
+
+window.closeDiceModal = function() {
+  document.getElementById('dice-modal').style.display = 'none';
+  window._diceData = null;
+};
+
+window.updateModalPool = function() {
+  if (!window._diceData) return;
+  var data = window._diceData;
+  var mod = parseInt(document.getElementById('dice-mod').value) || 0;
+  var risk = parseInt(document.getElementById('dice-risk').value) || 0;
+  var pool = data.attrVal + data.indice + mod;
+  var normal = Math.max(0, pool - risk);
+  var actualRisk = Math.min(risk, pool);
+  document.getElementById('modal-pool').textContent = pool;
+  document.getElementById('modal-pool-detail').textContent =
+    normal + ' normal' + (actualRisk ? ' + ' + actualRisk + ' risque' : '');
+};
+
+window.rollDiceFromModal = function() {
+  var data = window._diceData;
+  if (!data) return;
+  var mod = parseInt(document.getElementById('dice-mod').value) || 0;
+  var risk = parseInt(document.getElementById('dice-risk').value) || 0;
+  var state = document.getElementById('dice-state').value;
+  var pool = data.attrVal + data.indice + mod;
+  var normal = Math.max(0, pool - risk);
+  var actualRisk = Math.min(risk, pool);
+  var rr = data.rr || 0;
+
+  var successThreshold = 5;
+  if (state === 'advantage') successThreshold = 4;
+  if (state === 'disadvantage') successThreshold = 6;
+
+  var results = [];
+  for (var i = 0; i < normal; i++) results.push({ val: window.rollD6(), risk: false });
+  for (var i = 0; i < actualRisk; i++) results.push({ val: window.rollD6(), risk: true });
+
+  var successes = 0, doubles = 0, glitches = 0;
+  results.forEach(function(r) {
+    if (r.risk) {
+      // Dé de risque : seuil et plus = 2 succès, 1 = glitch
+      if (r.val >= successThreshold) {
+        successes += 2;
+        doubles++;
+      }
+      if (r.val === 1) glitches++;
+    } else {
+      // Dé normal : seuil et plus = 1 succès
+      if (r.val >= successThreshold) successes++;
+      if (r.val === 6) doubles++;
+    }
+  });
+
+  // Application de la Réduction de Risque (RR)
+  var glitchesEffectifs = Math.max(0, glitches - rr);
+  var glitchesAnnules = glitches - glitchesEffectifs;
+
+  var diceHtml = '';
+  results.forEach(function(r) {
+    var cls = 'die';
+    if (r.risk) cls += ' risk';
+    if (r.risk && r.val === 1) {
+      cls += ' glitch';
+    } else if (r.val === 6) {
+      cls += ' double-success';
+    } else if (r.risk && r.val >= successThreshold) {
+      // 5 (ou 4 en avantage) sur dé de risque = double succès aussi
+      cls += ' double-success';
+    } else if (r.val >= successThreshold) {
+      cls += ' normal-success';
+    } else {
+      cls += ' rest';
+    }
+    diceHtml += '<div class="' + cls + '">' + r.val + '</div>';
+  });
+
+  var summaryText = '', summaryClass = '', noteText = '';
+
+  // Construction du résumé avec RR
+  var rrInfo = '';
+  if (glitchesAnnules > 0) {
+    rrInfo = ' (' + glitchesAnnules + ' glitch' + (glitchesAnnules > 1 ? 'es' : '') + ' annulé' + (glitchesAnnules > 1 ? 's' : '') + ' par RR)';
+  }
+
+  if (glitchesEffectifs > 0 && successes === 0) {
+    summaryText = 'Glitch critique ! ' + successes + ' succès, ' + glitchesEffectifs + ' glitch' + (glitchesEffectifs > 1 ? 'es' : '') + rrInfo;
+    summaryClass = 'fail';
+  } else if (glitchesEffectifs > 0) {
+    summaryText = successes + ' succès mais ' + glitchesEffectifs + ' glitch' + (glitchesEffectifs > 1 ? 'es' : '') + rrInfo;
+    summaryClass = 'mixed';
+  } else if (successes === 0) {
+    summaryText = 'Échec - ' + successes + ' succès';
+    summaryClass = 'fail';
+  } else {
+    summaryText = successes + ' succès' + (doubles > 0 ? ' (' + doubles + ' double' + (doubles > 1 ? 's' : '') + ')' : '') + rrInfo;
+    summaryClass = 'success';
+  }
+
+  if (state === 'advantage') noteText = 'Jet avec avantage (4-5-6)';
+  if (state === 'disadvantage') noteText = 'Jet avec désavantage (6 seulement)';
+  if (actualRisk > 0) {
+    var riskNote = actualRisk + ' dé' + (actualRisk > 1 ? 's' : '') + ' de risque';
+    if (rr > 0) riskNote += ', RR ' + rr;
+    noteText = (noteText ? noteText + ' — ' : '') + riskNote;
+  }
+
+  var now = new Date();
+  var timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+  var msg = document.createElement('div');
+  msg.className = 'chatdice-msg';
+  msg.innerHTML =
+    '<div class="chatdice-msg-header">' +
+      '<span>' + escapeHtml(data.creature) + ' — ' + escapeHtml(data.skill) + '</span>' +
+      '<span class="chatdice-msg-time">' + timeStr + '</span>' +
+    '</div>' +
+    '<div class="chatdice-dice-box">' + diceHtml + '</div>' +
+    '<div class="chatdice-summary ' + summaryClass + '">' + summaryText + '</div>' +
+    (noteText ? '<div class="chatdice-note">' + noteText + '</div>' : '');
+
+  var hist = document.getElementById('chatdice-history');
+  var empty = document.getElementById('chatdice-empty');
+  if (empty) empty.remove();
+  hist.appendChild(msg);
+  hist.scrollTop = hist.scrollHeight;
+  window.closeDiceModal();
+};
+
+window.clearChatHistory = function() {
+  var hist = document.getElementById('chatdice-history');
+  hist.innerHTML = '<div class="chatdice-empty" id="chatdice-empty">Double-cliquez sur une compétence dans la fiche pour lancer les dés.</div>';
+};
+
+function escapeHtml(text) {
+  var div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ========== Event listeners (attendre le DOM) ==========
+document.addEventListener('DOMContentLoaded', function() {
+  var btnCancel = document.getElementById('btn-cancel-dice');
+  var btnRoll = document.getElementById('btn-roll-dice');
+  var btnClear = document.getElementById('btn-clear-chat');
+  var diceState = document.getElementById('dice-state');
+  var diceMod = document.getElementById('dice-mod');
+  var diceRisk = document.getElementById('dice-risk');
+  var diceModal = document.getElementById('dice-modal');
+
+  if (btnCancel) btnCancel.addEventListener('click', window.closeDiceModal);
+  if (btnRoll) btnRoll.addEventListener('click', window.rollDiceFromModal);
+  if (btnClear) btnClear.addEventListener('click', window.clearChatHistory);
+  if (diceState) diceState.addEventListener('change', window.updateModalPool);
+  if (diceMod) diceMod.addEventListener('input', window.updateModalPool);
+  if (diceRisk) diceRisk.addEventListener('input', window.updateModalPool);
+  if (diceModal) diceModal.addEventListener('click', function(e) {
+    if (e.target === this) window.closeDiceModal();
+  });
+
+  // ========== DOUBLE-CLIC SUR COMPÉTENCE ==========
+  var attrMap = {
+    'FOR': 'force',
+    'AGI': 'agilite',
+    'VOL': 'volonte',
+    'LOG': 'logique',
+    'CHA': 'charisme'
+  };
+
+  var compContainer = document.getElementById('competences-rows');
+  if (compContainer) {
+    compContainer.addEventListener('dblclick', function(e) {
+      var row = e.target.closest('.comp-row');
+      if (!row) return;
+
+      var rowNum = row.getAttribute('data-comp-row');
+      if (!rowNum) return;
+
+      var nameInput = row.querySelector('[data-field="comp-' + rowNum + '-name"]');
+      var indiceInput = row.querySelector('[data-field="comp-' + rowNum + '-indice"]');
+      var attSelect = row.querySelector('[data-field="comp-' + rowNum + '-att"]');
+
+      var skillName = nameInput ? nameInput.value.trim() : 'Compétence';
+      var indice = parseInt(indiceInput ? indiceInput.value : 0, 10) || 0;
+      var attrName = attSelect ? attSelect.value : '';
+
+      var attrVal = 0;
+      if (attrName && attrMap[attrName]) {
+        var attrInput = document.querySelector('[data-field="' + attrMap[attrName] + '"]');
+        attrVal = parseInt(attrInput ? attrInput.value : 0, 10) || 0;
+      }
+
+      var rr = 0;
+      row.querySelectorAll('.rr-circle').forEach(function(circle) {
+        if (circle.classList.contains('filled')) rr++;
+      });
+
+      var pseudoInput = document.querySelector('[data-field="pseudo"]');
+      var creature = pseudoInput ? pseudoInput.value.trim() : 'Runner';
+
+      window.openDiceModal({
+        creature: creature || 'Runner',
+        skill: skillName || 'Compétence',
+        attrName: attrName || '—',
+        attrVal: attrVal,
+        indice: indice,
+        rr: rr
+      });
+    });
+  }
+});
+</script>
+
+</body>
+<footer style="
+  color: #666;
+  font-family: inherit;
+  font-size: 0.7rem;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  margin-top: 2rem;
+  border-top: 1px solid #ddd;
+  background: transparent;
+">
+  <p style="margin: 0 0 0.3rem 0;">
+    <strong>Shadowrun</strong> est une marque déposée de <em>Topps Company, Inc.</em> / <em>Catalyst Game Labs</em>.
+  </p>
+  <p style="margin: 0; opacity: 0.8;">
+    Ce projet est un outil de fan <strong>non officiel</strong>, sans affiliation.
+  </p>
+  <p style="margin: 0.5rem 0 0 0; font-size: 0.65rem; opacity: 0.6;">
+    © 2026 — Projet communautaire francophone Shadowrun Anarchy
+  </p>
+</footer>
+</html>
