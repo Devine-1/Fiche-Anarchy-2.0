@@ -12,7 +12,7 @@
 
 <div class="toolbar">
   <a href="creation2.0.html" class="toolbar-btn">Engager un runner</a>
-  <a href="Black_Market.html" class="toolbar-btn">Black Market</a>
+  <a href="Black_Market.html" class="toolbar-btn" id="btn-blackmarket">Black Market</a>
   <a href="carte_interactive_cybermonde.html" class="toolbar-btn">Carte Interactive</a>
   <a href="bestiaire.html" class="toolbar-btn">Compendium</a>
   <div style="flex:1;"></div>
@@ -646,15 +646,19 @@ document.addEventListener('DOMContentLoaded', function() {
     reader.readAsDataURL(file);
   }
   // Bouton Black Market — transmission des Nuyen disponibles
-  document.getElementById('btn-blackmarket').addEventListener('click', function() {
-    var nuyenInput = document.querySelector('[data-field="nuyen-disponible"]');
-    var nuyenVal = '';
-    if (nuyenInput) {
-      nuyenVal = nuyenInput.value.replace(/[^0-9]/g, '');
-    }
-    var url = 'Black_Market.html' + (nuyenVal ? '?nuyen=' + nuyenVal : '');
-    window.open(url, '_blank');
-  });
+  var bmBtn = document.getElementById('btn-blackmarket');
+  if (bmBtn) {
+    bmBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var nuyenInput = document.querySelector('[data-field="nuyen-disponible"]');
+      var nuyenVal = '';
+      if (nuyenInput) {
+        nuyenVal = nuyenInput.value.replace(/[^0-9]/g, '');
+      }
+      var url = 'Black_Market.html' + (nuyenVal ? '?nuyen=' + nuyenVal : '');
+      window.open(url, '_blank');
+    });
+  }
   // ============ FONCTIONS D'ÉDITION RICHE ============
   function formatText(editorId, command) {
     const editor = document.getElementById(editorId);
