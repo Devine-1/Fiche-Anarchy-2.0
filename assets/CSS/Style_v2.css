@@ -46,13 +46,15 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  min-height: 60px;
+  height: auto;
   background: var(--black);
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 10px;
-  padding: 0 20px;
+  padding: 8px 12px;
   z-index: 1000;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
@@ -70,6 +72,7 @@ body {
   color: var(--black);
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
 }
 
 .toolbar-btn:hover {
@@ -195,6 +198,7 @@ body {
   gap: 8px;
   justify-content: flex-end;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
 .attr-box {
@@ -834,6 +838,53 @@ body {
   }
   .comp-row, .comp-header {
     grid-template-columns: 22px 1fr 40px 40px 40px 50px;
+  }
+
+  /* --- FIX MOBILE V33 : Attributs --- */
+  .top-layout {
+    grid-template-columns: 1fr;
+  }
+  .illustration-zone {
+    max-width: 110px;
+    margin: 0 auto;
+    min-height: 100px;
+  }
+  .attributes-area {
+    align-items: center !important;
+  }
+  .attributes-row {
+    justify-content: center;
+    gap: 6px;
+  }
+  .attr-box {
+    min-width: 52px;
+    padding: 5px 6px;
+  }
+  .attr-box .label-big {
+    font-size: 10px;
+  }
+  .attr-box .input-box {
+    width: 36px;
+    height: 26px;
+    font-size: 13px;
+  }
+
+  /* --- FIX MOBILE V33 : Nuyen --- */
+  .nuyen-row {
+    flex-wrap: wrap !important;
+    justify-content: center;
+    width: 100% !important;
+    align-self: center !important;
+    gap: 4px 8px;
+  }
+  .nuyen-label,
+  .nuyen-sep {
+    font-size: 10px;
+  }
+  .nuyen-input {
+    width: 58px;
+    height: 24px;
+    font-size: 11px;
   }
 }
 
@@ -1590,6 +1641,27 @@ body {
   .comp-row, .comp-header {
     grid-template-columns: 22px 1fr 40px 40px 40px 50px !important;
   }
+
+  /* ===== FIX TOOLBAR MOBILE ===== */
+  body {
+    padding: 100px 10px 10px;
+  }
+
+  .toolbar {
+    gap: 6px;
+    justify-content: center;
+    padding: 6px 8px;
+  }
+
+  .toolbar-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+    letter-spacing: 0.3px;
+  }
+
+  .toolbar > div[style*="flex:1"] {
+    display: none;
+  }
 }
   .contact-row {
     display: flex;
@@ -1930,3 +2002,32 @@ body {
     max-height: 400px;
   }
 }
+
+/* ===== FIX : bouton supprimer programmes cyberdeck ===== */
+.programme-row {
+  padding-right: 0; /* le bouton est dans le flux, plus besoin de padding */
+}
+.programme-row .btn-del-row {
+  position: static;
+  transform: none;
+  right: auto;
+  top: auto;
+  flex-shrink: 0;
+  align-self: center;
+  margin: 0;
+}
+  /* Spécialisations indentées sous leur compétence parente */
+  .comp-row.is-spec {
+    background: #f8f8f8;
+    border-left: 3px solid var(--yellow, #FFC107);
+  }
+  .comp-row.is-spec .comp-name {
+    padding-left: 12px;
+    font-size: 12px;
+    color: #444;
+  }
+  .comp-row.is-spec .comp-val,
+  .comp-row.is-spec .comp-att-select,
+  .comp-row.is-spec .comp-rd {
+    opacity: 0.85;
+  }

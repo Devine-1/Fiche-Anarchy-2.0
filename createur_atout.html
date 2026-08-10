@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créateur d'Atout — Shadowrun Anarchy 2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="icon" type="IMAGE/png" href="assets/images/Anarchy.ico">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;500;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --yellow: #FFC107; --yellow-dark: #E5AC00; --yellow-light: #FFE082;
+  --gray-light: #E0E0E0; --gray-mid: #9E9E9E; --gray-dark: #424242;
+  --black: #212121; --white: #FFFFFF; --bg: #E8E8E8; --paper: #FFFFFF;
+  --success: #43A047; --danger: #E53935; --essence: #C62828;
+}
+
+body {
+  font-family: 'Roboto', sans-serif; background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L35 10 L35 35' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M60 10 L85 10 L85 60 L110 60' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M10 60 L10 85 L35 85' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M60 85 L85 85 L85 110' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Ccircle cx='35' cy='35' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='85' cy='60' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='35' cy='85' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='85' cy='110' r='2.5' fill='%23BDBDBD'/%3E%3C/svg%3E");
+  padding: 64px 20px 20px; color: var(--black);
+}
+
+.page { width: 210mm; min-height: auto; margin: 0 auto 20px; background: var(--paper); padding: 10mm 12mm; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; }
+
+.toolbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: var(--black); display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 0 20px; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.3); flex-wrap: wrap; }
+.toolbar-btn { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 5px 14px; border: 2px solid var(--yellow); border-radius: 4px; background: var(--yellow); color: var(--black); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.toolbar-btn:hover { background: var(--yellow-dark); border-color: var(--yellow-dark); }
+.toolbar-btn.secondary { background: transparent; color: var(--yellow); }
+.toolbar-btn.secondary:hover { background: var(--yellow); color: var(--black); }
+
+.header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; border-bottom: 2px solid var(--yellow-dark); padding-bottom: 6px; }
+.pseudo-area { display: flex; align-items: baseline; gap: 8px; flex: 1; }
+.pseudo-label { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.pseudo-input { flex: 1; border: none; border-bottom: 2px solid var(--gray-mid); background: transparent; font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; color: var(--black); outline: none; padding: 0 4px; min-width: 200px; }
+.pseudo-input:focus { border-bottom-color: var(--yellow-dark); }
+.logo-text { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.logo-text span { color: var(--yellow-dark); }
+
+.info-bar { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; background: var(--gray-light); border: 2px solid var(--gray-mid); border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; }
+.info-item { display: flex; align-items: center; gap: 6px; }
+.info-label { font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--gray-dark); }
+.info-value { font-family: 'Roboto Mono', monospace; font-size: 18px; font-weight: 700; color: var(--black); }
+.info-value.essence { color: var(--essence); }
+.info-value.nuyen { color: var(--success); }
+
+.main-layout { display: grid; grid-template-columns: 1fr 160px; gap: 16px; align-items: start; }
+.left-col { display: flex; flex-direction: column; gap: 12px; }
+.right-col { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 70px; }
+
+.section-box { border: 2px solid var(--yellow-dark); border-radius: 4px; padding: 10px 12px; background: var(--white); }
+.section-title { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1.5px solid var(--yellow-dark); display: flex; justify-content: space-between; align-items: center; }
+
+.type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.type-card { border: 2px solid var(--gray-mid); border-radius: 6px; padding: 10px 8px; text-align: center; cursor: pointer; transition: all 0.15s; background: var(--white); }
+.type-card:hover { border-color: var(--yellow-dark); background: #fffbe6; }
+.type-card.selected { border-color: var(--yellow-dark); background: var(--yellow-light); box-shadow: 0 0 0 3px rgba(255,193,7,0.3); }
+.type-card .type-name { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
+.type-card .type-base { font-family: 'Roboto Mono', monospace; font-size: 11px; font-weight: 700; color: var(--gray-dark); }
+.type-card .type-essence { font-family: 'Roboto Mono', monospace; font-size: 10px; color: var(--essence); font-weight: 700; margin-top: 2px; }
+.type-card .type-prereq { font-size: 9px; color: var(--gray-dark); margin-top: 2px; font-style: italic; }
+
+.chk-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.chk-row input { width: 18px; height: 18px; accent-color: var(--yellow-dark); cursor: pointer; }
+.chk-row label { font-size: 12px; font-weight: 500; cursor: pointer; }
+
+.effet-cat { margin-bottom: 10px; }
+.effet-cat-title { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; background: var(--gray-light); padding: 4px 8px; border-radius: 3px; margin-bottom: 6px; border-left: 3px solid var(--yellow-dark); }
+.effet-list { display: flex; flex-direction: column; gap: 4px; }
+.effet-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px; transition: background 0.1s; cursor: pointer; }
+.effet-row:hover { background: #fffbe6; }
+.effet-row.disabled { opacity: 0.4; cursor: not-allowed; }
+.effet-row.disabled:hover { background: transparent; }
+.effet-row input { width: 16px; height: 16px; accent-color: var(--yellow-dark); cursor: pointer; flex-shrink: 0; }
+.effet-row.disabled input { cursor: not-allowed; }
+.effet-name { flex: 1; font-size: 12px; font-weight: 500; }
+.effet-cost { font-family: 'Roboto Mono', monospace; font-size: 12px; font-weight: 700; min-width: 36px; text-align: right; }
+.effet-cost.pos { color: var(--success); }
+.effet-cost.neg { color: var(--danger); }
+.effet-note { font-size: 10px; color: var(--gray-dark); font-style: italic; margin-left: 8px; }
+.effet-max { font-size: 9px; color: var(--gray-mid); background: var(--gray-light); padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+
+.eveil-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.eveil-card { border: 2px solid var(--gray-mid); border-radius: 6px; padding: 10px; text-align: center; cursor: pointer; transition: all 0.15s; }
+.eveil-card:hover { border-color: var(--yellow-dark); }
+.eveil-card.selected { border-color: var(--yellow-dark); background: var(--yellow-light); }
+.eveil-card .eveil-name { font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
+.eveil-card .eveil-cost { font-family: 'Roboto Mono', monospace; font-size: 14px; font-weight: 700; color: var(--success); }
+
+.defav-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--gray-mid); }
+.defav-row label { font-size: 11px; font-weight: 500; }
+.defav-row input { width: 60px; border: 1.5px solid var(--gray-mid); border-radius: 4px; padding: 4px; font-family: 'Roboto Mono', monospace; font-size: 12px; text-align: center; }
+.defav-row input:focus { border-color: var(--yellow-dark); }
+
+.narratif-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+.narratif-row input { flex: 1; border: 1.5px solid var(--gray-mid); border-radius: 4px; padding: 5px 8px; font-size: 12px; outline: none; }
+.narratif-row input:focus { border-color: var(--yellow-dark); }
+.narratif-row button { font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 5px 10px; border: 2px solid var(--yellow-dark); border-radius: 4px; background: var(--yellow); color: var(--black); cursor: pointer; }
+.narratif-row button:hover { background: var(--yellow-dark); }
+.narratif-list { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+.narratif-item { display: flex; justify-content: space-between; align-items: center; background: var(--gray-light); padding: 4px 8px; border-radius: 3px; font-size: 11px; }
+.narratif-item button { background: var(--danger); color: var(--white); border: none; border-radius: 3px; font-size: 10px; padding: 1px 6px; cursor: pointer; }
+
+.desc-area { width: 100%; min-height: 100px; border: 1.5px solid var(--gray-mid); border-radius: 4px; background: #fafafa; font-size: 13px; line-height: 1.5; color: var(--black); outline: none; padding: 10px 12px; resize: vertical; }
+.desc-area:focus { border-color: var(--yellow-dark); background: var(--white); }
+
+.illu-zone { border: 2px dashed var(--gray-mid); border-radius: 6px; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--white); cursor: pointer; transition: border-color 0.2s; position: relative; overflow: hidden; }
+.illu-zone:hover { border-color: var(--yellow-dark); }
+.illu-zone.has-image { border-style: solid; border-color: var(--gray-mid); }
+.illu-zone img { width: 100%; height: auto; display: block; object-fit: cover; }
+.illu-placeholder { font-family: 'Roboto Condensed', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--gray-mid); text-align: center; padding: 20px 10px; }
+.illu-btn-remove { position: absolute; top: 4px; right: 4px; background: var(--danger); color: var(--white); border: none; border-radius: 3px; font-size: 10px; padding: 2px 6px; cursor: pointer; font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; display: none; }
+.illu-zone.has-image .illu-btn-remove { display: block; }
+
+.recap-box { border: 2px solid var(--yellow-dark); border-radius: 4px; padding: 10px; background: var(--white); }
+.recap-title { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; text-align: center; margin-bottom: 8px; border-bottom: 1.5px solid var(--yellow-dark); padding-bottom: 4px; }
+.recap-line { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; border-bottom: 1px dashed var(--gray-light); }
+.recap-line .recap-label { font-weight: 500; color: var(--gray-dark); }
+.recap-line .recap-val { font-family: 'Roboto Mono', monospace; font-weight: 700; color: var(--black); }
+.recap-total { margin-top: 6px; padding-top: 6px; border-top: 2px solid var(--yellow-dark); display: flex; justify-content: space-between; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; }
+
+.mj-box { border: 2px solid var(--gray-mid); border-radius: 4px; padding: 10px; background: var(--white); }
+.mj-title { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; text-align: center; margin-bottom: 8px; color: var(--black); }
+.mj-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.mj-field label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--gray-dark); }
+.mj-field input { border: 1.5px solid var(--gray-mid); border-radius: 4px; padding: 5px 8px; font-size: 12px; outline: none; }
+.mj-field input:focus { border-color: var(--yellow-dark); }
+.mj-chk { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.mj-chk input { width: 18px; height: 18px; accent-color: var(--yellow-dark); }
+.mj-chk label { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.mj-stamp { margin-top: 8px; padding: 8px; border: 2px dashed var(--danger); border-radius: 4px; text-align: center; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 2px; display: none; }
+.mj-stamp.visible { display: block; animation: stampIn 0.3s ease-out; }
+@keyframes stampIn { from { opacity: 0; transform: scale(1.5) rotate(-5deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+
+/* ===== FICHE FINALE ===== */
+.fiche-finale { margin-top: 16px; border: 3px solid var(--black); border-radius: 6px; background: var(--white); overflow: hidden; }
+.fiche-header { background: var(--black); color: var(--yellow); padding: 8px 14px; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+.fiche-body { display: grid; grid-template-columns: 160px 1fr; gap: 0; min-height: 200px; }
+.fiche-illu { border-right: 2px solid var(--yellow-dark); background: var(--gray-light); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+.fiche-illu img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fiche-illu-placeholder { font-family: 'Roboto Condensed', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--gray-mid); text-align: center; padding: 20px; }
+.fiche-content { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.fiche-ligne { display: flex; gap: 16px; flex-wrap: wrap; align-items: baseline; }
+.fiche-nom { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; color: var(--black); flex: 1; }
+.fiche-tag { font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; background: var(--yellow-light); border: 1px solid var(--yellow-dark); color: var(--black); }
+.fiche-tag.essence-tag { background: #ffebee; border-color: var(--essence); color: var(--essence); }
+.fiche-tag.nuyen-tag { background: #e8f5e9; border-color: var(--success); color: var(--success); }
+.fiche-tag.niveau-tag { background: var(--gray-light); border-color: var(--gray-mid); }
+.fiche-section-title { font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--gray-dark); border-bottom: 1px solid var(--gray-light); padding-bottom: 2px; margin-top: 4px; }
+.fiche-effets-list { font-size: 12px; line-height: 1.6; color: var(--black); max-height: 120px; overflow-y: auto; }
+.fiche-effets-list .fiche-effet-item { display: flex; gap: 6px; }
+.fiche-effets-list .fiche-effet-cost { font-family: 'Roboto Mono', monospace; font-weight: 700; min-width: 24px; text-align: right; }
+.fiche-desc { font-size: 12px; line-height: 1.5; color: var(--black); white-space: pre-wrap; max-height: 100px; overflow-y: auto; }
+.fiche-footer { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--gray-mid); display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--gray-dark); }
+.fiche-footer .fiche-mj-stamp { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--danger); border: 2px dashed var(--danger); padding: 2px 8px; border-radius: 3px; display: none; }
+.fiche-footer .fiche-mj-stamp.visible { display: inline-block; }
+
+.alert-box { padding: 8px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; display: none; }
+.alert-box.visible { display: block; }
+.alert-warn { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
+.alert-err { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+
+/* ===== PRINT : uniquement la fiche finale ===== */
+@media print {
+  @page { size: A4 portrait; margin: 8mm; }
+  body { background: white; padding: 0; margin: 0; }
+  .toolbar, .header-row, .info-bar, .main-layout, .alert-box { display: none !important; }
+  .page {
+    box-shadow: none;
+    margin: 0 auto;
+    width: 194mm;
+    padding: 0;
+    background: white;
+  }
+  .fiche-finale {
+    margin: 0;
+    border: 2px solid #212121;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    width: 100%;
+    overflow: hidden;
+  }
+  .fiche-header {
+    padding: 5px 10px;
+    font-size: 11px;
+    background: #212121;
+    color: #FFC107;
+  }
+  .fiche-body {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 0;
+    min-height: 0;
+  }
+  .fiche-illu {
+    border-right: 2px solid #E5AC00;
+    background: #E0E0E0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    min-height: 0;
+    height: auto;
+  }
+  .fiche-illu img {
+    width: 100%;
+    height: auto;
+    max-height: 90mm;
+    object-fit: contain;
+    display: block;
+  }
+  .fiche-illu-placeholder {
+    font-size: 9px;
+    padding: 10px;
+  }
+  .fiche-content {
+    padding: 8px 10px;
+    gap: 5px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .fiche-nom {
+    font-size: 15px;
+    line-height: 1.2;
+  }
+  .fiche-ligne {
+    gap: 8px;
+  }
+  .fiche-tag {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+  .fiche-section-title {
+    font-size: 9px;
+    margin-top: 2px;
+    padding-bottom: 1px;
+  }
+  .fiche-effets-list {
+    font-size: 9.5px;
+    line-height: 1.35;
+    max-height: none;
+  }
+  .fiche-desc {
+    font-size: 9.5px;
+    line-height: 1.35;
+    max-height: none;
+  }
+  .fiche-footer {
+    font-size: 9px;
+    padding-top: 4px;
+    margin-top: auto;
+  }
+  .fiche-footer .fiche-mj-stamp {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+}media print {
+  @page { size: A4 portrait; margin: 8mm; }
+  body { background: white; padding: 0; margin: 0; }
+  .toolbar, .header-row, .info-bar, .main-layout, .alert-box { display: none !important; }
+  .page {
+    box-shadow: none;
+    margin: 0 auto;
+    width: 194mm;
+    height: 277mm;
+    padding: 0;
+    background: white;
+    overflow: hidden;
+  }
+  .fiche-finale {
+    margin: 0;
+    border: 2px solid var(--black);
+    page-break-inside: avoid;
+    break-inside: avoid;
+    width: 100%;
+    height: 277mm;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .fiche-header {
+    padding: 5px 10px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .fiche-body {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    flex: 1;
+    min-height: 0;
+    gap: 0;
+    overflow: hidden;
+  }
+  .fiche-illu {
+    border-right: 2px solid var(--yellow-dark);
+    background: var(--gray-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .fiche-illu img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    max-height: 277mm;
+  }
+  .fiche-illu-placeholder {
+    font-size: 9px;
+    padding: 10px;
+  }
+  .fiche-content {
+    padding: 8px 10px;
+    gap: 5px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .fiche-nom {
+    font-size: 15px;
+    line-height: 1.2;
+  }
+  .fiche-tag {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+  .fiche-section-title {
+    font-size: 9px;
+    margin-top: 2px;
+    padding-bottom: 1px;
+  }
+  .fiche-effets-list {
+    font-size: 9.5px;
+    line-height: 1.35;
+    max-height: none;
+    flex-shrink: 1;
+    overflow: hidden;
+  }
+  .fiche-desc {
+    font-size: 9.5px;
+    line-height: 1.35;
+    max-height: none;
+    flex-shrink: 1;
+    overflow: hidden;
+  }
+  .fiche-footer {
+    font-size: 9px;
+    padding-top: 4px;
+    margin-top: auto;
+    flex-shrink: 0;
+  }
+  .fiche-footer .fiche-mj-stamp {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+}
+
+@media (max-width: 900px) {
+  .page { width: 100%; padding: 8mm; }
+  .main-layout { grid-template-columns: 1fr; }
+  .right-col { position: static; }
+  .type-grid { grid-template-columns: repeat(2, 1fr); }
+  .eveil-grid { grid-template-columns: 1fr; }
+  .info-bar { flex-direction: column; align-items: flex-start; }
+  .fiche-body { grid-template-columns: 1fr; }
+  .fiche-illu { border-right: none; border-bottom: 2px solid var(--yellow-dark); min-height: 150px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <a href="index.html" class="toolbar-btn" style="font-weight: bold;">Fiche</a>
+  <div style="flex:1;"></div>
+  <button class="toolbar-btn secondary" onclick="resetAll()">Réinitialiser</button>
+  <button class="toolbar-btn secondary" onclick="exporterJSON()">Exporter</button>
+  <button class="toolbar-btn secondary" onclick="document.getElementById('json-import').click()">Importer</button>
+  <input type="file" id="json-import" accept=".json" style="display:none;" onchange="importerJSON(event)">
+  <button class="toolbar-btn" onclick="exportFichePNG()">Fiche PNG</button>
+  <button class="toolbar-btn" onclick="window.print()">Fiche PDF</button>
+</div>
+
+<!-- PAGE -->
+<div class="page" id="atout-page">
+
+  <div class="header-row">
+    <div class="pseudo-area">
+      <span class="pseudo-label">Nom de l'atout</span>
+      <input type="text" class="pseudo-input" id="atout-nom" placeholder="Nommez votre atout...">
+    </div>
+    <div class="logo-text">Shadowrun <span>Anarchy</span> 2.0</div>
+  </div>
+
+  <div class="info-bar">
+    <div class="info-item"><span class="info-label">Type</span><span class="info-value" id="info-type">—</span></div>
+    <div class="info-item"><span class="info-label">Niveau de base</span><span class="info-value" id="info-base">0</span></div>
+    <div class="info-item"><span class="info-label">Modificateurs</span><span class="info-value" id="info-mods">0</span></div>
+    <div class="info-item"><span class="info-label">Niveau final</span><span class="info-value" id="info-final" style="color:var(--yellow-dark);">0</span></div>
+    <div class="info-item"><span class="info-label">Coût</span><span class="info-value nuyen" id="info-nuyen">0 ¥</span></div>
+    <div class="info-item" id="info-essence-row" style="display:none;"><span class="info-label">Essence</span><span class="info-value essence" id="info-essence">0</span></div>
+  </div>
+
+  <div class="alert-box alert-warn" id="alert-box"></div>
+
+  <div class="main-layout">
+    <div class="left-col">
+      <div class="section-box">
+        <div class="section-title">1. Type d'atout</div>
+        <div class="type-grid" id="type-grid"></div>
+        <div class="chk-row" id="premier-trait-row" style="display:none;">
+          <input type="checkbox" id="premier-trait" onchange="onPremierTraitChange()">
+          <label for="premier-trait">Premier trait du personnage (niveau de base 0, gratuit)</label>
+        </div>
+        <div id="equip-prix-row" style="display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--gray-mid);">
+          <label style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--gray-dark);display:block;margin-bottom:4px;">Prix de base de l'équipement (¥)</label>
+          <input type="number" id="equip-prix" min="0" step="1" placeholder="0" style="width:140px;height:28px;border:1.5px solid var(--gray-mid);border-radius:4px;padding:4px 8px;font-family:'Roboto Mono',monospace;font-size:13px;text-align:right;" onchange="updateAll()" oninput="updateAll()">
+          <span style="font-size:10px;color:var(--gray-mid);margin-left:6px;">Le matériel doit être acheté séparément avant d'être converti en atout.</span>
+        </div>
+      </div>
+      <div class="section-box" id="effets-section">
+        <div class="section-title">2. Effets</div>
+        <div id="effets-container"><p style="font-size:12px;color:var(--gray-mid);font-style:italic;">Sélectionnez d'abord un type d'atout.</p></div>
+      </div>
+      <div class="section-box">
+        <div class="section-title">3. Description narrative</div>
+        <textarea class="desc-area" id="desc-text" placeholder="Décrivez l'origine, l'apparence et le fonctionnement narratif de votre atout..."></textarea>
+      </div>
+      <div class="mj-box">
+        <div class="mj-title">Validation du Meneur de Jeu</div>
+        <div class="mj-field"><label>Nom du MJ</label><input type="text" id="mj-nom" placeholder="Nom du MJ..."></div>
+        <div class="mj-field"><label>Date</label><input type="date" id="mj-date"></div>
+        <div class="mj-chk"><input type="checkbox" id="mj-valide" onchange="onMJValidate()"><label for="mj-valide">Atout validé par le MJ</label></div>
+        <div class="mj-stamp" id="mj-stamp">VALIDÉ PAR LE MJ</div>
+      </div>
+    </div>
+    <div class="right-col">
+      <div class="illu-zone" id="illu-zone" onclick="document.getElementById('illu-input').click()">
+        <div class="illu-placeholder" id="illu-placeholder">Cliquez pour ajouter<br>une illustration</div>
+        <img id="illu-img" style="display:none;">
+        <button class="illu-btn-remove" id="illu-btn-remove" onclick="event.stopPropagation();removeImage();">✕</button>
+        <input type="file" id="illu-input" accept="image/*" style="display:none;" onchange="onImageSelect(event)">
+      </div>
+      <div class="recap-box">
+        <div class="recap-title">Récapitulatif</div>
+        <div class="recap-line"><span class="recap-label">Base</span><span class="recap-val" id="recap-base">0</span></div>
+        <div class="recap-line"><span class="recap-label">Effets</span><span class="recap-val" id="recap-effets">0</span></div>
+        <div class="recap-line"><span class="recap-label">Défavorables</span><span class="recap-val" id="recap-defav">0</span></div>
+        <div class="recap-line"><span class="recap-label">Narratifs</span><span class="recap-val" id="recap-narr">0</span></div>
+        <div class="recap-line" id="recap-equip-row" style="display:none;"><span class="recap-label">Prix équip.</span><span class="recap-val" id="recap-equip">0 ¥</span></div>
+        <div class="recap-total"><span>Niveau</span><span id="recap-total">0</span></div>
+        <div class="recap-total" style="margin-top:4px;font-size:12px;color:var(--success);"><span>Coût total</span><span id="recap-nuyen">0 ¥</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FICHE FINALE -->
+  <div class="fiche-finale" id="fiche-finale">
+    <div class="fiche-header">
+      <span>Fiche d'atout</span>
+      <span style="font-size:11px;opacity:0.7;">Shadowrun Anarchy 2.0</span>
+    </div>
+    <div class="fiche-body">
+      <div class="fiche-illu" id="fiche-illu"><div class="fiche-illu-placeholder">Aucune illustration</div></div>
+      <div class="fiche-content">
+        <div class="fiche-ligne">
+          <span class="fiche-nom" id="fiche-nom">—</span>
+          <span class="fiche-tag niveau-tag" id="fiche-niveau">Niveau 0</span>
+          <span class="fiche-tag nuyen-tag" id="fiche-nuyen">0 ¥</span>
+          <span class="fiche-tag essence-tag" id="fiche-essence-tag" style="display:none;">Essence 0</span>
+          <span class="fiche-tag" id="fiche-equip-prix" style="display:none;background:#e3f2fd;border-color:#2196f3;color:#1565c0;">Équip. 0 ¥</span>
+        </div>
+        <div class="fiche-ligne"><span class="fiche-tag" id="fiche-type">Type : —</span></div>
+        <div class="fiche-section-title">Effets sélectionnés</div>
+        <div class="fiche-effets-list" id="fiche-effets-list">—</div>
+        <div class="fiche-section-title">Description</div>
+        <div class="fiche-desc" id="fiche-desc">—</div>
+        <div class="fiche-footer">
+          <span id="fiche-mj-info">Non validé</span>
+          <span class="fiche-mj-stamp" id="fiche-mj-stamp">VALIDÉ PAR LE MJ</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+const TYPES_ATOUT = [
+  { id: 'trait',        nom: 'Trait',           base: 3, essence: 0,   prereq: '', flags: ['premier_gratuit'] },
+  { id: 'eveil',        nom: 'Éveillé',         base: 0, essence: 0,   prereq: '', flags: ['no_effets'] },
+  { id: 'cyberware',    nom: 'Cyberware',       base: 1, essence: -1,  prereq: '' },
+  { id: 'bioware',      nom: 'Bioware',         base: 2, essence: -0.5, prereq: '' },
+  { id: 'adepte',       nom: "Pouvoir d'adepte", base: 1, essence: 0,   prereq: "Nécessite l'atout Éveil (Adepte)" },
+  { id: 'equipement',   nom: 'Équipement',      base: 0, essence: 0,   prereq: 'Équipement acheté séparément' },
+  { id: 'cyberdeck',    nom: 'Cyberdeck',       base: 1, essence: 0,   prereq: '' },
+];
+
+const EFFETS = [
+  { cat: 'Gestion du risque', nom: 'Réduction du risque 1 pour une spécialisation', cout: 2, types: ['trait','cyberware','bioware','adepte','equipement','cyberdeck'], max: null, note: 'RR max 3 par test. Spécialisation similaire aux compétences.', prereq: '' },
+  { cat: 'Gestion du risque', nom: 'Réduction du risque 1 pour une compétence', cout: 5, types: ['trait','cyberware','bioware','adepte','equipement','cyberdeck'], max: 'RR1 par atout', note: 'Maximum RR1 par atout.', prereq: '' },
+  { cat: 'Gestion du risque', nom: 'Réduction du risque 1 pour un attribut', cout: 10, types: ['trait','cyberware','bioware','adepte','equipement','cyberdeck'], max: 'RR1', note: 'Maximum RR1.', prereq: '' },
+  { cat: 'Initiative', nom: 'Initiative de base (+2)', cout: 2, types: ['trait','cyberware','bioware','adepte'], max: null, note: "+1 point Anarchy par scène d'action, actions supplémentaires illimitées.", prereq: '' },
+  { cat: 'Initiative', nom: '+1 action par narration', cout: 3, types: ['trait','cyberware','bioware','adepte'], max: null, note: 'Nécessite le niveau précédent.', prereq: 'init_base' },
+  { cat: 'Initiative', nom: "+1 point Anarchy par scène d'action", cout: 2, types: ['trait','cyberware','bioware','adepte'], max: null, note: 'Nécessite le niveau précédent.', prereq: 'init_action' },
+  { cat: 'Atouts physiques', nom: 'Valeur de dommages +1', cout: 1, types: ['cyberware','bioware','adepte','equipement'], max: 'max +2', note: 'Maximum +2.', prereq: '' },
+  { cat: 'Atouts physiques', nom: 'Amélioration de portée', cout: 2, types: ['adepte','equipement'], max: null, note: 'De – à Dés. ou de Dés. à OK.', prereq: '' },
+  { cat: 'Atouts physiques', nom: 'Armure +1', cout: 1, types: ['trait','cyberware','bioware','adepte','equipement'], max: 'max +1', note: 'Maximum +1.', prereq: '' },
+  { cat: 'Atouts physiques', nom: 'Blessure légère supplémentaire', cout: 3, types: ['trait','cyberware','bioware','adepte','cyberdeck'], max: 'max +1', note: 'Maximum +1.', prereq: '' },
+  { cat: 'Atouts physiques', nom: 'Blessure grave supplémentaire', cout: 6, types: ['trait','cyberware','bioware','adepte','cyberdeck'], max: 'max +1', note: 'Maximum +1.', prereq: '' },
+  { cat: 'Atouts magiques', nom: 'Sort maintenu supplémentaire', cout: 2, types: ['trait','equipement'], max: 'max +2', note: 'Maximum +2.', prereq: '' },
+  { cat: 'Atouts magiques', nom: 'Esprit invoqué supplémentaire', cout: 3, types: ['trait','equipement'], max: 'max +1', note: 'Maximum +1.', prereq: '' },
+  { cat: 'Atouts magiques', nom: "Focus d'arme", cout: 1, types: ['equipement'], max: null, note: 'Armes uniquement.', prereq: '' },
+  { cat: 'Réalité virtuelle', nom: 'RV cold-sim', cout: 1, types: ['cyberware'], max: null, note: '', prereq: '' },
+  { cat: 'Réalité virtuelle', nom: 'RV hot-sim', cout: 2, types: ['cyberware'], max: null, note: 'Nécessite RV cold-sim.', prereq: 'rv_cold' },
+  { cat: 'Atouts matriciels', nom: 'Firewall +1', cout: 1, types: ['cyberdeck','equipement','cyberware'], max: 'max 5', note: 'Maximum 5.', prereq: '' },
+  { cat: 'Atouts matriciels', nom: 'Attaque +1', cout: 1, types: ['cyberdeck'], max: 'max 5', note: 'Maximum 5.', prereq: '' },
+  { cat: 'Atouts de rigger', nom: 'Console de commande (par drone)', cout: 1, types: ['cyberware','equipement'], max: null, note: 'Nécessite accès RV cybernétique.', prereq: '' },
+  { cat: 'Atouts de rigger', nom: 'Câblage de contrôle de véhicule', cout: 2, types: ['cyberware'], max: null, note: 'Nécessite accès RV cybernétique.', prereq: '' },
+  { cat: 'Véhicules & drones', nom: 'Autopilote +1', cout: 1, types: ['equipement'], max: 'max 12/+6', note: 'Maximum 12/+6.', prereq: '' },
+  { cat: 'Véhicules & drones', nom: 'Vitesse +1', cout: 1, types: ['equipement'], max: 'max +3', note: 'Maximum +3.', prereq: '' },
+  { cat: 'Véhicules & drones', nom: 'Maniabilité +1', cout: 1, types: ['equipement'], max: 'max +3', note: 'Maximum +3.', prereq: '' },
+  { cat: 'Véhicules & drones', nom: 'Blindage +1', cout: 1, types: ['equipement'], max: 'max +Structure', note: 'Maximum +Structure.', prereq: '' },
+  { cat: 'Véhicules & drones', nom: 'Fixe (incapable de se déplacer)', cout: -1, types: ['equipement'], max: null, note: 'Effet défavorable.', prereq: '' },
+  { cat: 'Véhicules & drones', nom: 'Volant', cout: 1, types: ['equipement'], max: null, note: '', prereq: '' },
+  { cat: 'Véhicules & drones', nom: "Amélioration de monture d'arme", cout: 1, types: ['equipement'], max: null, note: 'Monture supplémentaire, dissimulée, tourelle, etc.', prereq: '' },
+  { cat: 'Véhicules & drones', nom: "Débridage de l'Autopilote", cout: 3, types: ['equipement'], max: null, note: '', prereq: '' },
+  { cat: 'Véhicules & drones', nom: 'Drone supplémentaire identique', cout: 2, types: ['equipement'], max: 'max 3', note: 'Maximum 3 drones.', prereq: '' },
+  { cat: 'Atouts divers', nom: 'Effet narratif', cout: 1, types: ['trait','cyberware','bioware','adepte','equipement','cyberdeck'], max: null, note: 'Annuler un désavantage ou dépenser 1 Anarchy pour un avantage (accord MJ).', prereq: '' },
+  { cat: 'Atouts divers', nom: 'Médikit autonome', cout: 1, types: ['equipement'], max: null, note: 'Peut bénéficier des améliorations de drones.', prereq: '' },
+];
+
+const EVEIL_CAPS = [
+  { id: 'percep_astrale', nom: 'Perception astrale', cout: 1 },
+  { id: 'proj_astrale', nom: 'Perception et projection astrale', cout: 2 },
+  { id: 'sorcellerie', nom: 'Sorcellerie', cout: 1 },
+  { id: 'conjuration', nom: 'Conjuration', cout: 2 },
+  { id: 'adepte', nom: 'Adepte', cout: 1 },
+];
+
+const COUT_NUYEN_PAR_NIVEAU = 2500;
+
+let state = { typeId: null, premierTrait: false, effets: {}, eveilCaps: [], defavValue: 0, narratifs: [] };
+let illustrationData = null;
+
+function init() {
+  renderTypes();
+  document.getElementById('mj-date').valueAsDate = new Date();
+  updateAll();
+}
+
+function renderTypes() {
+  const grid = document.getElementById('type-grid');
+  grid.innerHTML = TYPES_ATOUT.map(t => `
+    <div class="type-card" data-id="${t.id}" onclick="selectType('${t.id}')">
+      <span class="type-name">${t.nom}</span>
+      <span class="type-base">Niv. ${t.base}</span>
+      ${t.essence !== 0 ? `<span class="type-essence">Essence ${t.essence > 0 ? '+' : ''}${t.essence}</span>` : ''}
+      ${t.prereq ? `<span class="type-prereq">${t.prereq}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+function selectType(id) {
+  state.typeId = id;
+  state.effets = {};
+  state.eveilCaps = [];
+  state.defavValue = 0;
+  state.narratifs = [];
+  state.premierTrait = false;
+  document.querySelectorAll('.type-card').forEach(c => c.classList.toggle('selected', c.dataset.id === id));
+  const type = TYPES_ATOUT.find(t => t.id === id);
+  document.getElementById('premier-trait-row').style.display = type.flags && type.flags.includes('premier_gratuit') ? 'flex' : 'none';
+  document.getElementById('premier-trait').checked = false;
+  // Afficher/masquer le prix équipement
+  document.getElementById('equip-prix-row').style.display = (id === 'equipement') ? 'block' : 'none';
+  renderEffets();
+  updateAll();
+}
+
+function onPremierTraitChange() {
+  state.premierTrait = document.getElementById('premier-trait').checked;
+  updateAll();
+}
+
+function renderEffets() {
+  const container = document.getElementById('effets-container');
+  if (!state.typeId) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--gray-mid);font-style:italic;">Sélectionnez d\'abord un type d\'atout.</p>';
+    return;
+  }
+  const type = TYPES_ATOUT.find(t => t.id === state.typeId);
+  if (type.flags && type.flags.includes('no_effets')) {
+    renderEveil(container);
+    return;
+  }
+  const compatibles = EFFETS.filter(e => e.types.includes(state.typeId));
+  const cats = {};
+  compatibles.forEach(e => {
+    const globalIdx = EFFETS.indexOf(e);
+    if (!cats[e.cat]) cats[e.cat] = [];
+    cats[e.cat].push({ ...e, globalIdx });
+  });
+  let html = '';
+  for (const [catName, effets] of Object.entries(cats)) {
+    html += `<div class="effet-cat"><div class="effet-cat-title">${catName}</div><div class="effet-list">`;
+    for (const e of effets) {
+      const count = state.effets[e.globalIdx] || 0;
+      const disabled = !isEffetAvailable(e);
+      const checked = count > 0;
+      const isStackable = e.max && e.max.includes('max');
+      const showCount = isStackable && count > 0 ? ` (${count})` : '';
+      html += `
+        <div class="effet-row ${disabled ? 'disabled' : ''}" onclick="${disabled ? '' : `toggleEffet(${e.globalIdx})`}">
+          <input type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} onclick="event.stopPropagation();${disabled ? '' : `toggleEffet(${e.globalIdx})`}">
+          <span class="effet-name">${e.nom}${showCount}</span>
+          <span class="effet-cost ${e.cout >= 0 ? 'pos' : 'neg'}">${e.cout > 0 ? '+' : ''}${e.cout}</span>
+          ${e.max ? `<span class="effet-max">${e.max}</span>` : ''}
+          ${e.note ? `<span class="effet-note">${e.note}</span>` : ''}
+        </div>`;
+    }
+    html += `</div></div>`;
+  }
+  html += `
+    <div class="defav-row">
+      <label>Effet défavorable (réduction niveau) :</label>
+      <input type="number" id="defav-input" min="0" max="5" value="${state.defavValue}" onchange="setDefav(this.value)">
+      <span style="font-size:11px;color:var(--gray-mid);">niveaux −1 à −5</span>
+    </div>
+    <div style="margin-top:10px;padding-top:10px;border-top:2px solid var(--yellow-dark);">
+      <div style="font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Effets narratifs personnalisés (+1 niveau chacun)</div>
+      <div class="narratif-row">
+        <input type="text" id="narr-input" placeholder="Description de l'effet narratif..." onkeydown="if(event.key==='Enter')addNarratif()">
+        <button onclick="addNarratif()">Ajouter (+1)</button>
+      </div>
+      <div class="narratif-list" id="narr-list"></div>
+    </div>
+  `;
+  container.innerHTML = html;
+  renderNarratifs();
+}
+
+function renderEveil(container) {
+  let html = `<p style="font-size:12px;margin-bottom:10px;">L'atout Éveillé détermine ses capacités magiques. Sélectionnez celles possédées :</p>
+    <div class="eveil-grid">`;
+  for (const cap of EVEIL_CAPS) {
+    const selected = state.eveilCaps.includes(cap.id);
+    html += `<div class="eveil-card ${selected ? 'selected' : ''}" onclick="toggleEveilCap('${cap.id}')">
+      <span class="eveil-name">${cap.nom}</span>
+      <span class="eveil-cost">+${cap.cout}</span>
+    </div>`;
+  }
+  html += `</div>
+    <p style="font-size:11px;color:var(--gray-mid);font-style:italic;margin-top:10px;">Cet atout n'accepte pas d'effets supplémentaires. Les capacités peuvent être ajoutées en progression (talent latent).</p>`;
+  container.innerHTML = html;
+}
+
+function isEffetAvailable(effet) {
+  const count = state.effets[effet.globalIdx] || 0;
+  if (effet.prereq === 'init_action') {
+    const baseIdx = EFFETS.findIndex(x => x.prereq === '' && x.cat === 'Initiative' && x.nom.includes('Initiative de base'));
+    const actionIdx = EFFETS.findIndex(x => x.prereq === 'init_base');
+    if (!state.effets[baseIdx] || !state.effets[actionIdx]) return false;
+  }
+  if (effet.prereq === 'init_base') {
+    const baseIdx = EFFETS.findIndex(x => x.prereq === '' && x.cat === 'Initiative' && x.nom.includes('Initiative de base'));
+    if (!state.effets[baseIdx]) return false;
+  }
+  if (effet.prereq === 'rv_cold') {
+    const coldIdx = EFFETS.findIndex(x => x.nom === 'RV cold-sim');
+    if (!state.effets[coldIdx]) return false;
+  }
+  if (effet.max) {
+    const maxVal = parseMax(effet.max);
+    if (maxVal !== null && count >= maxVal) return false;
+  }
+  return true;
+}
+
+function parseMax(maxStr) {
+  if (!maxStr) return null;
+  const m = maxStr.match(/max\s*(\d+)/i);
+  if (m) return parseInt(m[1]);
+  const m2 = maxStr.match(/max\s*\+(\d+)/i);
+  if (m2) return parseInt(m2[1]);
+  return null;
+}
+
+function toggleEffet(idx) {
+  const effet = EFFETS[idx];
+  const current = state.effets[idx] || 0;
+  if (current > 0) {
+    if (effet.max && parseMax(effet.max) !== null) {
+      state.effets[idx] = current - 1;
+      if (state.effets[idx] <= 0) delete state.effets[idx];
+    } else {
+      delete state.effets[idx];
+    }
+  } else {
+    state.effets[idx] = 1;
+  }
+  renderEffets();
+  updateAll();
+}
+
+function setDefav(val) {
+  state.defavValue = Math.max(0, Math.min(5, parseInt(val) || 0));
+  document.getElementById('defav-input').value = state.defavValue;
+  updateAll();
+}
+
+function toggleEveilCap(capId) {
+  if (state.eveilCaps.includes(capId)) {
+    state.eveilCaps = state.eveilCaps.filter(c => c !== capId);
+  } else {
+    state.eveilCaps.push(capId);
+  }
+  renderEffets();
+  updateAll();
+}
+
+function addNarratif() {
+  const input = document.getElementById('narr-input');
+  const text = input.value.trim();
+  if (!text) return;
+  state.narratifs.push(text);
+  input.value = '';
+  renderNarratifs();
+  updateAll();
+}
+
+function removeNarratif(i) {
+  state.narratifs.splice(i, 1);
+  renderNarratifs();
+  updateAll();
+}
+
+function renderNarratifs() {
+  const list = document.getElementById('narr-list');
+  if (!list) return;
+  if (state.narratifs.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = state.narratifs.map((n, i) => `
+    <div class="narratif-item"><span>${n}</span><button onclick="removeNarratif(${i})">✕</button></div>
+  `).join('');
+}
+
+function getBaseLevel() {
+  if (!state.typeId) return 0;
+  const type = TYPES_ATOUT.find(t => t.id === state.typeId);
+  if (type.id === 'trait' && state.premierTrait) return 0;
+  return type.base;
+}
+
+function getEssence() {
+  if (!state.typeId) return 0;
+  const type = TYPES_ATOUT.find(t => t.id === state.typeId);
+  return type.essence;
+}
+
+function getEffetsCost() {
+  let total = 0;
+  for (const [idx, count] of Object.entries(state.effets)) {
+    total += EFFETS[idx].cout * count;
+  }
+  return total;
+}
+
+function getEveilCost() {
+  let total = 0;
+  for (const capId of state.eveilCaps) {
+    const cap = EVEIL_CAPS.find(c => c.id === capId);
+    if (cap) total += cap.cout;
+  }
+  return total;
+}
+
+function getNarratifCost() {
+  return state.narratifs.length;
+}
+
+function getFinalLevel() {
+  return getBaseLevel() + getEffetsCost() + getEveilCost() + getNarratifCost() - state.defavValue;
+}
+
+function getNuyenCost() {
+  const equipPrix = (state.typeId === 'equipement') ? (parseInt(document.getElementById('equip-prix').value) || 0) : 0;
+  return (getFinalLevel() * COUT_NUYEN_PAR_NIVEAU) + equipPrix;
+}
+
+function updateAll() {
+  const type = TYPES_ATOUT.find(t => t.id === state.typeId);
+  document.getElementById('info-type').textContent = type ? type.nom : '—';
+  document.getElementById('info-base').textContent = getBaseLevel();
+  document.getElementById('info-mods').textContent = (getEffetsCost() + getEveilCost() + getNarratifCost() - state.defavValue);
+  document.getElementById('info-final').textContent = getFinalLevel();
+  document.getElementById('info-nuyen').textContent = getNuyenCost().toLocaleString('fr-FR') + ' ¥';
+  const essRow = document.getElementById('info-essence-row');
+  const ess = getEssence();
+  if (ess !== 0) { essRow.style.display = 'flex'; document.getElementById('info-essence').textContent = (ess > 0 ? '+' : '') + ess; }
+  else { essRow.style.display = 'none'; }
+  document.getElementById('recap-base').textContent = getBaseLevel();
+  document.getElementById('recap-effets').textContent = getEffetsCost();
+  document.getElementById('recap-defav').textContent = state.defavValue > 0 ? '-' + state.defavValue : '0';
+  document.getElementById('recap-narr').textContent = getNarratifCost();
+  document.getElementById('recap-total').textContent = getFinalLevel();
+  const equipPrixVal = (state.typeId === 'equipement') ? (parseInt(document.getElementById('equip-prix').value) || 0) : 0;
+  const equipRow = document.getElementById('recap-equip-row');
+  if (equipPrixVal > 0) {
+    equipRow.style.display = 'flex';
+    document.getElementById('recap-equip').textContent = equipPrixVal.toLocaleString('fr-FR') + ' ¥';
+  } else {
+    equipRow.style.display = 'none';
+  }
+  document.getElementById('recap-nuyen').textContent = getNuyenCost().toLocaleString('fr-FR') + ' ¥';
+
+  const alertBox = document.getElementById('alert-box');
+  let alerts = [];
+  if (type && type.id === 'adepte') alerts.push("Pouvoir d'adepte : nécessite l'atout Éveil avec l'option Adepte.");
+  if (type && type.id === 'equipement') alerts.push("Équipement : la pièce doit être achetée séparément.");
+  if (getFinalLevel() < 0) alerts.push("Le niveau final est négatif. Vérifiez vos effets défavorables.");
+  if (alerts.length > 0) { alertBox.innerHTML = alerts.map(a => '• ' + a).join('<br>'); alertBox.classList.add('visible'); }
+  else { alertBox.classList.remove('visible'); }
+
+  updateFicheFinale();
+}
+
+function updateFicheFinale() {
+  const type = TYPES_ATOUT.find(t => t.id === state.typeId);
+  const nom = document.getElementById('atout-nom').value.trim() || '—';
+  const desc = document.getElementById('desc-text').value.trim() || '—';
+  const mjNom = document.getElementById('mj-nom').value.trim();
+  const mjDate = document.getElementById('mj-date').value;
+  const mjValide = document.getElementById('mj-valide').checked;
+
+  document.getElementById('fiche-nom').textContent = nom;
+  document.getElementById('fiche-niveau').textContent = 'Niveau ' + getFinalLevel();
+  document.getElementById('fiche-nuyen').textContent = getNuyenCost().toLocaleString('fr-FR') + ' ¥';
+  document.getElementById('fiche-type').textContent = 'Type : ' + (type ? type.nom : '—');
+
+  const essTag = document.getElementById('fiche-essence-tag');
+  const ess = getEssence();
+  if (ess !== 0) { essTag.style.display = 'inline-block'; essTag.textContent = 'Essence ' + (ess > 0 ? '+' : '') + ess; }
+  else { essTag.style.display = 'none'; }
+
+  // Prix équipement
+  const equipPrixTag = document.getElementById('fiche-equip-prix');
+  const equipPrix = parseInt(document.getElementById('equip-prix').value) || 0;
+  if (state.typeId === 'equipement' && equipPrix > 0) {
+    equipPrixTag.style.display = 'inline-block';
+    equipPrixTag.textContent = 'Équip. ' + equipPrix.toLocaleString('fr-FR') + ' ¥';
+  } else {
+    equipPrixTag.style.display = 'none';
+  }
+
+  const ficheIllu = document.getElementById('fiche-illu');
+  if (illustrationData) { ficheIllu.innerHTML = `<img src="${illustrationData}" alt="Illustration">`; }
+  else { ficheIllu.innerHTML = '<div class="fiche-illu-placeholder">Aucune illustration</div>'; }
+
+  const effetsList = document.getElementById('fiche-effets-list');
+  let effetsHTML = '';
+  if (type && type.flags && type.flags.includes('no_effets')) {
+    if (state.eveilCaps.length > 0) {
+      for (const capId of state.eveilCaps) {
+        const cap = EVEIL_CAPS.find(c => c.id === capId);
+        if (cap) effetsHTML += `<div class="fiche-effet-item"><span class="fiche-effet-cost">+${cap.cout}</span><span>${cap.nom}</span></div>`;
+      }
+    } else { effetsHTML = 'Aucune capacité sélectionnée.'; }
+  } else {
+    const selectedEffets = [];
+    for (const [idx, count] of Object.entries(state.effets)) {
+      const e = EFFETS[idx];
+      if (e) { for (let i = 0; i < count; i++) selectedEffets.push(e); }
+    }
+    if (selectedEffets.length === 0 && state.narratifs.length === 0 && state.defavValue === 0) {
+      effetsHTML = 'Aucun effet sélectionné.';
+    } else {
+      for (const e of selectedEffets) {
+        effetsHTML += `<div class="fiche-effet-item"><span class="fiche-effet-cost">${e.cout > 0 ? '+' : ''}${e.cout}</span><span>${e.nom}</span></div>`;
+      }
+      for (const n of state.narratifs) {
+        effetsHTML += `<div class="fiche-effet-item"><span class="fiche-effet-cost">+1</span><span>${n} (narratif)</span></div>`;
+      }
+      if (state.defavValue > 0) {
+        effetsHTML += `<div class="fiche-effet-item"><span class="fiche-effet-cost" style="color:var(--danger);">-${state.defavValue}</span><span>Effet défavorable</span></div>`;
+      }
+    }
+  }
+  effetsList.innerHTML = effetsHTML;
+  document.getElementById('fiche-desc').textContent = desc;
+
+  const mjInfo = document.getElementById('fiche-mj-info');
+  const mjStamp = document.getElementById('fiche-mj-stamp');
+  if (mjValide) {
+    mjInfo.textContent = (mjNom ? 'Validé par ' + mjNom : 'Validé par le MJ') + (mjDate ? ' — ' + mjDate : '');
+    mjStamp.classList.add('visible');
+  } else {
+    mjInfo.textContent = 'Non validé';
+    mjStamp.classList.remove('visible');
+  }
+}
+
+function onImageSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    illustrationData = ev.target.result;
+    const img = document.getElementById('illu-img');
+    img.src = illustrationData;
+    img.style.display = 'block';
+    document.getElementById('illu-placeholder').style.display = 'none';
+    document.getElementById('illu-zone').classList.add('has-image');
+    updateAll();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  illustrationData = null;
+  document.getElementById('illu-img').style.display = 'none';
+  document.getElementById('illu-img').src = '';
+  document.getElementById('illu-placeholder').style.display = 'block';
+  document.getElementById('illu-zone').classList.remove('has-image');
+  document.getElementById('illu-input').value = '';
+  updateAll();
+}
+
+function onMJValidate() {
+  const checked = document.getElementById('mj-valide').checked;
+  document.getElementById('mj-stamp').classList.toggle('visible', checked);
+  updateAll();
+}
+
+function buildJSON() {
+  return {
+    version: '1.0',
+    nom: document.getElementById('atout-nom').value.trim(),
+    type: state.typeId,
+    premierTrait: state.premierTrait,
+    effets: state.effets,
+    eveilCaps: state.eveilCaps,
+    defavValue: state.defavValue,
+    narratifs: state.narratifs,
+    equipPrix: parseInt(document.getElementById('equip-prix').value) || 0,
+    description: document.getElementById('desc-text').value.trim(),
+    mjNom: document.getElementById('mj-nom').value.trim(),
+    mjDate: document.getElementById('mj-date').value,
+    mjValide: document.getElementById('mj-valide').checked,
+    illustration: illustrationData,
+    niveauFinal: getFinalLevel(),
+    coutNuyen: getNuyenCost(),
+    essence: getEssence()
+  };
+}
+
+function exporterJSON() {
+  const data = buildJSON();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const nom = data.nom || 'atout';
+  a.download = nom.replace(/\s+/g, '_') + '_anarchy2.json';
+  a.href = url;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importerJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.version) { alert('Fichier JSON invalide.'); return; }
+      state.typeId = data.type || null;
+      state.premierTrait = data.premierTrait || false;
+      state.effets = data.effets || {};
+      state.eveilCaps = data.eveilCaps || [];
+      state.defavValue = data.defavValue || 0;
+      state.narratifs = data.narratifs || [];
+      document.getElementById('atout-nom').value = data.nom || '';
+      document.getElementById('desc-text').value = data.description || '';
+      document.getElementById('equip-prix').value = data.equipPrix || '';
+      document.getElementById('mj-nom').value = data.mjNom || '';
+      document.getElementById('mj-date').value = data.mjDate || '';
+      document.getElementById('mj-valide').checked = data.mjValide || false;
+      document.getElementById('mj-stamp').classList.toggle('visible', data.mjValide || false);
+      if (data.illustration) {
+        illustrationData = data.illustration;
+        const img = document.getElementById('illu-img');
+        img.src = illustrationData;
+        img.style.display = 'block';
+        document.getElementById('illu-placeholder').style.display = 'none';
+        document.getElementById('illu-zone').classList.add('has-image');
+      } else {
+        removeImage();
+      }
+      document.querySelectorAll('.type-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.typeId));
+      const type = TYPES_ATOUT.find(t => t.id === state.typeId);
+      document.getElementById('premier-trait-row').style.display = type && type.flags && type.flags.includes('premier_gratuit') ? 'flex' : 'none';
+      document.getElementById('premier-trait').checked = state.premierTrait;
+      renderEffets();
+      updateAll();
+    } catch (err) {
+      alert('Erreur lors de l\'import : ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function exportFichePNG() {
+  const fiche = document.getElementById('fiche-finale');
+  html2canvas(fiche, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+    const link = document.createElement('a');
+    const nom = document.getElementById('atout-nom').value.trim() || 'atout';
+    link.download = nom.replace(/\s+/g, '_') + '_fiche_anarchy2.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+function resetAll() {
+  state = { typeId: null, premierTrait: false, effets: {}, eveilCaps: [], defavValue: 0, narratifs: [] };
+  illustrationData = null;
+  document.getElementById('atout-nom').value = '';
+  document.getElementById('desc-text').value = '';
+  document.getElementById('equip-prix').value = '';
+  document.getElementById('mj-nom').value = '';
+  document.getElementById('mj-valide').checked = false;
+  document.getElementById('mj-stamp').classList.remove('visible');
+  removeImage();
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('premier-trait-row').style.display = 'none';
+  document.getElementById('equip-prix-row').style.display = 'none';
+  renderEffets();
+  updateAll();
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

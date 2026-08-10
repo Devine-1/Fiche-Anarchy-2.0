@@ -6,6 +6,7 @@
 <title>Fiche Personnage - Shadowrun Anarchy 2.0</title>
 <script src="assets/JS/shadowrun-data-2.0.js"></script>
 <link rel="stylesheet" href="assets/CSS/Style_v2.css">
+
 <link rel="icon" type="IMAGE/png" href="assets/images/Anarchy.ico">
 </head>
 <body>
@@ -15,10 +16,13 @@
   <a href="Black_Market.html" class="toolbar-btn" id="btn-blackmarket">Black Market</a>
   <a href="carte_interactive_cybermonde.html" class="toolbar-btn">Carte Interactive</a>
   <a href="bestiaire.html" class="toolbar-btn">Compendium</a>
+  <a href="createur_atout.html" class="toolbar-btn">Créer un atout</a>
   <div style="flex:1;"></div>
   <button class="toolbar-btn" id="btn-save">Sauvegarder</button>
   <button class="toolbar-btn secondary" id="btn-load">Charger</button>
   <input type="file" id="file-input" accept=".json" style="display:none;">
+  <button class="toolbar-btn" id="btn-export-foundry" style="background:#7b1fa2;color:#fff;">Exporter Foundry</button>
+
 </div>
 
 <!-- ==================== PAGE UNIQUE ==================== -->
@@ -530,11 +534,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Réorganiser les compétences selon l'ordre sauvegardé
         if (data['__comp_order__'] && data['__comp_order__'].value) {
           var container = document.getElementById('competences-rows');
-          var order = data['__comp_order__'].value;
+          var order = data['__comp_order__'].value.map(String);
           var rows = Array.from(container.querySelectorAll('.comp-row'));
-          order.forEach(function(id) {
-            var row = rows.find(function(r) { return r.getAttribute('data-comp-row') == id; });
-            if (row) container.appendChild(row);
+
+          rows.sort(function(a, b) {
+            var idA = a.getAttribute('data-comp-row');
+            var idB = b.getAttribute('data-comp-row');
+            var idxA = order.indexOf(idA);
+            var idxB = order.indexOf(idB);
+            if (idxA === -1 && idxB === -1) return 0;
+            if (idxA === -1) return 1;
+            if (idxB === -1) return -1;
+            return idxA - idxB;
+          });
+
+          rows.forEach(function(row) {
+            container.appendChild(row);
           });
         }
         // Créer les lignes d'atouts manquantes
@@ -580,6 +595,16 @@ document.addEventListener('DOMContentLoaded', function() {
           } else if (item.type === 'circle') {
             if (item.value) el.classList.add('filled');
             else el.classList.remove('filled');
+          }
+        });
+
+        // Identifier et styler les spécialisations (lignes avec "(+2)" dans le nom)
+        document.querySelectorAll('.comp-row').forEach(function(row) {
+          var nameInput = row.querySelector('.comp-name');
+          if (nameInput && nameInput.value.indexOf('(+2)') !== -1) {
+            row.classList.add('is-spec');
+          } else {
+            row.classList.remove('is-spec');
           }
         });
 
@@ -995,6 +1020,12 @@ document.addEventListener('DOMContentLoaded', function() {
               updateCompDP(id);
             }
           }
+        }
+        // Styling auto pour spécialisations
+        if (this.value.indexOf('(+2)') !== -1) {
+          row.classList.add('is-spec');
+        } else {
+          row.classList.remove('is-spec');
         }
       });
     }
@@ -1525,7 +1556,6 @@ document.addEventListener('DOMContentLoaded', function() {
       this.value = val;
     });
   });
-});
 
   // ============ AUTO-RESIZE TEXTAREA ARMES ET SORTS / ATOUTS / CONNAISSANCES / ÉQUIPEMENT ============
   window.autoResizeTextarea = function(el) {
@@ -1540,6 +1570,509 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // ============ EXPORT FOUNDRY SRA2 (NATIF) ============
+  function generateFoundryId() {
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var id = '';
+    for (var i = 0; i < 16; i++) {
+      id += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return id;
+  }
+
+  function toSlug(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  var exportFoundryBtn = document.getElementById('btn-export-foundry');
+  if (exportFoundryBtn) {
+    exportFoundryBtn.addEventListener('click', function() {
+      var exportData = {};
+      document.querySelectorAll('[data-field]').forEach(function(el) {
+        var field = el.dataset.field;
+        if (el.type === 'checkbox') {
+          exportData[field] = el.checked;
+        } else if (el.tagName === 'SELECT') {
+          exportData[field] = el.value;
+        } else if (el.tagName === 'TEXTAREA') {
+          exportData[field] = el.value;
+        } else if (el.tagName === 'INPUT') {
+          exportData[field] = el.value;
+        } else if (el.isContentEditable || el.getAttribute('contenteditable') === 'true') {
+          exportData[field] = el.innerHTML;
+        } else if (el.classList.contains('rr-circle') || el.classList.contains('circle-small')) {
+          exportData[field] = el.classList.contains('filled');
+        }
+      });
+
+      var attrMap = { 'FOR': 'strength', 'AGI': 'agility', 'VOL': 'willpower', 'LOG': 'logic', 'CHA': 'charisma' };
+      var skillSlugMap = {
+        'Perception': 'perception',
+        'Furtivité': 'stealth',
+        'Discrétion': 'stealth',
+        'discretion': 'stealth',
+        'Armes à distance': 'ranged-weapons',
+        'Piratage': 'cracking',
+        'Électronique': 'electronics',
+        'Ingénierie': 'engineering',
+        'Réseau': 'networking',
+        'Combat rapproché': 'close-combat',
+        'Athlétisme': 'athletics',
+        'Influence': 'influence',
+        'Sorcellerie': 'sorcery',
+        'Conjuration': 'conjuration',
+        'Survie': 'survival',
+        'Pilotage': 'piloting',
+        'Combat astral': 'astral-combat',
+        'Technomancie': 'technomancer'
+      };
+
+      var specSlugMap = {
+        'Armes de jet': { slug: 'spec_thrown-weapons', linkedSkill: 'ranged-weapons' },
+        'Armes de trait': { slug: 'spec_heavy-weapons', linkedSkill: 'ranged-weapons' },
+        'Armes lourdes': { slug: 'spec_heavy-weapons', linkedSkill: 'ranged-weapons' },
+        'Armes montées': { slug: 'spec_mounted-weapons', linkedSkill: 'ranged-weapons' },
+        'Fusils': { slug: 'spec_rifles', linkedSkill: 'ranged-weapons' },
+        'Lance-grenades': { slug: 'spec_grenade-launchers', linkedSkill: 'ranged-weapons' },
+        'Mitraillettes': { slug: 'spec_smgs', linkedSkill: 'ranged-weapons' },
+        'Pistolets': { slug: 'spec_pistols', linkedSkill: 'ranged-weapons' },
+        'Shotguns': { slug: 'spec_shotguns', linkedSkill: 'ranged-weapons' },
+        'Pistolets-mitrailleurs': { slug: 'spec_smgs', linkedSkill: 'ranged-weapons' },
+        'Course': { slug: 'spec_running', linkedSkill: 'athletics' },
+        'Défense à distance': { slug: 'spec_ranged-defense', linkedSkill: 'athletics' },
+        'Escalade': { slug: 'spec_climbing', linkedSkill: 'athletics' },
+        'Natation': { slug: 'spec_swimming', linkedSkill: 'athletics' },
+        'Parkour': { slug: 'spec_parkour', linkedSkill: 'athletics' },
+        'Armes contondantes': { slug: 'spec_blunt-weapons', linkedSkill: 'close-combat' },
+        'Combat astral': { slug: 'spec_astral-combat', linkedSkill: 'close-combat' },
+        'Crocs': { slug: 'spec_fangs', linkedSkill: 'close-combat' },
+        'Défense': { slug: 'spec_defense', linkedSkill: 'close-combat' },
+        'Lames': { slug: 'spec_blades', linkedSkill: 'close-combat' },
+        'Mains nues': { slug: 'spec_unarmed', linkedSkill: 'close-combat' },
+        'monofilament': { slug: 'spec_monofilament', linkedSkill: 'close-combat' },
+        'Bannissement': { slug: 'spec_banishing', linkedSkill: 'conjuration' },
+        'Esprit des aînés': { slug: 'spec_kin-spirits', linkedSkill: 'conjuration' },
+        'Esprits de l\'air': { slug: 'spec_air-spirits', linkedSkill: 'conjuration' },
+        'Esprits de l\'eau': { slug: 'spec_water-spirits', linkedSkill: 'conjuration' },
+        'Esprits de la terre': { slug: 'spec_earth-spirits', linkedSkill: 'conjuration' },
+        'Esprits des bêtes': { slug: 'spec_beast-spirits', linkedSkill: 'conjuration' },
+        'Esprits des plantes': { slug: 'spec_plant-spirits', linkedSkill: 'conjuration' },
+        'Esprits du feu': { slug: 'spec_fire-spirits', linkedSkill: 'conjuration' },
+        'Crochetage': { slug: 'spec_lockpicking', linkedSkill: 'stealth' },
+        'Discrétion Physique': { slug: 'spec_physical-stealth', linkedSkill: 'stealth' },
+        'Discrétion astrale': { slug: 'spec_astral-stealth', linkedSkill: 'stealth' },
+        'Discrétion matricielle': { slug: 'spec_matrix-stealth', linkedSkill: 'stealth' },
+        'Escamotage': { slug: 'spec_stealth', linkedSkill: 'stealth' },
+        'Bluff': { slug: 'spec_bluff', linkedSkill: 'influence' },
+        'Imposture': { slug: 'spec_impersonation', linkedSkill: 'influence' },
+        'Intimidation': { slug: 'spec_intimidation', linkedSkill: 'influence' },
+        'Négociation': { slug: 'spec_negotiation', linkedSkill: 'influence' },
+        'Étiquette': { slug: 'spec_etiquette', linkedSkill: 'influence' },
+        'Corporatiste': { slug: 'spec_corporate', linkedSkill: 'networking' },
+        'Corporation': { slug: 'spec_corporate', linkedSkill: 'networking' },
+        'Criminel': { slug: 'spec_criminal', linkedSkill: 'networking' },
+        'Gouvernemental': { slug: 'spec_government', linkedSkill: 'networking' },
+        'Ingénierie': { slug: 'spec_engineering', linkedSkill: 'networking' },
+        'La rue': { slug: 'spec_la-rue', linkedSkill: 'networking' },
+        'Magique': { slug: 'spec_magic', linkedSkill: 'networking' },
+        'Matriciel': { slug: 'spec_matrix', linkedSkill: 'networking' },
+        'Matrice': { slug: 'spec_matrix', linkedSkill: 'networking' },
+        'Médiatique': { slug: 'spec_media', linkedSkill: 'networking' },
+        'Médical': { slug: 'spec_medical', linkedSkill: 'networking' },
+        'Universitaire': { slug: 'spec_academic', linkedSkill: 'networking' },
+        'Armes contrôlées à distance': { slug: 'spec_remote-controlled-weapons', linkedSkill: 'engineering' },
+        'Armes télécommandées': { slug: 'spec_remote-controlled-weapons', linkedSkill: 'engineering' },
+        'C&R appareils électroniques': { slug: 'spec_personal-electronics', linkedSkill: 'engineering' },
+        'C&R drones': { slug: 'spec_cr-drones', linkedSkill: 'engineering' },
+        'C&R engins mécaniques': { slug: 'spec_cr-mechanical-devices', linkedSkill: 'engineering' },
+        'C&R implants cybernétiques': { slug: 'spec_cybernetics', linkedSkill: 'engineering' },
+        'C&R véhicules': { slug: 'spec_cr-vehicles', linkedSkill: 'engineering' },
+        'Explosifs': { slug: 'spec_explosives', linkedSkill: 'engineering' },
+        'Guerre électronique': { slug: 'spec_electronic-warfare', linkedSkill: 'engineering' },
+        'Matricielle': { slug: 'spec_matrix', linkedSkill: 'perception' },
+        'Perception Matrice': { slug: 'spec_matrix-perception', linkedSkill: 'perception' },
+        'Perception astrale': { slug: 'spec_astral-perception', linkedSkill: 'perception' },
+        'Perception matricielle': { slug: 'spec_matrix-perception', linkedSkill: 'perception' },
+        'Perception physique': { slug: 'spec_physical-perception', linkedSkill: 'perception' },
+        'Perception sociale': { slug: 'spec_social-perception', linkedSkill: 'perception' },
+        'Physique': { slug: 'spec_physical', linkedSkill: 'perception' },
+        'Camions': { slug: 'spec_trucks', linkedSkill: 'piloting' },
+        'Drones aquatiques': { slug: 'spec_aquatic-drones', linkedSkill: 'piloting' },
+        'Drones terrestres': { slug: 'spec_ground-drones', linkedSkill: 'piloting' },
+        'Drones volants': { slug: 'spec_flying-drones', linkedSkill: 'piloting' },
+        'Motos': { slug: 'spec_bikes', linkedSkill: 'piloting' },
+        'Voitures': { slug: 'spec_cars', linkedSkill: 'piloting' },
+        'Véhicules aquatiques': { slug: 'spec_aquatic-vehicles', linkedSkill: 'piloting' },
+        'Véhicules volants': { slug: 'spec_flying-vehicles', linkedSkill: 'piloting' },
+        'Backdoor': { slug: 'spec_backdoor', linkedSkill: 'cracking' },
+        'Porte dérobée': { slug: 'spec_backdoor', linkedSkill: 'cracking' },
+        'Cybercombat': { slug: 'spec_cybercombat', linkedSkill: 'cracking' },
+        'Force brute': { slug: 'spec_brute-force', linkedSkill: 'cracking' },
+        'Contresort': { slug: 'spec_counterspelling', linkedSkill: 'sorcery' },
+        'Sorts d\'illusion': { slug: 'spec_illusion-spells', linkedSkill: 'sorcery' },
+        'Sorts de combat': { slug: 'spec_combat-spells', linkedSkill: 'sorcery' },
+        'Sorts de détection': { slug: 'spec_detection-spells', linkedSkill: 'sorcery' },
+        'Sorts de manipulation': { slug: 'spec_manipulation-spells', linkedSkill: 'sorcery' },
+        'Sorts de santé': { slug: 'spec_health-spells', linkedSkill: 'sorcery' },
+        'Dressage': { slug: 'spec_animal-training', linkedSkill: 'survival' },
+        'Orientation': { slug: 'spec_navigation', linkedSkill: 'survival' },
+        'Premiers soins': { slug: 'spec_first-aid', linkedSkill: 'survival' },
+        'Sang-froid': { slug: 'spec_composure', linkedSkill: 'survival' },
+        'Survie en milieu naturel': { slug: 'spec_wilderness-survival', linkedSkill: 'survival' },
+        'Compilation': { slug: 'spec_compilation', linkedSkill: 'technomancer' },
+        'Décompilation': { slug: 'spec_decompilation', linkedSkill: 'technomancer' },
+        'Formes complexes': { slug: 'spec_complex-forms', linkedSkill: 'technomancer' },
+        'Appareils personnels': { slug: 'spec_personal-devices', linkedSkill: 'electronics' },
+        'Protection matricielle': { slug: 'spec_matrix-protection', linkedSkill: 'electronics' },
+        'Recherche matricielle': { slug: 'spec_matrix-search', linkedSkill: 'electronics' }
+      };
+
+      function createBaseItem(name, type, systemExtras) {
+        var item = {
+          _id: generateFoundryId(),
+          name: name,
+          type: type,
+          img: 'icons/svg/item-bag.svg',
+          system: {
+            description: '',
+            gmDescription: '',
+            bookmarked: false,
+            reference: ''
+          },
+          effects: [],
+          folder: null,
+          sort: 0,
+          ownership: { default: 0 },
+          flags: {}
+        };
+        for (var key in systemExtras) {
+          item.system[key] = systemExtras[key];
+        }
+        return item;
+      }
+
+      function createFeatItem(name, featType, desc, extras) {
+        var system = {
+          description: desc ? '<p>' + desc + '</p>' : '',
+          gmDescription: '',
+          bookmarked: false,
+          rating: 0,
+          cost: 'free-equipment',
+          active: true,
+          rrList: [],
+          bonusLightDamage: 0,
+          bonusSevereDamage: 0,
+          bonusPhysicalThreshold: 0,
+          bonusMentalThreshold: 0,
+          bonusMatrixThreshold: 0,
+          armorValue: 0,
+          bonusAnarchy: 0,
+          essenceCost: 0,
+          isBioware: false,
+          isOptional: false,
+          isAChoice: false,
+          numberOfChoice: 1,
+          featType: featType,
+          weaponType: '',
+          damageValue: '0',
+          damageValueBonus: 0,
+          vdMode: 'custom',
+          vdCustomValue: 0,
+          vdAttribute: 'strength',
+          vdBonus: 0,
+          damageType: 'physical',
+          meleeRange: 'none',
+          shortRange: 'none',
+          mediumRange: 'none',
+          longRange: 'none',
+          rangeImprovements: { melee: false, short: false, medium: false, long: false },
+          contactName: '',
+          reference: ''
+        };
+        for (var key in extras) {
+          system[key] = extras[key];
+        }
+        return createBaseItem(name, 'feat', system);
+      }
+
+      var items = [];
+      var lastSkillSlug = '';
+      var lastSkillAttr = '';
+
+      // === COMPÉTENCES & SPÉCIALISATIONS ===
+      document.querySelectorAll('.comp-row').forEach(function(row) {
+        var rowNum = row.getAttribute('data-comp-row');
+        var skName = exportData['comp-' + rowNum + '-name'] || '';
+        var skLevel = parseInt(exportData['comp-' + rowNum + '-indice'], 10) || 0;
+        var skAttr = exportData['comp-' + rowNum + '-att'] || '';
+        var attrEn = attrMap[skAttr] || 'logic';
+
+        if (!skName.trim()) return;
+
+        if (row.classList.contains('is-spec')) {
+          var cleanName = skName.trim().replace(/\s*\(\+2\)\s*$/, '').trim();
+          var specInfo = specSlugMap[cleanName];
+          var specSlug = specInfo ? specInfo.slug : 'spec_' + toSlug(cleanName);
+          var linkedSkill = specInfo ? specInfo.linkedSkill : lastSkillSlug;
+          if (!specInfo) {
+            console.warn('Spécialisation non reconnue, slug approximatif : ' + cleanName);
+          }
+          items.push(createBaseItem(skName.trim(), 'specialization', {
+            linkedSkill: linkedSkill,
+            linkedAttribute: lastSkillAttr,
+            description: '',
+            gmDescription: '',
+            bookmarked: false,
+            reference: '',
+            slug: specSlug
+          }));
+        } else {
+          var slug = skillSlugMap[skName] || toSlug(skName);
+          lastSkillSlug = slug;
+          lastSkillAttr = attrEn;
+          items.push(createBaseItem(skName.trim(), 'skill', {
+            rating: skLevel,
+            linkedAttribute: attrEn,
+            description: '',
+            gmDescription: '',
+            bookmarked: false,
+            reference: '',
+            slug: slug
+          }));
+        }
+      });
+
+      // === ATOUTS ===
+      document.querySelectorAll('.atout-row textarea').forEach(function(el) {
+        var val = el.value.trim();
+        if (val) items.push(createFeatItem(val, 'trait', val, {}));
+      });
+
+      // === CONNAISSANCES ===
+      document.querySelectorAll('.simple-section textarea[data-field^="connaissance-"]').forEach(function(el) {
+        var val = el.value.trim();
+        if (val) items.push(createFeatItem(val, 'connaissance', val, {}));
+      });
+
+      // === ARMES & SORTS ===
+      document.querySelectorAll('.arme-row').forEach(function(row) {
+        var rowNum = row.getAttribute('data-arme-row');
+        var arName = exportData['arme-' + rowNum + '-name'] || '';
+        var arType = exportData['arme-' + rowNum + '-type'] || 'Arme';
+        if (arName.trim()) {
+          var featType = (arType === 'Sort') ? 'spell' : 'weapon';
+          items.push(createFeatItem(arName.trim(), featType, arName.trim(), {}));
+        }
+      });
+
+      // === ÉQUIPEMENT ===
+      document.querySelectorAll('.equip-row textarea').forEach(function(el) {
+        var val = el.value.trim();
+        if (val) items.push(createFeatItem(val, 'equipment', val, {}));
+      });
+
+      // === CONTACTS ===
+      document.querySelectorAll('.contact-row textarea').forEach(function(el) {
+        var val = el.value.trim();
+        if (val) items.push(createFeatItem(val, 'contact', val, { contactName: val }));
+      });
+
+      // === ARMURES ===
+      var exportArmurePrinc = parseInt(exportData['armure-princ'], 10) || 0;
+      if (exportArmurePrinc > 0) {
+        items.push(createFeatItem('Armure principale', 'armor',
+          'Valeur d\'armure: ' + exportArmurePrinc,
+          { armorValue: exportArmurePrinc }));
+      }
+      var exportArmureSec = parseInt(exportData['armure-sec'], 10) || 0;
+      if (exportArmureSec > 0) {
+        items.push(createFeatItem('Armure secondaire', 'armor',
+          'Valeur d\'armure: ' + exportArmureSec,
+          { armorValue: exportArmureSec }));
+      }
+
+      // === CYBERDECKS ===
+      document.querySelectorAll('.cyberdeck-block').forEach(function(block) {
+        var cid = block.getAttribute('data-cyberdeck-id');
+        var cModele = exportData['cyberdeck-' + cid + '-modele'] || '';
+        if (cModele.trim()) {
+          var cDesc = exportData['cyberdeck-' + cid + '-desc'] || '';
+          var cProgs = [];
+          block.querySelectorAll('.programme-input').forEach(function(inp) {
+            var val = inp.value.trim();
+            if (val) cProgs.push(val);
+          });
+          if (cProgs.length > 0) {
+            cDesc += (cDesc ? '\n' : '') + 'Programmes: ' + cProgs.join(', ');
+          }
+          var fw = parseInt(exportData['cyberdeck-' + cid + '-fireware'], 10) || 0;
+          var atk = parseInt(exportData['cyberdeck-' + cid + '-attaque'], 10) || 0;
+          items.push(createFeatItem(cModele.trim(), 'cyberdeck', cDesc, {
+            firewall: fw,
+            attack: atk,
+            cyberdeckBiofeedbackFilter: false,
+            cyberdeckBiofeedback: false
+          }));
+        }
+      });
+
+      // === VÉHICULES & DRONES (notes uniquement) ===
+      var vehiculesNotes = [];
+      document.querySelectorAll('.vehicule-block').forEach(function(block) {
+        var vid = block.getAttribute('data-vehicule-id');
+        var vModele = exportData['vehicule-' + vid + '-modele'] || '';
+        if (vModele.trim()) {
+          var vDesc = exportData['vehicule-' + vid + '-desc'] || '';
+          var vStats = 'Autopilote ' + (parseInt(exportData['vehicule-' + vid + '-autopilote'], 10) || 0) +
+            ' | Structure ' + (parseInt(exportData['vehicule-' + vid + '-structure'], 10) || 0) +
+            ' | Maniabilité ' + (parseInt(exportData['vehicule-' + vid + '-maniabilite'], 10) || 0) +
+            ' | Vitesse ' + (parseInt(exportData['vehicule-' + vid + '-vitesse'], 10) || 0) +
+            ' | Blindage ' + (parseInt(exportData['vehicule-' + vid + '-blindage'], 10) || 0);
+          vehiculesNotes.push('<p><strong>Véhicule : ' + vModele.trim() + '</strong><br>' + vStats + (vDesc ? '<br>' + vDesc : '') + '</p>');
+        }
+      });
+      document.querySelectorAll('.drone-block').forEach(function(block) {
+        var did = block.getAttribute('data-drone-id');
+        var dModele = exportData['drone-' + did + '-modele'] || '';
+        if (dModele.trim()) {
+          var dDesc = exportData['drone-' + did + '-desc'] || '';
+          var dTaille = exportData['drone-' + did + '-taille'] || '';
+          var dStats = 'Taille ' + dTaille +
+            ' | Autopilote ' + (parseInt(exportData['drone-' + did + '-autopilote'], 10) || 0) +
+            ' | Structure ' + (parseInt(exportData['drone-' + did + '-structure'], 10) || 0) +
+            ' | Maniabilité ' + (parseInt(exportData['drone-' + did + '-maniabilite'], 10) || 0) +
+            ' | Vitesse ' + (parseInt(exportData['drone-' + did + '-vitesse'], 10) || 0) +
+            ' | Blindage ' + (parseInt(exportData['drone-' + did + '-blindage'], 10) || 0);
+          vehiculesNotes.push('<p><strong>Drone : ' + dModele.trim() + '</strong><br>' + dStats + (dDesc ? '<br>' + dDesc : '') + '</p>');
+        }
+      });
+
+      // === MÉTATYPE ===
+      items.push(createBaseItem('Métatype (non spécifié)', 'metatype', {
+        maxStrength: 6,
+        maxAgility: 6,
+        maxWillpower: 6,
+        maxLogic: 6,
+        maxCharisma: 6,
+        anarchyBonus: 1,
+        description: '<p>Métatype non renseigné dans la fiche source. Veuillez vérifier les plafonds d\'attribut et le bonus Anarchy dans Foundry.</p>',
+        gmDescription: '',
+        bookmarked: false,
+        reference: ''
+      }));
+
+      // === WOUNDS ===
+      var damage = {
+        light: [
+          exportData['legere-1'] || false,
+          exportData['legere-2'] || false,
+          exportData['legere-3'] || false
+        ],
+        severe: [
+          exportData['grave-1'] || false,
+          exportData['grave-2'] || false
+        ],
+        incapacitating: exportData['incap-1'] || false
+      };
+
+      // === ANARCHY ===
+      var anarchyVal = parseInt(exportData['anarchy'], 10) || 0;
+      var anarchySpent = [];
+      for (var i = 0; i < anarchyVal; i++) anarchySpent.push(false);
+
+      // === KEYWORDS / BEHAVIORS / CATCHPHRASES ===
+      var keywords = {};
+      for (var i = 1; i <= 5; i++) {
+        var val = exportData['motcle-' + i];
+        if (val) keywords['keyword' + i] = val;
+      }
+      var behaviors = {};
+      for (var i = 1; i <= 5; i++) {
+        var val = exportData['comportement-' + i];
+        if (val) behaviors['behavior' + i] = val;
+      }
+      var catchphrases = {};
+      for (var i = 1; i <= 5; i++) {
+        var val = exportData['replique-' + i];
+        if (val) catchphrases['catchphrase' + i] = val;
+      }
+
+      // === NUYEN ===
+      var nuyenDispRaw = (exportData['nuyen-disponible'] || '').replace(/[^0-9]/g, '');
+      var nuyenTotalRaw = (exportData['nuyen-total'] || '').replace(/[^0-9]/g, '');
+
+      // === ESSENCE ===
+      var essence = parseFloat((exportData['essence'] || '6').replace(',', '.')) || 6;
+
+      // === NOM ===
+      var exportPseudo = exportData['pseudo'] || 'Runner';
+
+      // === NOTES : ajouter véhicules/drones si présents ===
+      var notesText = exportData['notes-text'] || '';
+      if (vehiculesNotes.length > 0) {
+        notesText += (notesText ? '<hr>' : '') + '<h3>Véhicules & Drones</h3>' + vehiculesNotes.join('');
+      }
+
+      // === ASSEMBLAGE ACTOR ===
+      var foundryActor = {
+        _id: generateFoundryId(),
+        name: exportPseudo,
+        type: 'character',
+        img: 'icons/svg/mystery-man.svg',
+        system: {
+          attributes: {
+            strength: parseInt(exportData['force'], 10) || 0,
+            agility: parseInt(exportData['agilite'], 10) || 0,
+            willpower: parseInt(exportData['volonte'], 10) || 0,
+            logic: parseInt(exportData['logique'], 10) || 0,
+            charisma: parseInt(exportData['charisme'], 10) || 0
+          },
+          resources: {
+            yens: parseInt(nuyenDispRaw, 10) || 0,
+            anarchy: anarchyVal
+          },
+          maxEssence: essence,
+          gender: 'random',
+          connectionMode: 'ar',
+          astralState: 'physical',
+          damage: damage,
+          anarchySpent: anarchySpent,
+          tempAnarchy: 0,
+          tempAnarchySpent: [],
+          bio: {
+            background: exportData['background-text'] || '',
+            notes: notesText,
+            gmDescription: ''
+          },
+          keywords: keywords,
+          behaviors: behaviors,
+          catchphrases: catchphrases,
+          linkedVehicles: [],
+          reference: '',
+          damageGaugeType: 'physical'
+        },
+        items: items,
+        effects: [],
+        folder: null,
+        sort: 0,
+        ownership: { default: 0 },
+        flags: {}
+      };
+
+      var blob = new Blob([JSON.stringify(foundryActor, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = exportPseudo.replace(/\s+/g, '_') + '_foundry_sra2.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+});
 </script>
 <!-- Chatdice Panel -->
 <aside class="chatdice-panel" id="chatdice-panel">
