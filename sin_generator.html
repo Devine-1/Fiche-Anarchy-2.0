@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generateur de SIN - Shadowrun Anarchy</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   VARIABLES & BASE
+   ============================================================ */
+:root {
+  --yellow: #FFC107;
+  --yellow-dark: #E5AC00;
+  --yellow-light: #FFE082;
+  --gray-light: #E0E0E0;
+  --gray-mid: #9E9E9E;
+  --gray-dark: #424242;
+  --black: #212121;
+  --white: #FFFFFF;
+  --bg: #E8E8E8;
+  --paper: #FFFFFF;
+  --success: #43A047;
+  --danger: #E53935;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L35 10 L35 35' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M60 10 L85 10 L85 60 L110 60' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M10 60 L10 85 L35 85' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M60 85 L85 85 L85 110' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Ccircle cx='35' cy='35' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='85' cy='60' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='35' cy='85' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='85' cy='110' r='2.5' fill='%23BDBDBD'/%3E%3C/svg%3E");
+  padding: 64px 20px 20px;
+  color: var(--black);
+  min-height: 100vh;
+}
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+.toolbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  min-height: 60px;
+  background: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 16px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.toolbar-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--yellow);
+  letter-spacing: 1px;
+}
+.toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.toolbar-btn {
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 16px;
+  border: 2px solid var(--yellow);
+  border-radius: 4px;
+  background: var(--yellow);
+  color: var(--black);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.toolbar-btn:hover {
+  background: var(--yellow-dark);
+  border-color: var(--yellow-dark);
+}
+.toolbar-btn.secondary {
+  background: transparent;
+  color: var(--yellow);
+}
+.toolbar-btn.secondary:hover {
+  background: var(--yellow);
+  color: var(--black);
+}
+
+/* ============================================================
+   PAGE (formulaire)
+   ============================================================ */
+.page {
+  width: 210mm;
+  margin: 0 auto 20px;
+  background: var(--paper);
+  padding: 10mm 12mm;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  position: relative;
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 14px;
+  border-bottom: 2px solid var(--yellow-dark);
+  padding-bottom: 6px;
+}
+.page-header h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--black);
+  letter-spacing: 1px;
+}
+.logo-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.logo-text span { color: var(--yellow-dark); }
+
+/* ============================================================
+   FORMULAIRE - Style site
+   ============================================================ */
+.sin-form-section {
+  border: 2px solid var(--yellow-dark);
+  border-radius: 4px;
+  padding: 14px 16px;
+  background: var(--white);
+  margin-bottom: 12px;
+}
+.section-title-yellow {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--black);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  padding-bottom: 4px;
+  border-bottom: 1.5px solid var(--yellow-dark);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.form-group.full-width { grid-column: 1 / -1; }
+.form-group label {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gray-dark);
+  letter-spacing: 0.5px;
+}
+.form-group input[type="text"],
+.form-group input[list] {
+  width: 100%;
+  height: 32px;
+  border: none;
+  border-bottom: 2px solid var(--gray-mid);
+  background: transparent;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  color: var(--black);
+  outline: none;
+  padding: 0 4px;
+  transition: border-color 0.2s;
+}
+.form-group input:focus { border-bottom-color: var(--yellow-dark); }
+
+/* Type selector */
+.type-selector {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.type-selector-label {
+  display: block;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gray-dark);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.type-buttons {
+  display: inline-flex;
+  gap: 8px;
+}
+.type-btn {
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 20px;
+  border: 2px solid var(--gray-mid);
+  border-radius: 4px;
+  background: var(--white);
+  color: var(--gray-dark);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.type-btn:hover {
+  border-color: var(--yellow-dark);
+  color: var(--black);
+}
+.type-btn.active-real {
+  background: var(--yellow);
+  border-color: var(--yellow-dark);
+  color: var(--black);
+}
+.type-btn.active-fake {
+  background: var(--danger);
+  border-color: #b71c1c;
+  color: var(--white);
+}
+.type-btn.active-corpo {
+  background: #ffd700;
+  border-color: #c7a000;
+  color: var(--black);
+}
+
+/* Licences */
+.license-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.license-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--gray-light);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--black);
+  user-select: none;
+  transition: all 0.15s;
+}
+.license-item:hover {
+  border-color: var(--yellow-dark);
+  background: var(--yellow-light);
+}
+.license-item input[type="checkbox"] { cursor: pointer; }
+.license-item.checked {
+  background: var(--yellow-light);
+  border-color: var(--yellow-dark);
+}
+.license-custom-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.license-custom-row input {
+  flex: 1;
+  height: 32px;
+  border: none;
+  border-bottom: 2px solid var(--gray-mid);
+  background: transparent;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  color: var(--black);
+  outline: none;
+  padding: 0 4px;
+}
+.license-custom-row input:focus { border-bottom-color: var(--yellow-dark); }
+.btn-add {
+  padding: 6px 14px;
+  background: var(--yellow);
+  border: 2px solid var(--yellow-dark);
+  border-radius: 4px;
+  color: var(--black);
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-add:hover { background: var(--yellow-dark); }
+
+/* Generate button */
+.generate-row {
+  text-align: center;
+  margin-top: 16px;
+}
+.btn-generate {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 36px;
+  background: var(--yellow);
+  border: 2px solid var(--yellow-dark);
+  border-radius: 4px;
+  color: var(--black);
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.btn-generate:hover {
+  background: var(--yellow-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ============================================================
+   CARTE SIN - BLEU CYBER
+   ============================================================ */
+.sin-card-wrapper {
+  display: none;
+  margin-top: 20px;
+}
+#sin-card {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #0a1f1f 0%, #0d2b2b 50%, #0a1f1f 100%);
+  border: 2px solid #00bcd4;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0,188,212,0.2), inset 0 0 40px rgba(0,0,0,0.5);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #e0f7fa;
+}
+#sin-card.corpo-style {
+  border-color: #ffd700;
+  box-shadow: 0 0 30px rgba(255,215,0,0.15), inset 0 0 40px rgba(0,0,0,0.5);
+}
+#sin-card.fake-style {
+  border-color: #ff5252;
+  box-shadow: 0 0 30px rgba(255,82,82,0.15), inset 0 0 40px rgba(0,0,0,0.5);
+}
+#fake-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,0,0,0.03) 2px, rgba(255,0,0,0.03) 4px);
+  pointer-events: none;
+  z-index: 10;
+}
+.sin-header {
+  background: linear-gradient(90deg, rgba(0,188,212,0.2), rgba(0,188,212,0.05));
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(0,188,212,0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#sin-card.corpo-style .sin-header {
+  background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
+  border-bottom-color: rgba(255,215,0,0.3);
+}
+#sin-card.fake-style .sin-header {
+  background: linear-gradient(90deg, rgba(255,82,82,0.15), rgba(255,82,82,0.05));
+  border-bottom-color: rgba(255,82,82,0.3);
+}
+.sin-header-title {
+  color: #00e5ff;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+#sin-card.corpo-style .sin-header-title { color: #ffd700; }
+#sin-card.fake-style .sin-header-title { color: #ff8a80; }
+.sin-badge {
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.sin-body {
+  padding: 14px;
+  display: flex;
+  gap: 14px;
+}
+.sin-col-left {
+  flex-shrink: 0;
+  width: 110px;
+}
+.sin-photo-box {
+  width: 100px;
+  height: 120px;
+  border: 2px solid #00bcd4;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #0a1a1a;
+  position: relative;
+}
+#sin-card.corpo-style .sin-photo-box { border-color: #ffd700; }
+#sin-card.fake-style .sin-photo-box { border-color: #ff5252; }
+.sin-photo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+.sin-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #006064;
+  font-size: 28px;
+  font-family: 'Oswald', sans-serif;
+}
+.sin-barcode-wrap { margin-top: 8px; }
+.sin-bio-box {
+  margin-top: 8px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(0,188,212,0.15);
+  border-radius: 3px;
+  padding: 6px;
+}
+.sin-bio-label {
+  color: #4dd0e1;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+.sin-bio-id {
+  color: #80cbc4;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  word-break: break-all;
+  outline: none;
+  min-height: 30px;
+}
+.sin-col-right { flex: 1; min-width: 0; }
+.sin-name-block { margin-bottom: 10px; }
+.sin-name-label {
+  color: #4dd0e1;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+.sin-name-value {
+  color: #e0f7fa;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(0,229,255,0.2);
+  outline: none;
+}
+.sin-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.sin-info-cell-label {
+  color: #4dd0e1;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.sin-info-cell-value {
+  color: #e0f7fa;
+  font-size: 11px;
+  outline: none;
+}
+.sin-sin-box {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(0,188,212,0.2);
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.sin-sin-label {
+  color: #4dd0e1;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+.sin-sin-number {
+  color: #00e5ff;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  word-break: break-all;
+  outline: none;
+}
+.sin-extra-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.sin-extra-label {
+  color: #4dd0e1;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.sin-extra-value {
+  color: #e0f7fa;
+  font-size: 10px;
+  outline: none;
+}
+.sin-licenses-title {
+  color: #4dd0e1;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.sin-licenses-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.sin-license-tag {
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  border: 1px solid #00bcd4;
+  color: #80deea;
+  background: rgba(0,0,0,0.3);
+}
+.sin-license-tag.expired { border-color: #ff5252; color: #ff8a80; }
+.sin-license-tag.corpo { border-color: #ffd700; color: #ffe082; }
+
+/* Biometrics */
+.sin-biometrics { padding: 0 14px 10px; }
+.sin-bio-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.sin-bio-stats {
+  flex-shrink: 0;
+  width: 130px;
+}
+.sin-bio-stats-title {
+  color: #4dd0e1;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.sin-bio-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+}
+.sin-bio-stat-label { color: #006064; font-size: 6px; }
+.sin-bio-stat-value { color: #e0f7fa; font-size: 9px; outline: none; }
+.sin-dna-status { margin-top: 4px; font-size: 8px; letter-spacing: 1px; }
+.sin-dna-wrap { flex: 1; min-width: 0; }
+.sin-dna-label {
+  color: #4dd0e1;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+.sin-dna-canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 3px;
+  background: #000;
+  border: 1px solid rgba(0,188,212,0.15);
+}
+.sin-dna-sequence {
+  color: #4dd0e1;
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  word-break: break-all;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+/* Fingerprints */
+.sin-fingerprints-title {
+  color: #4dd0e1;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  margin-top: 8px;
+}
+.sin-fingerprints {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.sin-fingerprint-item { text-align: center; }
+.sin-fingerprint-item canvas {
+  border: 1px solid rgba(0,188,212,0.25);
+  border-radius: 50% 50% 40% 40%;
+  background: rgba(0,0,0,0.3);
+}
+.sin-fingerprint-label {
+  color: #4dd0e1;
+  font-size: 6px;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+/* Footer */
+.sin-footer {
+  background: rgba(0,188,212,0.05);
+  padding: 6px 14px;
+  border-top: 1px solid rgba(0,188,212,0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#sin-card.corpo-style .sin-footer {
+  background: rgba(255,215,0,0.05);
+  border-top-color: rgba(255,215,0,0.2);
+}
+#sin-card.fake-style .sin-footer {
+  background: rgba(255,82,82,0.05);
+  border-top-color: rgba(255,82,82,0.2);
+}
+.sin-footer-version { color: #006064; font-size: 7px; letter-spacing: 1px; }
+.sin-footer-validity { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  html, body { 
+    background: white !important; 
+    padding: 0 !important; 
+    margin: 0 !important; 
+    background-image: none !important;
+  }
+  .toolbar { display: none !important; }
+  .page { 
+    box-shadow: none !important; 
+    margin: 0 auto !important; 
+    width: 210mm !important; 
+    max-width: 210mm !important;
+    padding: 8mm !important; 
+    page-break-inside: avoid;
+    background: white !important;
+  }
+  .sin-form-section { display: none !important; }
+  #page-form { display: none !important; }
+  .sin-card-wrapper { 
+    display: block !important; 
+    margin-top: 0 !important; 
+    width: 100% !important;
+  }
+  .sin-card-wrapper .toolbar-actions { display: none !important; }
+  #sin-card { 
+    max-width: 100% !important; 
+    width: 100% !important;
+    box-shadow: 0 0 30px rgba(0,188,212,0.2), inset 0 0 40px rgba(0,0,0,0.5) !important;
+    page-break-inside: avoid;
+  }
+  #sin-card.corpo-style {
+    box-shadow: 0 0 30px rgba(255,215,0,0.15), inset 0 0 40px rgba(0,0,0,0.5) !important;
+  }
+  #sin-card.fake-style {
+    box-shadow: 0 0 30px rgba(255,82,82,0.15), inset 0 0 40px rgba(0,0,0,0.5) !important;
+  }
+  .sin-body { padding: 10px; gap: 10px; }
+  .sin-biometrics { padding: 0 10px 8px; }
+  .sin-fingerprints { gap: 4px; }
+  .sin-fingerprint-item canvas { width: 32px; height: 40px; }
+  .sin-name-value { font-size: 15px; }
+  .sin-header { 
+    background: linear-gradient(90deg, rgba(0,188,212,0.2), rgba(0,188,212,0.05)) !important; 
+  }
+  #sin-card.corpo-style .sin-header {
+    background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05)) !important;
+  }
+  #sin-card.fake-style .sin-header {
+    background: linear-gradient(90deg, rgba(255,82,82,0.15), rgba(255,82,82,0.05)) !important;
+  }
+  .sin-footer {
+    background: rgba(0,188,212,0.05) !important;
+  }
+  #sin-card.corpo-style .sin-footer {
+    background: rgba(255,215,0,0.05) !important;
+  }
+  #sin-card.fake-style .sin-footer {
+    background: rgba(255,82,82,0.05) !important;
+  }
+  .sin-photo-box {
+    background: #0a1a1a !important;
+  }
+  .sin-bio-box {
+    background: rgba(0,0,0,0.3) !important;
+  }
+  .sin-sin-box {
+    background: rgba(0,0,0,0.3) !important;
+  }
+  .sin-license-tag {
+    background: rgba(0,0,0,0.3) !important;
+  }
+  .sin-fingerprint-item canvas {
+    background: rgba(0,0,0,0.3) !important;
+  }
+  #fake-overlay {
+    display: block !important;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,0,0,0.03) 2px, rgba(255,0,0,0.03) 4px) !important;
+  }
+}
+
+/* Input file styling */
+input[type="file"] {
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  color: var(--black);
+  padding: 4px 0;
+}
+input[type="file"]::file-selector-button {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  background: var(--yellow);
+  border: 2px solid var(--yellow-dark);
+  border-radius: 4px;
+  color: var(--black);
+  cursor: pointer;
+  margin-right: 8px;
+}
+input[type="file"]::file-selector-button:hover {
+  background: var(--yellow-dark);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .page { width: 100%; padding: 8mm; }
+  .form-grid { grid-template-columns: 1fr; }
+  .toolbar { gap: 6px; justify-content: center; padding: 6px 8px; }
+  .toolbar-title { display: none; }
+  body { padding-top: 80px; }
+  .sin-body { flex-direction: column; align-items: center; }
+  .sin-col-left { width: 100%; display: flex; flex-direction: column; align-items: center; }
+  .sin-bio-row { flex-direction: column; }
+  .sin-bio-stats { width: 100%; }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- TOOLBAR                                                      -->
+<!-- ============================================================ -->
+<div class="toolbar">
+  <div class="toolbar-title">Generateur de SIN</div>
+  <div class="toolbar-actions">
+    <a href="index.html" class="toolbar-btn secondary">&lt; Retour Fiche</a>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE FORMULAIRE                                              -->
+<!-- ============================================================ -->
+<div class="page" id="page-form">
+  <div class="page-header">
+    <h1>Generateur de SIN</h1>
+    <div class="logo-text">Shadowrun <span>Anarchy</span> 2.0</div>
+  </div>
+
+  <div class="sin-form-section">
+    <div class="section-title-yellow">Parametres de generation</div>
+
+    <div class="form-grid">
+
+      <div class="form-group full-width type-selector">
+        <span class="type-selector-label">Type de SIN</span>
+        <div class="type-buttons">
+          <button id="btn-real" class="type-btn active-real" onclick="setSinType('real')">Vrai SIN</button>
+          <button id="btn-fake" class="type-btn" onclick="setSinType('fake')">Faux SIN</button>
+          <button id="btn-corpo" class="type-btn" onclick="setSinType('corpo')">Corpo SIN</button>
+        </div>
+        <input type="hidden" id="sin-type" value="real">
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Nom</label>
+        <input type="text" id="lastName" placeholder="Surname">
+      </div>
+
+      <div class="form-group">
+        <label for="firstName">Prenom</label>
+        <input type="text" id="firstName" placeholder="Name">
+      </div>
+
+      <div class="form-group">
+        <label for="sex">Sexe</label>
+        <input type="text" id="sex" placeholder="M / F / Autre">
+      </div>
+
+      <div class="form-group">
+        <label for="metatype">Metatype</label>
+        <input type="text" id="metatype" placeholder="Humain, Elf, Ork...">
+      </div>
+
+      <div class="form-group full-width">
+        <label for="country" id="label-country">Pays</label>
+        <input type="text" id="country" list="country-list" placeholder="Tapez ou choisissez...">
+        <datalist id="country-list">
+          <option value="UCAS">
+          <option value="CAS">
+          <option value="Aztlan">
+          <option value="Amazonia">
+          <option value="Ares Macrotechnology">
+          <option value="Renraku Computer Systems">
+          <option value="Saeder-Krupp">
+          <option value="Shiawase">
+          <option value="Horizon">
+          <option value="Evo">
+          <option value="Wuxing">
+          <option value="Sony">
+          <option value="Tir Tairngire">
+          <option value="Tir na nOg">
+          <option value="Sioux Nation">
+          <option value="Salish-Shidhe">
+          <option value="Pueblo">
+          <option value="Allied German States">
+          <option value="France">
+          <option value="United Kingdom">
+          <option value="Japan">
+          <option value="Russia">
+        </datalist>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="photoUrl">Photo</label>
+        <input type="text" id="photoUrl" placeholder="https://..." onchange="photoDataUrl=''; document.getElementById('photo-preview').style.display='none'; document.getElementById('photoFile').value='';">
+        <div id="url-cors-warning" style="display:none; color:#E53935; font-size:11px; margin-top:4px;">
+          ⚠️ Les images externes (URL) peuvent ne pas s'afficher en mode local (file://). Utilisez plutôt l'import de fichier ci-dessous.
+        </div>
+      </div>
+      <div class="form-group full-width">
+        <label for="photoFile">Ou importer une image locale</label>
+        <input type="file" id="photoFile" accept="image/*" onchange="handlePhotoUpload(this)">
+        <div id="photo-preview" style="margin-top:8px; display:none;">
+          <img id="preview-img" src="" style="max-height:80px; max-width:120px; border:2px solid var(--yellow-dark); border-radius:4px;">
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Licences a inclure</label>
+        <div class="license-grid" id="license-selector">
+          <label class="license-item">
+            <input type="checkbox" value="Port d'arme leger" class="license-check"> Port d'arme leger
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Port d'arme lourd" class="license-check"> Port d'arme lourd
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Permis de conduire" class="license-check"> Permis de conduire
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Licence de magie" class="license-check"> Licence de magie
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Permis de drone" class="license-check"> Permis de drone
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Licence cyberware" class="license-check"> Licence cyberware
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Visa de travail" class="license-check"> Visa de travail
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Passeport corporatiste" class="license-check"> Passeport corporatiste
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Permis de chasse" class="license-check"> Permis de chasse
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Licence BTL" class="license-check"> Licence BTL
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Autorisation zone rouge" class="license-check"> Autorisation zone rouge
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Permis de pilote" class="license-check"> Permis de pilote
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Licence de decker" class="license-check"> Licence de decker
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Acces niveau 3" class="license-check"> Acces niveau 3
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Permis de port ouvert" class="license-check"> Permis de port ouvert
+          </label>
+        </div>
+        <div class="license-custom-row">
+          <input type="text" id="custom-license" placeholder="Ajouter une licence personnalisee...">
+          <button class="btn-add" onclick="addCustomLicense()">+</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="generate-row">
+      <button class="btn-generate" onclick="generateSIN()">Generer la carte SIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CARTE SIN GENEREE                                            -->
+<!-- ============================================================ -->
+<div class="page sin-card-wrapper" id="page-card">
+  <div class="page-header">
+    <h1>Carte SIN</h1>
+    <div class="logo-text">Shadowrun <span>Anarchy</span> 2.0</div>
+  </div>
+
+  <div class="toolbar-actions" style="justify-content:center; margin-bottom:14px;">
+    <button class="toolbar-btn secondary" onclick="backToForm()">&lt; Modifier</button>
+    <button class="toolbar-btn" onclick="window.print()">Imprimer</button>
+    <button class="toolbar-btn" onclick="exportPNG()">Exporter PNG</button>
+  </div>
+
+  <div id="sin-card">
+    <div id="fake-overlay"></div>
+
+    <div class="sin-header">
+      <div class="sin-header-title">Systeme d'Identification Numerique</div>
+      <div class="sin-badge" id="sin-badge">VERIFIE</div>
+    </div>
+
+    <div class="sin-body">
+      <div class="sin-col-left">
+        <div class="sin-photo-box" id="photo-container">
+          <img id="card-photo" src="" alt="" crossorigin="anonymous">
+          <div class="sin-photo-placeholder" id="photo-placeholder">?</div>
+        </div>
+        <div class="sin-barcode-wrap">
+          <canvas id="barcode-canvas" style="width:100px; height:32px;"></canvas>
+        </div>
+        <div class="sin-bio-box">
+          <div class="sin-bio-label">ID Biometrique</div>
+          <div class="sin-bio-id" id="card-bio-id" contenteditable="true">--</div>
+        </div>
+      </div>
+
+      <div class="sin-col-right">
+        <div class="sin-name-block">
+          <div class="sin-name-label">Identite</div>
+          <div class="sin-name-value" id="card-fullname" contenteditable="true">NOM Prenom</div>
+        </div>
+
+        <div class="sin-info-grid">
+          <div>
+            <div class="sin-info-cell-label">Nationalite</div>
+            <div class="sin-info-cell-value" id="card-country" contenteditable="true">--</div>
+          </div>
+          <div>
+            <div class="sin-info-cell-label">Metatype</div>
+            <div class="sin-info-cell-value" id="card-metatype" contenteditable="true">--</div>
+          </div>
+          <div>
+            <div class="sin-info-cell-label">Sexe</div>
+            <div class="sin-info-cell-value" id="card-sex" contenteditable="true">--</div>
+          </div>
+          <div>
+            <div class="sin-info-cell-label">Naissance</div>
+            <div class="sin-info-cell-value" id="card-birth" contenteditable="true">--</div>
+          </div>
+        </div>
+
+        <div class="sin-sin-box">
+          <div class="sin-sin-label">Numero SIN</div>
+          <div class="sin-sin-number" id="card-sin-number" contenteditable="true">--</div>
+        </div>
+
+        <div class="sin-extra-grid">
+          <div>
+            <div class="sin-extra-label">Profession</div>
+            <div class="sin-extra-value" id="card-profession" contenteditable="true">--</div>
+          </div>
+          <div>
+            <div class="sin-extra-label">Adresse</div>
+            <div class="sin-extra-value" id="card-address" contenteditable="true">--</div>
+          </div>
+          <div>
+            <div class="sin-extra-label">Ville</div>
+            <div class="sin-extra-value" id="card-city" contenteditable="true">--</div>
+          </div>
+          <div>
+            <div class="sin-extra-label" id="label-residence">Residence</div>
+            <div class="sin-extra-value" id="card-residence" contenteditable="true">--</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="sin-licenses-title">Permis &amp; Licences</div>
+          <div class="sin-licenses-list" id="licenses-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sin-biometrics">
+      <div class="sin-bio-row">
+        <div class="sin-bio-stats">
+          <div class="sin-bio-stats-title">Donnees Biometriques</div>
+          <div class="sin-bio-stats-grid">
+            <div>
+              <div class="sin-bio-stat-label">TAILLE</div>
+              <div class="sin-bio-stat-value" id="card-height" contenteditable="true">--</div>
+            </div>
+            <div>
+              <div class="sin-bio-stat-label">POIDS</div>
+              <div class="sin-bio-stat-value" id="card-weight" contenteditable="true">--</div>
+            </div>
+            <div>
+              <div class="sin-bio-stat-label">SANG</div>
+              <div class="sin-bio-stat-value" id="card-blood" contenteditable="true">--</div>
+            </div>
+            <div>
+              <div class="sin-bio-stat-label">YEUX</div>
+              <div class="sin-bio-stat-value" id="card-eyes" contenteditable="true">--</div>
+            </div>
+            <div>
+              <div class="sin-bio-stat-label">CHEVEUX</div>
+              <div class="sin-bio-stat-value" id="card-hair" contenteditable="true">--</div>
+            </div>
+            <div>
+              <div class="sin-bio-stat-label">PEAU</div>
+              <div class="sin-bio-stat-value" id="card-skin" contenteditable="true">--</div>
+            </div>
+          </div>
+          <div class="sin-dna-status" id="dna-status">MATCH BIOMETRIQUE CONFIRME</div>
+        </div>
+
+        <div class="sin-dna-wrap">
+          <div class="sin-dna-label">Empreinte ADN</div>
+          <canvas id="dna-canvas" width="280" height="80" class="sin-dna-canvas"></canvas>
+          <div class="sin-dna-sequence" id="dna-sequence"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sin-fingerprints-title">Empreintes Digitales</div>
+        <div class="sin-fingerprints" id="fingerprints"></div>
+      </div>
+    </div>
+
+    <div class="sin-footer">
+      <div class="sin-footer-version">SIN v.6.2.1 // Horizon ID Services</div>
+      <div class="sin-footer-validity" id="card-validity">VALIDITE : 100%</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DONNEES
+   ============================================================ */
+const PROFESSIONS = ['Technicien','Secretaire','Consultant','Vendeur','Chauffeur','Agent de securite','Comptable','Ingenieur','Medecin','Avocat','Journaliste','Artiste','Chef d\'entreprise','Ouvrier','Etudiant','Sans emploi'];
+const CITIES = ['Seattle','Denver','Chicago','Dallas','Atlanta','Boston','Detroit','New York','Los Angeles','San Francisco','Phoenix','Montreal','Toronto','Vancouver','Berlin','Paris','Londres','Tokyo','Moscou','Hong Kong'];
+const STREETS = ['Oak','Pine','Maple','Cedar','Elm','Willow','Birch','Spruce','Ash','Cherry','Main','First','Second','Third','Fourth','Fifth','Broadway','Market','Park','River'];
+const BLOOD_TYPES = ['A+','A-','B+','B-','AB+','AB-','O+','O-'];
+const EYE_COLORS = ['Noir','Marron','Bleu','Vert','Gris','Noisette','Ambre','Violet'];
+const HAIR_COLORS = ['Noir','Brun','Chatain','Blond','Roux','Gris','Blanc','Bleu dye','Rase'];
+const SKIN_TONES = ['Très clair','Clair','Moyen','Olive','Bronze','Fonce','Très fonce','Albinos'];
+
+let currentSinType = 'real';
+let photoDataUrl = '';  // Stocke la photo en base64 pour html2canvas
+let isFileProtocol = window.location.protocol === 'file:';
+
+function randomDigits(n) {
+  let s = '';
+  for (let i = 0; i < n; i++) s += Math.floor(Math.random() * 10);
+  return s;
+}
+function randomInt(min, max) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+function randomPick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/* ============================================================
+   LICENCE PERSONNALISEE
+   ============================================================ */
+function addCustomLicense() {
+  const input = document.getElementById('custom-license');
+  const val = input.value.trim();
+  if (!val) return;
+  const container = document.getElementById('license-selector');
+  const label = document.createElement('label');
+  label.className = 'license-item checked';
+  label.innerHTML = '<input type="checkbox" value="' + val.replace(/"/g, '&quot;') + '" class="license-check" checked> ' + val;
+  container.appendChild(label);
+  label.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'INPUT') return;
+    label.classList.toggle('checked', e.target.checked);
+  });
+  input.value = '';
+}
+
+document.querySelectorAll('.license-item').forEach(function(item) {
+  item.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'INPUT') return;
+    item.classList.toggle('checked', e.target.checked);
+  });
+});
+
+document.getElementById('custom-license').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') addCustomLicense();
+});
+
+/* ============================================================
+   TYPE DE SIN
+   ============================================================ */
+function setSinType(type) {
+  currentSinType = type;
+  document.getElementById('sin-type').value = type;
+  var btns = {
+    real: document.getElementById('btn-real'),
+    fake: document.getElementById('btn-fake'),
+    corpo: document.getElementById('btn-corpo')
+  };
+  btns.real.className = 'type-btn';
+  btns.fake.className = 'type-btn';
+  btns.corpo.className = 'type-btn';
+  if (type === 'real') btns.real.className = 'type-btn active-real';
+  else if (type === 'fake') btns.fake.className = 'type-btn active-fake';
+  else btns.corpo.className = 'type-btn active-corpo';
+
+  var label = document.getElementById('label-country');
+  var input = document.getElementById('country');
+  if (type === 'corpo') {
+    label.textContent = 'Corporation';
+    input.placeholder = 'Nom de la corporation...';
+  } else {
+    label.textContent = 'Pays';
+    input.placeholder = 'Tapez ou choisissez...';
+  }
+}
+
+function backToForm() {
+  document.getElementById('page-form').style.display = 'block';
+  document.getElementById('page-card').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ============================================================
+   UPLOAD PHOTO (base64 pour html2canvas)
+   ============================================================ */
+function handlePhotoUpload(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    photoDataUrl = e.target.result;
+    var preview = document.getElementById('preview-img');
+    var previewBox = document.getElementById('photo-preview');
+    preview.src = photoDataUrl;
+    previewBox.style.display = 'block';
+    document.getElementById('photoUrl').value = '[Fichier local importe]';
+    document.getElementById('url-cors-warning').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============================================================
+   CHARGEMENT IMAGE EXTERNE VIA PROXY CORS
+   ============================================================ */
+async function fetchImageAsBase64(url) {
+  // Essayer plusieurs proxies CORS
+  var proxies = [
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    'https://corsproxy.io/?' + encodeURIComponent(url),
+    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url)
+  ];
+
+  for (var i = 0; i < proxies.length; i++) {
+    try {
+      var response = await fetch(proxies[i], { method: 'GET' });
+      if (!response.ok) continue;
+      var blob = await response.blob();
+      return new Promise(function(resolve) {
+        var reader = new FileReader();
+        reader.onloadend = function() { resolve(reader.result); };
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      console.log('Proxy ' + (i+1) + ' failed:', e);
+    }
+  }
+  return null;
+}
+
+/* ============================================================
+   GENERATION
+   ============================================================ */
+async function generateSIN() {
+  var type = currentSinType;
+  var lastName = document.getElementById('lastName').value.trim() || 'INCONNU';
+  var firstName = document.getElementById('firstName').value.trim() || 'INCONNU';
+  var sex = document.getElementById('sex').value.trim() || '?';
+  var metatype = document.getElementById('metatype').value.trim() || 'Inconnu';
+  var country = document.getElementById('country').value.trim() || 'INCONNU';
+  var photoUrl = document.getElementById('photoUrl').value.trim();
+
+  var checkedLicenses = [];
+  document.querySelectorAll('.license-check:checked').forEach(function(cb) {
+    checkedLicenses.push(cb.value);
+  });
+
+  var birthYear = 2048 + Math.floor(Math.random() * 25);
+  var birthMonth = 1 + Math.floor(Math.random() * 12);
+  var birthDay = 1 + Math.floor(Math.random() * 28);
+  var randomNum = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+
+  var countryCode = country.substring(0, 4).toUpperCase();
+  var metaCode = metatype.substring(0, 4).toUpperCase();
+  var sexCode = sex.substring(0, 1).toUpperCase();
+
+  var sinNumber = countryCode + '-' + birthYear + '-' + String(birthMonth).padStart(2,'0') + '-' + String(birthDay).padStart(2,'0') + '-' + sexCode + '-' + metaCode + '-' + lastName.toUpperCase() + '-' + firstName.toUpperCase() + '-' + randomNum;
+
+  var bioId = 'IDC-0:' + countryCode + '-' + randomDigits(12) + '-' + randomDigits(10) + '-' + randomDigits(12) + '-' + randomDigits(2) + ' <<< ' + randomDigits(8) + '/' + countryCode + '/' + randomDigits(5) + ' >>> SIN-ID';
+
+  var profession = randomPick(PROFESSIONS);
+  var streetNum = randomInt(1, 9999);
+  var street = randomPick(STREETS);
+  var city = randomPick(CITIES);
+  var address = streetNum + ' ' + street + ' Street, Apt ' + randomInt(1, 500);
+
+  var height = randomInt(150, 210);
+  var weight = randomInt(50, 120);
+  var blood = randomPick(BLOOD_TYPES);
+  var eyes = randomPick(EYE_COLORS);
+  var hair = randomPick(HAIR_COLORS);
+  var skin = randomPick(SKIN_TONES);
+
+  document.getElementById('page-form').style.display = 'none';
+  document.getElementById('page-card').style.display = 'block';
+
+  var card = document.getElementById('sin-card');
+  card.className = '';
+  if (type === 'corpo') card.classList.add('corpo-style');
+  else if (type === 'fake') card.classList.add('fake-style');
+
+  document.getElementById('card-fullname').textContent = lastName.toUpperCase() + ' ' + firstName;
+  document.getElementById('card-country').textContent = country || 'Non specifie';
+  document.getElementById('card-metatype').textContent = metatype || 'Non specifie';
+  document.getElementById('card-sex').textContent = sex || 'Non specifie';
+  document.getElementById('card-birth').textContent = birthYear + '-' + String(birthMonth).padStart(2,'0') + '-' + String(birthDay).padStart(2,'0');
+  document.getElementById('card-sin-number').textContent = sinNumber;
+  document.getElementById('card-bio-id').textContent = bioId;
+
+  var cardPhoto = document.getElementById('card-photo');
+  var placeholder = document.getElementById('photo-placeholder');
+  var srcToUse = photoDataUrl || '';
+
+  // Si URL externe et pas de base64, essayer de charger via proxy CORS
+  if (!srcToUse && photoUrl && photoUrl.indexOf('http') === 0) {
+    if (isFileProtocol) {
+      document.getElementById('url-cors-warning').style.display = 'block';
+    }
+    try {
+      var proxyResult = await fetchImageAsBase64(photoUrl);
+      if (proxyResult) {
+        srcToUse = proxyResult;
+        photoDataUrl = proxyResult; // cache pour les prochaines fois
+      }
+    } catch (e) {
+      console.log('Impossible de charger l\'image via proxy:', e);
+    }
+  }
+
+  if (srcToUse) {
+    cardPhoto.src = srcToUse;
+    cardPhoto.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    cardPhoto.style.display = 'none';
+    placeholder.style.display = 'flex';
+    placeholder.textContent = type === 'fake' ? 'X' : (type === 'corpo' ? 'C' : '?');
+  }
+
+  var badge = document.getElementById('sin-badge');
+  var overlay = document.getElementById('fake-overlay');
+  var validity = document.getElementById('card-validity');
+
+  if (type === 'fake') {
+    badge.textContent = 'NON VERIFIE';
+    badge.style.background = '#ff5252';
+    badge.style.color = '#fff';
+    overlay.style.display = 'block';
+    var fakeValidity = 30 + Math.floor(Math.random() * 50);
+    validity.textContent = 'VALIDITE ESTIMEE : ' + fakeValidity + '%';
+    validity.style.color = '#ff5252';
+  } else if (type === 'corpo') {
+    badge.textContent = 'CORPO';
+    badge.style.background = '#ffd700';
+    badge.style.color = '#000';
+    overlay.style.display = 'none';
+    validity.textContent = 'ACCES NIVEAU CORPO';
+    validity.style.color = '#ffd700';
+  } else {
+    badge.textContent = 'VERIFIE';
+    badge.style.background = '#00bcd4';
+    badge.style.color = '#000';
+    overlay.style.display = 'none';
+    validity.textContent = 'VALIDITE : 100%';
+    validity.style.color = '#00e5ff';
+  }
+
+  drawBarcode(sinNumber, type);
+
+  document.getElementById('card-profession').textContent = profession;
+  document.getElementById('card-address').textContent = address;
+  document.getElementById('card-city').textContent = city;
+  document.getElementById('card-residence').textContent = country || 'Non specifie';
+
+  var labelResidence = document.getElementById('label-residence');
+  labelResidence.textContent = type === 'corpo' ? 'Employeur' : 'Residence';
+
+  var licensesContainer = document.getElementById('licenses-list');
+  licensesContainer.innerHTML = '';
+
+  if (checkedLicenses.length === 0) {
+    var div = document.createElement('div');
+    div.style.cssText = 'color:#006064; font-size:9px; font-style:italic;';
+    div.textContent = 'Aucune licence declaree';
+    licensesContainer.appendChild(div);
+  } else {
+    checkedLicenses.forEach(function(lic) {
+      var isExpired = type === 'fake' && Math.random() > 0.6;
+      var div = document.createElement('div');
+      div.className = 'sin-license-tag';
+      if (isExpired) div.classList.add('expired');
+      if (type === 'corpo') div.classList.add('corpo');
+      div.textContent = isExpired ? lic + ' [EXPIRE]' : lic;
+      licensesContainer.appendChild(div);
+    });
+  }
+
+  document.getElementById('card-height').textContent = height + ' cm';
+  document.getElementById('card-weight').textContent = weight + ' kg';
+  document.getElementById('card-blood').textContent = blood;
+  document.getElementById('card-eyes').textContent = eyes;
+  document.getElementById('card-hair').textContent = hair;
+  document.getElementById('card-skin').textContent = skin;
+
+  var dnaStatus = document.getElementById('dna-status');
+  if (type === 'fake') {
+    dnaStatus.textContent = 'ANOMALIE BIOMETRIQUE DETECTEE';
+    dnaStatus.style.color = '#ff5252';
+  } else if (type === 'corpo') {
+    dnaStatus.textContent = 'BIOMETRIE CORPO ENREGISTREE';
+    dnaStatus.style.color = '#ffd700';
+  } else {
+    dnaStatus.textContent = 'MATCH BIOMETRIQUE CONFIRME';
+    dnaStatus.style.color = '#00e5ff';
+  }
+
+  drawDNA(type);
+  drawFingerprints(type);
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ============================================================
+   BARCODE
+   ============================================================ */
+function drawBarcode(text, type) {
+  var canvas = document.getElementById('barcode-canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = 200;
+  canvas.height = 64;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  var x = 8;
+  var seed = type === 'fake' ? 0.4 : 0.5;
+  var color = type === 'corpo' ? '#ffd700' : '#00e5ff';
+  for (var i = 0; i < text.length * 6; i++) {
+    var w = Math.random() > seed ? 3 : 1;
+    if (Math.random() > 0.3) {
+      ctx.fillStyle = (type === 'fake' && Math.random() > 0.9) ? '#ff5252' : color;
+      ctx.fillRect(x, 6, w, 36);
+    }
+    x += w + 1;
+    if (x > canvas.width - 8) break;
+  }
+  ctx.fillStyle = color;
+  ctx.font = '9px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(text.substring(0, 18), canvas.width / 2, 56);
+}
+
+/* ============================================================
+   ADN
+   ============================================================ */
+function drawDNA(type) {
+  var canvas = document.getElementById('dna-canvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width;
+  var H = canvas.height;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+  var lanes = 20;
+  var laneWidth = W / lanes;
+  var sequence = [];
+  for (var lane = 0; lane < lanes; lane++) {
+    var numBands = 6 + Math.floor(Math.random() * 10);
+    for (var b = 0; b < numBands; b++) {
+      var y = 6 + Math.random() * (H - 14);
+      var thickness = 1.5 + Math.random() * 3;
+      var intensity = 0.3 + Math.random() * 0.7;
+      var isAnomaly = type === 'fake' && Math.random() > 0.78;
+      var x = lane * laneWidth + laneWidth * 0.12;
+      var w = laneWidth * 0.76;
+      if (isAnomaly) {
+        ctx.fillStyle = 'rgba(' + (100 + Math.floor(Math.random()*100)) + ',' + (180 + Math.floor(Math.random()*75)) + ',255,' + (intensity * 0.5) + ')';
+        var ox = (Math.random() - 0.5) * 8;
+        var oy = (Math.random() - 0.5) * 6;
+        ctx.fillRect(x + ox, y + oy, w * (0.3 + Math.random() * 0.5), thickness);
+      } else {
+        var baseColor;
+        if (type === 'corpo') {
+          baseColor = 'rgba(255,' + (180 + Math.floor(Math.random()*75)) + ',0,' + intensity + ')';
+        } else {
+          baseColor = 'rgba(0,' + (180 + Math.floor(Math.random()*75)) + ',' + (220 + Math.floor(Math.random()*35)) + ',' + intensity + ')';
+        }
+        ctx.fillStyle = baseColor;
+        ctx.fillRect(x, y, w, thickness);
+      }
+      ctx.shadowColor = isAnomaly ? 'rgba(255,80,80,0.3)' : (type === 'corpo' ? 'rgba(255,200,0,0.3)' : 'rgba(0,200,255,0.4)');
+      ctx.shadowBlur = isAnomaly ? 2 : 3;
+    }
+    ctx.shadowBlur = 0;
+    var bases = type === 'fake' && Math.random() > 0.82 ? ['X', 'Y', '?', '0'] : ['A', 'T', 'C', 'G'];
+    for (var i = 0; i < 5; i++) {
+      sequence.push(bases[Math.floor(Math.random() * bases.length)]);
+    }
+  }
+  ctx.strokeStyle = 'rgba(0,100,100,0.1)';
+  ctx.lineWidth = 0.5;
+  for (var lane = 0; lane <= lanes; lane++) {
+    ctx.beginPath();
+    ctx.moveTo(lane * laneWidth, 0);
+    ctx.lineTo(lane * laneWidth, H);
+    ctx.stroke();
+  }
+  var suffix = type === 'fake' ? ' [ANOMALIES]' : (type === 'corpo' ? ' [CORPO]' : ' [STABLE]');
+  document.getElementById('dna-sequence').textContent = 'SEQ: ' + sequence.join('') + suffix;
+}
+
+/* ============================================================
+   EMPREINTES DIGITALES
+   ============================================================ */
+function drawFingerprints(type) {
+  var container = document.getElementById('fingerprints');
+  container.innerHTML = '';
+  var fingerNames = ['Pouce D','Index D','Majeur D','Annulaire D','Auriculaire D','Pouce G','Index G','Majeur G','Annulaire G','Auriculaire G'];
+  fingerNames.forEach(function(name) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'sin-fingerprint-item';
+    var canvas = document.createElement('canvas');
+    canvas.width = 36;
+    canvas.height = 44;
+    var ctx = canvas.getContext('2d');
+    var cx = 18;
+    var cy = 22;
+    var lineColor = type === 'fake' && Math.random() > 0.75 ? 'rgba(255,100,100,0.5)' : (type === 'corpo' ? 'rgba(255,200,0,0.4)' : 'rgba(0,200,255,0.4)');
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 0.6;
+    for (var r = 5; r < 16; r += 2 + Math.random() * 2) {
+      ctx.beginPath();
+      for (var a = 0; a < Math.PI * 2; a += 0.2) {
+        var noise = Math.random() * 1.5;
+        var x = cx + (r + noise) * Math.cos(a);
+        var y = cy + (r + noise) * Math.sin(a) * 1.1;
+        if (a === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+    for (var i = 0; i < 4; i++) {
+      var mx = cx + (Math.random() - 0.5) * 20;
+      var my = cy + (Math.random() - 0.5) * 28;
+      ctx.fillStyle = type === 'fake' && Math.random() > 0.7 ? '#ff5252' : (type === 'corpo' ? '#ffd700' : '#00bcd4');
+      ctx.beginPath();
+      ctx.arc(mx, my, 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    wrapper.appendChild(canvas);
+    var label = document.createElement('div');
+    label.className = 'sin-fingerprint-label';
+    label.textContent = name;
+    wrapper.appendChild(label);
+    container.appendChild(wrapper);
+  });
+}
+
+function exportPNG() {
+  var card = document.getElementById('sin-card');
+  if (!card) return;
+
+  // Attendre que l'image soit chargee avant de capturer
+  var cardPhoto = document.getElementById('card-photo');
+  function doCapture() {
+    html2canvas(card, {
+      backgroundColor: '#0a1f1f',
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      logging: false
+    }).then(function(canvas) {
+      var link = document.createElement('a');
+      var name = document.getElementById('card-fullname').textContent.trim().replace(/\s+/g, '_') || 'SIN_Card';
+      link.download = name + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }).catch(function(err) {
+      console.error('Erreur export PNG:', err);
+      alert('Erreur lors de l\'export PNG. Verifiez la console.');
+    });
+  }
+
+  if (cardPhoto && cardPhoto.style.display !== 'none' && cardPhoto.src) {
+    if (cardPhoto.complete && cardPhoto.naturalHeight !== 0) {
+      doCapture();
+    } else {
+      cardPhoto.onload = doCapture;
+      cardPhoto.onerror = doCapture;
+      setTimeout(doCapture, 1500); // fallback
+    }
+  } else {
+    doCapture();
+  }
+}
+
+</script>
+
+</body>
+</html>

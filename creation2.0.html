@@ -931,6 +931,33 @@ body {
   color: #7B1FA2;
 }
 
+
+/* ====== TOOLBAR FIXE ====== */
+.toolbar {
+  position: fixed;
+  top: 12px;
+  left: 24px;
+  z-index: 2500;
+}
+.toolbar-btn {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 24px;
+  border: 2px solid var(--black);
+  border-radius: 6px;
+  background: var(--yellow);
+  color: var(--black);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-block;
+  text-decoration: none;
+}
+.toolbar-btn:hover {
+  background: var(--yellow-dark);
+}
 @media print {
   body { background: white; padding: 0; }
   .container { box-shadow: none; border-radius: 0; }
@@ -1379,7 +1406,7 @@ body.nuyen-active {
 </head>
 <body>
 <div class="toolbar">
-  <a href="index.html" class="toolbar-btn" style="font-weight: bold;">Fiche</a>
+  <a href="index.html" class="toolbar-btn">Fiche</a>
 </div>
 <!-- Boutons de navigation flottants -->
 <div class="scroll-nav">
@@ -5947,10 +5974,11 @@ function generateFicheJSON() {
 
   let compCounter = 0;
 
-  // Export compétences parentes
+  // Export compétences + spécialisations (spécialisations juste après leur compétence parente)
   comps.forEach((s) => {
+    // --- Compétence parente ---
     compCounter++;
-    const idx = compCounter;
+    let idx = compCounter;
     compOrder.push(idx);
 
     let attrKey = s.attribut || 'Force';
@@ -5960,48 +5988,47 @@ function generateFicheJSON() {
     }
     if (!attr) attr = "FOR";
 
-    const attrVal = character.attributs[attrKey] || 0;
-    const rd = (parseInt(s.rang) || 0) + (parseInt(attrVal) || 0);
+    let attrVal = character.attributs[attrKey] || 0;
+    let rd = (parseInt(s.rang) || 0) + (parseInt(attrVal) || 0);
 
     input("comp-" + idx + "-name", s.nom || "");
     input("comp-" + idx + "-indice", s.rang || "");
     select("comp-" + idx + "-att", attr);
     input("comp-" + idx + "-rd", rd > 0 ? rd : "");
 
-    const redR = s.redR || [false, false, false];
+    let redR = s.redR || [false, false, false];
     circle("comp-" + idx + "-rr-0", redR[0]);
     circle("comp-" + idx + "-rr-1", redR[1]);
     circle("comp-" + idx + "-rr-2", redR[2]);
-  });
 
-  // Export spécialisations comme compétences séparées avec leur propre attribut
-  comps.forEach((s) => {
-    if (!s.specialisations) return;
-    s.specialisations.filter(sp => sp.selected).forEach((spec) => {
-      compCounter++;
-      const idx = compCounter;
-      compOrder.push(idx);
+    // --- Spécialisations de cette compétence (immédiatement après) ---
+    if (s.specialisations) {
+      s.specialisations.filter(sp => sp.selected).forEach((spec) => {
+        compCounter++;
+        idx = compCounter;
+        compOrder.push(idx);
 
-      let attrKey = spec.attribut || s.attribut || 'Force';
-      let attr = attrMap[attrKey];
-      if (!attr && attrKey.toLowerCase().includes("logique") && attrKey.toLowerCase().includes("charisme")) {
-        attr = (character.tradition && character.tradition.ATTRIBUT_DE_CONJURATION === "Charisme") ? "CHA" : "LOG";
-      }
-      if (!attr) attr = "FOR";
+        let specAttrKey = spec.attribut || s.attribut || 'Force';
+        let specAttr = attrMap[specAttrKey];
+        if (!specAttr && specAttrKey.toLowerCase().includes("logique") && specAttrKey.toLowerCase().includes("charisme")) {
+          specAttr = (character.tradition && character.tradition.ATTRIBUT_DE_CONJURATION === "Charisme") ? "CHA" : "LOG";
+        }
+        if (!specAttr) specAttr = "FOR";
 
-      const attrVal = character.attributs[attrKey] || 0;
-      const rd = (parseInt(s.rang) || 0) + (parseInt(attrVal) || 0) + 2;
+        let specAttrVal = character.attributs[specAttrKey] || 0;
+        let specRd = (parseInt(s.rang) || 0) + (parseInt(specAttrVal) || 0) + 2;
 
-      input("comp-" + idx + "-name", (spec.nom || "") + " (+2)");
-      input("comp-" + idx + "-indice", s.rang || "");
-      select("comp-" + idx + "-att", attr);
-      input("comp-" + idx + "-rd", rd > 0 ? rd : "");
+        input("comp-" + idx + "-name", (spec.nom || "") + " (+2)");
+        input("comp-" + idx + "-indice", (parseInt(s.rang) || 0) + 2);
+        select("comp-" + idx + "-att", specAttr);
+        input("comp-" + idx + "-rd", specRd > 0 ? specRd : "");
 
-      const specRedR = spec.redR || [false, false, false];
-      circle("comp-" + idx + "-rr-0", specRedR[0]);
-      circle("comp-" + idx + "-rr-1", specRedR[1]);
-      circle("comp-" + idx + "-rr-2", specRedR[2]);
-    });
+        let specRedR = spec.redR || [false, false, false];
+        circle("comp-" + idx + "-rr-0", specRedR[0]);
+        circle("comp-" + idx + "-rr-1", specRedR[1]);
+        circle("comp-" + idx + "-rr-2", specRedR[2]);
+      });
+    }
   });
 
   meta("__comp_order__", compOrder);

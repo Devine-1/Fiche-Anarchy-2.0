@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="assets/images/Anarchy.png">
-    <title>Bestiaire Shadowrun Anarchy 2.0</title>
+    <title>Compendium Shadowrun Anarchy 2.0</title>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;500;700&display=swap");
 
@@ -42,7 +42,7 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 56px;
+        min-height: 56px;
         background: var(--black);
         display: flex;
         align-items: center;
@@ -51,6 +51,7 @@
         padding: 0 16px;
         z-index: 1000;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        flex-wrap: wrap;
       }
       .toolbar-left,
       .toolbar-right {
@@ -231,16 +232,103 @@
         overflow: hidden;
       }
 
+
+      /* === MOBILE OVERLAYS === */
+      .mobile-only { display: none; }
+
+      .overlay-backdrop {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 900;
+      }
+      .overlay-backdrop.active { display: block; }
+
       @media (max-width: 900px) {
-        .app-layout {
-          grid-template-columns: 1fr;
-        }
+        .mobile-only { display: inline-block; }
+
         .sidebar {
-          display: none;
+          position: fixed;
+          top: 0; left: 0; bottom: 0;
+          width: 280px;
+          z-index: 1100;
+          transform: translateX(-100%);
+          transition: transform 0.25s ease;
+          border-right: 2px solid var(--yellow-dark);
+          box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+          display: flex !important;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        .chatdice-panel {
+          position: fixed;
+          top: 0; right: 0; bottom: 0;
+          width: 320px;
+          z-index: 1100;
+          transform: translateX(100%);
+          transition: transform 0.25s ease;
+          border-left: 2px solid var(--yellow-dark);
+          box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+          display: flex !important;
+        }
+        .chatdice-panel.open {
+          transform: translateX(0);
+        }
+
+        .app-layout {
+          grid-template-columns: 1fr !important;
+          display: block;
+        }
+        .main-area {
+          padding: 0;
+          justify-content: flex-start;
+          display: block;
         }
         .fiche-container {
-          width: 100%;
-          padding: 8mm;
+          width: 100% !important;
+          min-height: 0;
+          padding: 4mm 5mm;
+          box-shadow: none;
+          border-radius: 0;
+        }
+        .toolbar {
+          padding: 6px 10px;
+          gap: 6px;
+        }
+        .toolbar-title {
+          position: relative;
+          left: auto;
+          transform: none;
+          order: -1;
+          flex-basis: 100%;
+          text-align: center;
+          margin-bottom: 2px;
+          font-size: 14px;
+        }
+        .toolbar-left,
+        .toolbar-right {
+          gap: 4px;
+          flex: 1;
+        }
+        .toolbar-right {
+          justify-content: flex-end;
+        }
+        .toolbar-btn {
+          font-size: 10px;
+          padding: 4px 8px;
+        }
+      }
+      @media (max-width: 500px) {
+        .toolbar-title {
+          display: none;
+        }
+        .toolbar-btn {
+          font-size: 9px;
+          padding: 3px 6px;
+          border-width: 1.5px;
         }
       }
 
@@ -1217,7 +1305,7 @@
         background: rgba(255, 193, 7, 0.15);
       }
 
-      @media (max-width: 1100px) {
+      @media (max-width: 1100px) and (min-width: 900px) {
         .app-layout { grid-template-columns: 260px 1fr; }
         .chatdice-panel { display: none; }
       }
@@ -1227,11 +1315,13 @@
   <body>
     <div class="toolbar">
       <div class="toolbar-left">
+        <button class="toolbar-btn mobile-only" id="btn-toggle-sidebar" title="Liste des créatures">☰</button>
         <button class="toolbar-btn" id="btn-new">Nouveau</button>
         <button class="toolbar-btn secondary" id="btn-edit">Éditer</button>
       </div>
-      <div class="toolbar-title">BESTIAIRE ANARCHY 2.0</div>
+      <div class="toolbar-title">COMPENDIUM ANARCHY 2.0</div>
       <div class="toolbar-right">
+        <button class="toolbar-btn secondary mobile-only" id="btn-toggle-chatdice" title="Lancer de dés">🎲</button>
         <button class="toolbar-btn secondary" id="btn-print" onclick="printFiche()" title="Imprimer la fiche active (A5)">PDF</button>
         <button class="toolbar-btn secondary" id="btn-save-json">Sauver</button>
         <button class="toolbar-btn secondary" id="btn-load-json">
@@ -1249,6 +1339,7 @@
       <input type="file" id="file-input" accept=".json" />
     </div>
 
+    <div class="overlay-backdrop" id="overlay-backdrop"></div>
     <div class="app-layout">
 <aside class="sidebar">
         <div class="sidebar-header">
@@ -1275,7 +1366,7 @@
 
 <main class="main-area" id="main-area">
         <div class="empty-state" id="empty-state">
-          <h2>Bienvenue dans le Bestiaire</h2>
+          <h2>Bienvenue dans le Compendium</h2>
           <p>
             Sélectionnez une créature dans la liste ou créez-en une nouvelle.
           </p>
@@ -43038,7 +43129,58 @@
       // ============================================================
       renderCategoryFilters();
       renderCreatureList();
-    </script>
+    
+      // === MOBILE TOGGLE SIDEBAR / CHATDICE ===
+      (function() {
+        const sidebar = document.querySelector('.sidebar');
+        const chatPanel = document.querySelector('.chatdice-panel');
+        const backdrop = document.getElementById('overlay-backdrop');
+        const btnSidebar = document.getElementById('btn-toggle-sidebar');
+        const btnChat = document.getElementById('btn-toggle-chatdice');
+
+        function closeAll() {
+          sidebar.classList.remove('open');
+          chatPanel.classList.remove('open');
+          backdrop.classList.remove('active');
+        }
+
+        if (btnSidebar) {
+          btnSidebar.addEventListener('click', () => {
+            const isOpen = sidebar.classList.contains('open');
+            closeAll();
+            if (!isOpen) {
+              sidebar.classList.add('open');
+              backdrop.classList.add('active');
+            }
+          });
+        }
+
+        if (btnChat) {
+          btnChat.addEventListener('click', () => {
+            const isOpen = chatPanel.classList.contains('open');
+            closeAll();
+            if (!isOpen) {
+              chatPanel.classList.add('open');
+              backdrop.classList.add('active');
+            }
+          });
+        }
+
+        if (backdrop) {
+          backdrop.addEventListener('click', closeAll);
+        }
+
+        // Fermer aussi quand on clique sur une créature dans la liste (mobile)
+        const creatureList = document.getElementById('creature-list');
+        if (creatureList) {
+          creatureList.addEventListener('click', (e) => {
+            if (window.innerWidth <= 900 && e.target.closest('.creature-item')) {
+              closeAll();
+            }
+          });
+        }
+      })();
+</script>
     <!-- Modal Export -->
 
     <!-- Modal Export -->

@@ -232,6 +232,137 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 .marker-detail, .token-detail { transition: max-height 0.3s ease, padding 0.3s ease; }
 .marker-detail.full, .token-detail.full { max-height:none; flex:1; overflow-y:auto; display:flex; flex-direction:column; }
 
+
+/* === AJOUTS RESPONSIVE === */
+.toolbar {
+  max-height: 40vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.toolbar::-webkit-scrollbar { width: 4px; }
+.toolbar::-webkit-scrollbar-track { background: transparent; }
+.toolbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.btn-text { display: inline; }
+
+/* Grid settings : position dynamique gérée par JS, flex-wrap natif */
+.grid-settings {
+  top: auto;
+  flex-wrap: wrap;
+  max-width: 92vw;
+  justify-content: center;
+}
+
+/* Footer repositionné dans le body */
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: rgba(5,5,8,0.85);
+  border-top: 1px solid var(--border);
+  border-radius: 8px 8px 0 0;
+  padding: 0.4rem 1rem;
+  font-size: 0.65rem;
+  color: #666;
+  text-align: center;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.app-footer p { margin: 0; }
+
+@media (max-width: 768px) {
+  .toolbar {
+    top: 0.4rem;
+    padding: 0.35rem;
+    gap: 0.25rem;
+    border-radius: 10px;
+    max-width: 98vw;
+    max-height: 38vh;
+  }
+  .toolbar-btn {
+    padding: 0.4rem 0.55rem;
+    font-size: 0.78rem;
+    border-radius: 6px;
+  }
+  .toolbar-sep { margin: 0 0.1rem; }
+  .grid-settings {
+    padding: 0.5rem 0.75rem;
+    gap: 0.6rem;
+    border-radius: 8px;
+  }
+  .grid-settings label { font-size: 0.75rem; }
+  .grid-settings input[type="range"] { width: 80px; }
+  .coords-panel {
+    bottom: 0.4rem;
+    right: 0.4rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    border-radius: 6px;
+  }
+  .sidebar { width: 280px; }
+  .sidebar.collapsed { transform: translateX(-280px); }
+  .sidebar-toggle { left: 280px; }
+  .map-container { left: 280px; }
+  .app-footer { display: none; }
+}
+
+@media (max-width: 640px) {
+  .btn-text { display: none; }
+  .toolbar-btn {
+    padding: 0.35rem 0.45rem;
+    font-size: 0.9rem;
+    gap: 0;
+  }
+  .toolbar-btn::before {
+    content: attr(title);
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-lighter);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 2000;
+  }
+  .toolbar-btn:hover::before { opacity: 1; }
+}
+
+@media (max-width: 480px) {
+  .sidebar { width: 260px; }
+  .sidebar.collapsed { transform: translateX(-260px); }
+  .sidebar-toggle { left: 260px; }
+  .map-container { left: 260px; }
+  .sidebar.minimized { width: 45px; }
+  .sidebar.minimized + .sidebar-toggle { left: 45px; }
+  .toolbar {
+    max-height: 35vh;
+    top: 0.3rem;
+    padding: 0.25rem;
+    gap: 0.2rem;
+  }
+  .toolbar-btn {
+    padding: 0.3rem 0.4rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .sidebar { width: 240px; }
+  .sidebar.collapsed { transform: translateX(-240px); }
+  .sidebar-toggle { left: 240px; }
+  .map-container { left: 240px; }
+}
+
 </style>
 </head>
 <body>
@@ -249,22 +380,22 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 
 <!-- Toolbar -->
 <div class="toolbar" id="toolbar">
-  <button class="toolbar-btn active" data-tool="select" title="Sélectionner (V)">🖱️ SÉLECTION</button>
-  <button class="toolbar-btn" data-tool="add" title="Ajouter un point (A)">📍 AJOUTER</button>
-  <button class="toolbar-btn" data-tool="move" title="Déplacer un point (M)">↔️ DÉPLACER</button>
-  <button class="toolbar-btn" data-tool="delete" title="Supprimer un point (S)">🗑️ SUPPRIMER</button>
-  <button class="toolbar-btn" data-tool="measure" title="Mesurer distance (R)">📏 MESURER</button>
-  <button class="toolbar-btn" data-tool="scale" title="Définir l'échelle (E)">⚖️ ÉCHELLE</button>
-  <button class="toolbar-btn" data-tool="token" title="Ajouter un token (T)">👤 TOKEN</button>
+  <button class="toolbar-btn active" data-tool="select" title="Sélectionner (V)">🖱️ <span class="btn-text">SÉLECTION</span></button>
+  <button class="toolbar-btn" data-tool="add" title="Ajouter un point (A)">📍 <span class="btn-text">AJOUTER</span></button>
+  <button class="toolbar-btn" data-tool="move" title="Déplacer un point (M)">↔️ <span class="btn-text">DÉPLACER</span></button>
+  <button class="toolbar-btn" data-tool="delete" title="Supprimer un point (S)">🗑️ <span class="btn-text">SUPPRIMER</span></button>
+  <button class="toolbar-btn" data-tool="measure" title="Mesurer distance (R)">📏 <span class="btn-text">MESURER</span></button>
+  <button class="toolbar-btn" data-tool="scale" title="Définir l'échelle (E)">⚖️ <span class="btn-text">ÉCHELLE</span></button>
+  <button class="toolbar-btn" data-tool="token" title="Ajouter un token (T)">👤 <span class="btn-text">TOKEN</span></button>
   <div class="toolbar-sep"></div>
   <button class="toolbar-btn" id="btnZoomIn" title="Zoom +">+</button>
   <button class="toolbar-btn" id="btnZoomOut" title="Zoom −">−</button>
   <button class="toolbar-btn" id="btnReset" title="Réinitialiser (0)">⌂</button>
   <div class="toolbar-sep"></div>
-  <button class="toolbar-btn" id="btnToggleGrid" title="Grille (G)">⊞ GRILLE</button>
-  <button class="toolbar-btn" id="btnChangeMap" title="Changer de carte">🗺️ CARTE</button>
+  <button class="toolbar-btn" id="btnToggleGrid" title="Grille (G)">⊞ <span class="btn-text">GRILLE</span></button>
+  <button class="toolbar-btn" id="btnChangeMap" title="Changer de carte">🗺️ <span class="btn-text">CARTE</span></button>
   <div class="toolbar-sep"></div>
-  <button class="toolbar-btn" id="btnSaveImage" title="Extraire PNG (Ctrl+S)">💾 EXPORT</button>
+  <button class="toolbar-btn" id="btnSaveImage" title="Extraire PNG (Ctrl+S)">💾 <span class="btn-text">EXPORT</span></button>
 </div>
 
 <!-- Grid settings -->
@@ -337,7 +468,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
     </div>
     <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
       <button class="btn-secondary" id="btnEditToken" style="flex:1; padding:0.4rem; font-size:0.8rem; border-radius:6px; border:1px solid var(--border); background:var(--bg-lighter); color:var(--text); cursor:pointer;">✏️ ÉDITER</button>
-      <button class="btn-danger" id="btnDeleteToken" style="flex:1; padding:0.4rem; font-size:0.8rem; border-radius:6px; border:1px solid var(--danger); background:rgba(255,42,109,0.15); color:var(--danger); cursor:pointer;">🗑️ SUPPRIMER</button>
+      <button class="btn-danger" id="btnDeleteToken" style="flex:1; padding:0.4rem; font-size:0.8rem; border-radius:6px; border:1px solid var(--danger); background:rgba(255,42,109,0.15); color:var(--danger); cursor:pointer;">🗑️ <span class="btn-text">SUPPRIMER</span></button>
     </div>
   </div>
 
@@ -1919,6 +2050,34 @@ async function saveMapImage() {
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
 }
 
+
+// === RESPONSIVE FIXES ===
+function updateGridSettingsPosition() {
+  const toolbar = $('toolbar');
+  const gridSettings = $('gridSettings');
+  if (!toolbar || !gridSettings) return;
+  const rect = toolbar.getBoundingClientRect();
+  gridSettings.style.top = (rect.bottom + 6) + 'px';
+}
+
+// Sur petit écran, collapse la sidebar par défaut au chargement
+if (window.innerWidth < 768) {
+  setSidebarCollapsed(true);
+}
+
+// Mettre à jour la position des grid settings quand nécessaire
+const origToggleGrid = $('btnToggleGrid').onclick;
+$('btnToggleGrid').addEventListener('click', () => {
+  setTimeout(updateGridSettingsPosition, 10);
+});
+
+window.addEventListener('resize', () => {
+  updateGridSettingsPosition();
+});
+
+// Appel initial après un court délai pour laisser le DOM se stabiliser
+setTimeout(updateGridSettingsPosition, 100);
+
 // ==================== INIT ====================
 initTokenEditor();
 renderFilters();
@@ -1961,24 +2120,5 @@ window.addEventListener('resize', ()=>{
 renderTokenList();
 </script>
 </body>
-<footer style="
-  color: #666;
-  font-family: inherit;
-  font-size: 0.7rem;
-  text-align: center;
-  padding: 1.5rem 1rem;
-  margin-top: 2rem;
-  border-top: 1px solid #ddd;
-  background: transparent;
-">
-  <p style="margin: 0 0 0.3rem 0;">
-    <strong>Shadowrun</strong> est une marque déposée de <em>Topps Company, Inc.</em> / <em>Catalyst Game Labs</em>.
-  </p>
-  <p style="margin: 0; opacity: 0.8;">
-    Ce projet est un outil de fan <strong>non officiel</strong>, sans affiliation.
-  </p>
-  <p style="margin: 0.5rem 0 0 0; font-size: 0.65rem; opacity: 0.6;">
-    © 2026 — Projet communautaire francophone Shadowrun Anarchy
-  </p>
-</footer>
+
 </html>

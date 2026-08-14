@@ -22,12 +22,12 @@
 body {
   font-family: 'Roboto', sans-serif; background-color: var(--bg);
   background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L35 10 L35 35' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M60 10 L85 10 L85 60 L110 60' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M10 60 L10 85 L35 85' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M60 85 L85 85 L85 110' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Ccircle cx='35' cy='35' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='85' cy='60' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='35' cy='85' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='85' cy='110' r='2.5' fill='%23BDBDBD'/%3E%3C/svg%3E");
-  padding: 64px 20px 20px; color: var(--black);
+  padding: 80px 20px 20px; color: var(--black);
 }
 
 .page { width: 210mm; min-height: auto; margin: 0 auto 20px; background: var(--paper); padding: 10mm 12mm; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; }
 
-.toolbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: var(--black); display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 0 20px; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.3); flex-wrap: wrap; }
+.toolbar { position: fixed; top: 0; left: 0; right: 0; min-height: 60px; background: var(--black); display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 8px 20px; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.3); flex-wrap: wrap; }
 .toolbar-btn { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 5px 14px; border: 2px solid var(--yellow); border-radius: 4px; background: var(--yellow); color: var(--black); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .toolbar-btn:hover { background: var(--yellow-dark); border-color: var(--yellow-dark); }
 .toolbar-btn.secondary { background: transparent; color: var(--yellow); }
@@ -1046,7 +1046,17 @@ function resetAll() {
   updateAll();
 }
 
-window.addEventListener('DOMContentLoaded', init);
+function adjustToolbar() {
+  const toolbar = document.querySelector('.toolbar');
+  if (toolbar) {
+    document.body.style.paddingTop = (toolbar.offsetHeight + 16) + 'px';
+  }
+}
+window.addEventListener('resize', adjustToolbar);
+window.addEventListener('DOMContentLoaded', function() {
+  init();
+  adjustToolbar();
+});
 </script>
 </body>
 </html>

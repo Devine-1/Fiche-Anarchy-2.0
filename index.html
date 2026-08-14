@@ -14,9 +14,12 @@
 <div class="toolbar">
   <a href="creation2.0.html" class="toolbar-btn">Engager un runner</a>
   <a href="Black_Market.html" class="toolbar-btn" id="btn-blackmarket">Black Market</a>
-  <a href="carte_interactive_cybermonde.html" class="toolbar-btn">Carte Interactive</a>
+  
   <a href="bestiaire.html" class="toolbar-btn">Compendium</a>
   <a href="createur_atout.html" class="toolbar-btn">Créer un atout</a>
+
+  <a href="carte_interactive_cybermonde.html" class="toolbar-btn">Carte Interactive</a>
+  <a href="sin_generator.html" class="toolbar-btn">SIN</a>
   <div style="flex:1;"></div>
   <button class="toolbar-btn" id="btn-save">Sauvegarder</button>
   <button class="toolbar-btn secondary" id="btn-load">Charger</button>
@@ -1796,6 +1799,175 @@ document.addEventListener('DOMContentLoaded', function() {
         return createBaseItem(name, 'feat', system);
       }
 
+      // --- Parsing RR depuis le texte ---
+      function parseRRFromText(text) {
+        if (!text) return [];
+        // Nettoyer les balises HTML et les entités
+        var cleanText = text.replace(/<[^>]+>/g, ' ').replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        var rrList = [];
+        // Regex robuste : RR <nombre> <nom> [(spécialisation)] suivi de séparateur
+        var regex = /RR\s+(\d+)\s+([^(\n]+?)(?:\s*\(([^)]+)\))?(?=\s*(?:RR\s+\d+|\.|,|;|\n|$))/gi;
+        var match;
+        while ((match = regex.exec(cleanText)) !== null) {
+          if (match.index === regex.lastIndex) {
+            regex.lastIndex++;
+            continue;
+          }
+          var val = parseInt(match[1], 10);
+          var skillName = match[2].trim().replace(/[.,;:\s]+$/, '');
+          var specName = match[3] ? match[3].trim() : null;
+
+          if (!skillName) continue;
+
+          var entry = {
+            rrValue: val,
+            rrLabel: skillName + (specName ? ' (' + specName + ')' : ''),
+            rrType: 'skill',
+            rrTarget: ''
+          };
+
+          var normSkill = skillName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+          var parentSlug = null;
+
+          // Trouver le slug de la compétence parente
+          if (skillSlugMap[skillName]) {
+            parentSlug = skillSlugMap[skillName];
+          } else {
+            for (var key in skillSlugMap) {
+              var normKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+              if (normKey === normSkill) {
+                parentSlug = skillSlugMap[key];
+                break;
+              }
+            }
+          }
+
+          if (specName) {
+            var normSpec = specName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+            var foundSpec = null;
+
+            // 1. Recherche exacte "Compétence Spécialisation"
+            var combined = normSkill + ' ' + normSpec;
+            for (var key in specSlugMap) {
+              var normKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+              if (normKey === combined) {
+                foundSpec = specSlugMap[key];
+                break;
+              }
+            }
+
+            // 2. Recherche par linkedSkill parent + spécialisation (contient)
+            if (!foundSpec && parentSlug) {
+              for (var key in specSlugMap) {
+                var entryMap = specSlugMap[key];
+                if (entryMap.linkedSkill === parentSlug) {
+                  var normKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+                  if (normKey.indexOf(normSpec) !== -1 || normSpec.indexOf(normKey) !== -1) {
+                    foundSpec = entryMap;
+                    break;
+                  }
+                }
+              }
+            }
+
+            // 3. Recherche spécialisation seule (fallback exact ou endsWith)
+            if (!foundSpec) {
+              for (var key in specSlugMap) {
+                var normKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+                if (normKey === normSpec || normKey.endsWith(normSpec) || normSpec.endsWith(normKey)) {
+                  foundSpec = specSlugMap[key];
+                  break;
+                }
+              }
+            }
+
+            if (foundSpec) {
+              entry.rrType = 'specialization';
+              entry.rrTarget = foundSpec.slug;
+            } else {
+              // Spécialisation non reconnue → traiter comme compétence simple
+              entry.rrType = 'skill';
+              entry.rrLabel = skillName;
+              entry.rrTarget = parentSlug || toSlug(skillName);
+            }
+          } else {
+            // Pas de spécialisation
+            if (parentSlug) {
+              entry.rrTarget = parentSlug;
+            } else {
+              entry.rrTarget = toSlug(skillName);
+            }
+          }
+          rrList.push(entry);
+        }
+        return rrList;
+      }
+
+      // --- Parsing stats d'arme ---
+      function parseWeaponStats(name, desc) {
+        var text = (name || '') + ' ' + (desc || '');
+        var result = {
+          weaponType: '',
+          damageValue: '0',
+          meleeRange: 'none',
+          shortRange: 'none',
+          mediumRange: 'none',
+          longRange: 'none'
+        };
+
+        var weaponTypeMap = {
+          'mitraillettes': 'smgs',
+          'pistolets-mitrailleurs': 'smgs',
+          'smg': 'smgs',
+          'pistolets': 'pistols',
+          'fusils d\'assaut': 'rifles',
+          'fusils': 'rifles',
+          'fusil': 'rifles',
+          'shotguns': 'shotguns',
+          'armes lourdes': 'heavy-weapons',
+          'armes de jet': 'thrown-weapons',
+          'armes montees': 'mounted-weapons',
+          'lance-grenades': 'grenade-launchers',
+          'armes contondantes': 'blunt-weapons',
+          'lames': 'blades',
+          'mains nues': 'unarmed',
+          'monofilament': 'monofilament'
+        };
+
+        var normText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+        for (var key in weaponTypeMap) {
+          if (normText.indexOf(key) !== -1) {
+            result.weaponType = weaponTypeMap[key];
+            break;
+          }
+        }
+
+        // VD plus robuste : VD 5, VD:5, Dommages: 5, Dommages 5P, etc.
+        var vdMatch = text.match(/VD[:\s]*(\d+)/i) || 
+                      text.match(/Dommages[:\s]*(\d+)/i) ||
+                      text.match(/DV[:\s]*(\d+)/i);
+        if (vdMatch) {
+          result.damageValue = vdMatch[1];
+        }
+
+        // Portées : Dés/ok/ok/- ou Désavantage/ok/ok/none etc.
+        var rangeMatch = text.match(/(D[eé]s|D[eé]savantage|disadvantage|ok|none|-)\s*\/\s*(ok|none|-)\s*\/\s*(ok|none|-)\s*\/\s*(ok|none|-)/i);
+        if (rangeMatch) {
+          var rangeMap = {
+            'dés': 'disadvantage', 'des': 'disadvantage', 'désavantage': 'disadvantage',
+            'desavantage': 'disadvantage', 'disadvantage': 'disadvantage',
+            'ok': 'ok', '-': 'none', 'none': 'none'
+          };
+          result.meleeRange = rangeMap[rangeMatch[1].toLowerCase()] || 'none';
+          result.shortRange = rangeMap[rangeMatch[2].toLowerCase()] || 'none';
+          result.mediumRange = rangeMap[rangeMatch[3].toLowerCase()] || 'none';
+          result.longRange = rangeMap[rangeMatch[4].toLowerCase()] || 'none';
+        }
+
+        return result;
+      }
+
       var items = [];
       var lastSkillSlug = '';
       var lastSkillAttr = '';
@@ -1846,7 +2018,10 @@ document.addEventListener('DOMContentLoaded', function() {
       // === ATOUTS ===
       document.querySelectorAll('.atout-row textarea').forEach(function(el) {
         var val = el.value.trim();
-        if (val) items.push(createFeatItem(val, 'trait', val, {}));
+        if (val) {
+          var rrList = parseRRFromText(val);
+          items.push(createFeatItem(val, 'trait', val, { rrList: rrList }));
+        }
       });
 
       // === CONNAISSANCES ===
@@ -1862,14 +2037,27 @@ document.addEventListener('DOMContentLoaded', function() {
         var arType = exportData['arme-' + rowNum + '-type'] || 'Arme';
         if (arName.trim()) {
           var featType = (arType === 'Sort') ? 'spell' : 'weapon';
-          items.push(createFeatItem(arName.trim(), featType, arName.trim(), {}));
+          var weaponExtras = {};
+          if (featType === 'weapon') {
+            var wStats = parseWeaponStats(arName, arName);
+            weaponExtras.weaponType = wStats.weaponType;
+            weaponExtras.damageValue = wStats.damageValue;
+            weaponExtras.meleeRange = wStats.meleeRange;
+            weaponExtras.shortRange = wStats.shortRange;
+            weaponExtras.mediumRange = wStats.mediumRange;
+            weaponExtras.longRange = wStats.longRange;
+          }
+          items.push(createFeatItem(arName.trim(), featType, arName.trim(), weaponExtras));
         }
       });
 
       // === ÉQUIPEMENT ===
       document.querySelectorAll('.equip-row textarea').forEach(function(el) {
         var val = el.value.trim();
-        if (val) items.push(createFeatItem(val, 'equipment', val, {}));
+        if (val) {
+          var rrList = parseRRFromText(val);
+          items.push(createFeatItem(val, 'equipment', val, { rrList: rrList }));
+        }
       });
 
       // === CONTACTS ===
@@ -1908,11 +2096,16 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           var fw = parseInt(exportData['cyberdeck-' + cid + '-fireware'], 10) || 0;
           var atk = parseInt(exportData['cyberdeck-' + cid + '-attaque'], 10) || 0;
+          var fullText = cModele + ' ' + cDesc;
+          var cleanFullText = fullText.replace(/<[^>]+>/g, ' ').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+          var hasBiofeedbackFilter = /filtre\s+de\s+biofeedback/i.test(cleanFullText) || /biofeedback\s+filter/i.test(cleanFullText);
+          var rrList = parseRRFromText(fullText);
           items.push(createFeatItem(cModele.trim(), 'cyberdeck', cDesc, {
             firewall: fw,
             attack: atk,
-            cyberdeckBiofeedbackFilter: false,
-            cyberdeckBiofeedback: false
+            cyberdeckBiofeedbackFilter: hasBiofeedbackFilter,
+            cyberdeckBiofeedback: false,
+            rrList: rrList
           }));
         }
       });
@@ -1949,14 +2142,28 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
       // === MÉTATYPE ===
-      items.push(createBaseItem('Métatype (non spécifié)', 'metatype', {
-        maxStrength: 6,
-        maxAgility: 6,
-        maxWillpower: 6,
-        maxLogic: 6,
-        maxCharisma: 6,
-        anarchyBonus: 1,
-        description: '<p>Métatype non renseigné dans la fiche source. Veuillez vérifier les plafonds d\'attribut et le bonus Anarchy dans Foundry.</p>',
+      var metaTypeName = (exportData['motcle-1'] || '').trim() || 'Métatype (non spécifié)';
+      var metaTypeData = {
+        'humain': { maxStrength: 4, maxAgility: 4, maxWillpower: 4, maxLogic: 4, maxCharisma: 4, anarchyBonus: 1 },
+        'humaine': { maxStrength: 4, maxAgility: 4, maxWillpower: 4, maxLogic: 4, maxCharisma: 4, anarchyBonus: 1 },
+        'elfe': { maxStrength: 3, maxAgility: 4, maxWillpower: 4, maxLogic: 4, maxCharisma: 5, anarchyBonus: 1 },
+        'elf': { maxStrength: 3, maxAgility: 4, maxWillpower: 4, maxLogic: 4, maxCharisma: 5, anarchyBonus: 1 },
+        'nain': { maxStrength: 5, maxAgility: 3, maxWillpower: 5, maxLogic: 4, maxCharisma: 3, anarchyBonus: 1 },
+        'dwarf': { maxStrength: 5, maxAgility: 3, maxWillpower: 5, maxLogic: 4, maxCharisma: 3, anarchyBonus: 1 },
+        'ork': { maxStrength: 5, maxAgility: 4, maxWillpower: 4, maxLogic: 3, maxCharisma: 3, anarchyBonus: 1 },
+        'orc': { maxStrength: 5, maxAgility: 4, maxWillpower: 4, maxLogic: 3, maxCharisma: 3, anarchyBonus: 1 },
+        'troll': { maxStrength: 6, maxAgility: 3, maxWillpower: 5, maxLogic: 3, maxCharisma: 2, anarchyBonus: 1 }
+      };
+      var metaKey = metaTypeName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      var metaStats = metaTypeData[metaKey] || { maxStrength: 6, maxAgility: 6, maxWillpower: 6, maxLogic: 6, maxCharisma: 6, anarchyBonus: 1 };
+      items.push(createBaseItem(metaTypeName, 'metatype', {
+        maxStrength: metaStats.maxStrength,
+        maxAgility: metaStats.maxAgility,
+        maxWillpower: metaStats.maxWillpower,
+        maxLogic: metaStats.maxLogic,
+        maxCharisma: metaStats.maxCharisma,
+        anarchyBonus: metaStats.anarchyBonus,
+        description: '<p>Métatype : ' + escapeHtml(metaTypeName) + '. Veuillez vérifier les plafonds d\'attribut dans Foundry si nécessaire.</p>',
         gmDescription: '',
         bookmarked: false,
         reference: ''
