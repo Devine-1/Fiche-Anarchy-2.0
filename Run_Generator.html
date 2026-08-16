@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Run Generator - Shadowrun Anarchy 2.0</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;500;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --yellow: #FFC107;
+  --yellow-dark: #E5AC00;
+  --yellow-light: #FFE082;
+  --gray-light: #E0E0E0;
+  --gray-mid: #9E9E9E;
+  --gray-dark: #424242;
+  --black: #212121;
+  --white: #FFFFFF;
+  --bg: #E8E8E8;
+  --paper: #FFFFFF;
+  --paper-dark: #E8E0D0;
+  --success: #43A047;
+  --danger: #E53935;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L35 10 L35 35' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M60 10 L85 10 L85 60 L110 60' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M10 60 L10 85 L35 85' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Cpath d='M60 85 L85 85 L85 110' stroke='%23BDBDBD' stroke-width='1' fill='none'/%3E%3Ccircle cx='35' cy='35' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='85' cy='60' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='35' cy='85' r='2.5' fill='%23BDBDBD'/%3E%3Ccircle cx='85' cy='110' r='2.5' fill='%23BDBDBD'/%3E%3C/svg%3E");
+  padding: 80px 16px 40px;
+  color: var(--black);
+  min-height: 100vh;
+}
+
+/* ===== TOOLBAR ===== */
+.toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: 60px;
+  background: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 16px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.toolbar-btn {
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 18px;
+  border: 2px solid var(--yellow);
+  border-radius: 4px;
+  background: var(--yellow);
+  color: var(--black);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.toolbar-btn:hover {
+  background: var(--yellow-dark);
+  border-color: var(--yellow-dark);
+}
+
+.toolbar-btn.secondary {
+  background: transparent;
+  color: var(--yellow);
+}
+
+.toolbar-btn.secondary:hover {
+  background: var(--yellow);
+  color: var(--black);
+}
+
+/* ===== PAGE ===== */
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--paper);
+  padding: 14mm 16mm;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border-radius: 4px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  border-bottom: 3px solid var(--yellow-dark);
+  padding-bottom: 8px;
+}
+
+.logo-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--black);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.logo-text span { color: var(--yellow-dark); }
+
+.subtitle {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 12px;
+  color: var(--gray-dark);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ===== RUN CARDS ===== */
+.run-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.run-card {
+  border: 2px solid var(--yellow-dark);
+  border-radius: 4px;
+  padding: 10px 12px;
+  background: var(--white);
+  position: relative;
+  transition: opacity 0.2s, filter 0.2s;
+}
+
+.run-card.hidden-card {
+  opacity: 0.35;
+  filter: grayscale(0.8);
+}
+
+.run-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1.5px solid var(--yellow-dark);
+}
+
+.run-card-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--black);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.run-card-num {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 10px;
+  background: var(--black);
+  color: var(--yellow);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.run-card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.card-btn {
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 4px;
+  background: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'Roboto Condensed', sans-serif;
+  transition: all 0.15s;
+}
+
+.card-btn:hover {
+  border-color: var(--yellow-dark);
+  background: var(--yellow-light);
+}
+
+.card-btn.active-toggle {
+  background: var(--yellow);
+  border-color: var(--yellow-dark);
+}
+
+.run-card-body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--black);
+}
+
+.run-card-body .prefix {
+  font-weight: 500;
+  color: var(--gray-dark);
+}
+
+.run-card-body .result {
+  font-weight: 700;
+  color: var(--black);
+}
+
+/* Narrative block */
+.narrative-block {
+  background: #faf8f3;
+  border: 2px solid var(--gray-mid);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--black);
+}
+
+.narrative-block h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: var(--yellow-dark);
+  border-bottom: 1px solid var(--yellow-light);
+  padding-bottom: 4px;
+}
+
+.narrative-text {
+  font-style: italic;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+  body { padding: 100px 10px 20px; }
+  .page { padding: 8mm 10mm; }
+  .toolbar { gap: 6px; padding: 8px; }
+  .toolbar-btn { font-size: 11px; padding: 6px 12px; }
+}
+
+@media print {
+  body { background: white; padding: 0; }
+  .page { box-shadow: none; margin: 0; max-width: 100%; }
+  .toolbar { display: none; }
+  .run-card { break-inside: avoid; }
+  .card-btn { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="index.html" class="toolbar-btn secondary">&lt; Retour Fiche</a>
+  <div style="flex:1;"></div>
+  <button class="toolbar-btn" onclick="generateFullRun()">Générer une nouvelle Run</button>
+  <button class="toolbar-btn secondary" onclick="toggleAll(true)">Tout afficher</button>
+  <button class="toolbar-btn secondary" onclick="toggleAll(false)">Tout masquer</button>
+  <button class="toolbar-btn secondary" onclick="window.print()">Imprimer</button>
+</div>
+
+<div class="page">
+  <div class="header-row">
+    <div>
+      <div class="logo-text">Run <span>Generator</span></div>
+      <div class="subtitle">Shadowrun Anarchy 2.0 - Générateur de missions aléatoires</div>
+    </div>
+    <div class="subtitle" id="run-id" style="font-family:'Roboto Mono',monospace;font-size:11px;">#RUN-000</div>
+  </div>
+
+  <div class="narrative-block" id="narrative">
+    <h3>Briefing narratif</h3>
+    <div class="narrative-text" id="narrative-text">Appuyez sur « Générer une nouvelle Run » pour commencer…</div>
+  </div>
+
+  <div class="run-grid" id="run-grid"></div>
+</div>
+
+<script>
+// ==================== DONNÉES ====================
+const DATA = {
+  johnson: [
+    "Corp anonyme en costume gris, paie en Nuyen propres via compte offshore",
+    "Chef de gang local","Fixer connu de la scène qui prend 10% mais garantit le paiement",
+    "Politicien corrompu du district","Scientifique désespéré ayant volé des données corp",
+    "Esprit ancien / IA fragmentée","Ancien runner à la retraite qui veut se venger, paie en équipement militaire",
+    "Dragon (par intermédiaire humain), objectif mystérieux, récompense colossale",
+    "Yakuza local qui veut étendre son territoire discrètement",
+    "Mage puissant qui veut un artefact, interdit de poser des questions",
+    "Journaliste d'investigation qui veut des preuves, paie en informations sensibles",
+    "Message automatique d'un runner disparu","Corpo rival (Ares vs Shiawase) pour espionnage industriel classique",
+    "Technomancien isolé qui a besoin d'aide dans un domaine",
+    "Goule civilisée qui veut de la bioware fraîche ou des données médicales",
+    "Enfant des rues qui a entendu quelque chose, paie en bric-à-brac trouvé dans la rue",
+    "Ancien militaire pour mission de récupération avec règles de conduite strictes",
+    "Culte ésotérique qui a besoin d'un artefact pour un rituel",
+    "IA sauvage échappée dont l'objectif est incompréhensible, récompense en data rare",
+    "Toi-même tu as découvert l'info par hasard, c'est ta run personnelle"
+  ],
+  contexte: [
+    "Dans un bar à thème corporatiste bondé, bruit de fond assourdissant, M. Johnson arrive avec 10 minutes de retard",
+    "Dans une ruelle sombre derrière une clinique de rue, éclairage au néon clignotant, odeur de détritus",
+    "Dans une cabine de Matrix virtuelle décorée comme un bureau des années 2020, avatar flou et voix modifiée",
+    "Dans un véhicule autonome en mouvement constant, destination inconnue, fenêtres occultées",
+    "Dans un club de nuit underground, musique à fond, M. Johnson porte un masque de fête",
+    "Dans un parking souterrain désert au niveau -5, seul le bruit des conduits d'aération rompt le silence",
+    "Via un appel vidéo chiffré, fond vert numérique, M. Johnson refuse de montrer son visage",
+    "Dans un restaurant de luxe avec vue sur la baie, serveurs robots, M. Johnson paie en espèces",
+    "Dans un squat du Barrens, matelas par terre, bougies, M. Johnson est déguisé en SINless",
+    "Dans un sauna privé de spa corporatiste, vapeur épaisse, conversation à voix basse",
+    "Dans un cimetière abandonné au milieu de la nuit, M. Johnson se tient devant une tombe anonyme",
+    "Dans une cabine de ferry traversant la baie, brume épaisse, moteurs qui vibrent",
+    "Dans une chapelle désaffectée, vitraux brisés, M. Johnson prie devant l'autel",
+    "Dans un stand de tir couvert, cibles, M. Johnson recharge son arme en parlant",
+    "Dans une salle de cinéma abandonnée, écran blanc, projection d'un film muet en boucle",
+    "Dans une clinique de chirurgie esthétique, salle d'attente, M. Johnson a le visage bandé",
+    "Dans un ascenseur de gratte-ciel bloqué entre deux étages, lumière qui vacille",
+    "Dans une bibliothèque publique, section histoire, M. Johnson feuillette un livre ancien",
+    "Dans un marché de nuit asiatique, étals de nourriture, M. Johnson mange des nouilles en parlant",
+    "Dans une station-service automatique, seul le clignotement des pompes à essence éclaire la scène",
+    "The Drowned Rat, Bar flottant sur la baie, clientèle mixte, serveurs goules",
+    "The Jackal's Lantern, Club underground dans les anciens égouts, accès par code",
+    "Mama's Kitchen, Diner familial en façade, arrière-salle réservée aux deals",
+    "The Rusty Nail, Bar de dockers à Tacoma, vue sur les porte-conteneurs",
+    "Projection astrale uniquement, lieu créé par le MJ pour l'occasion",
+    "Le 47ème étage, Penthouse corporatiste anonyme, vue imprenable, verre blindé",
+    "Le Parking Omega, Sous-sol -3 d'un centre commercial fermé, éclairage au hasard",
+    "The Data Haven, Serveur privé dans la Matrice, salle de réunion virtuelle sécurisée",
+    "L'Orphelinat de Puyallup, Ancien bâtiment scolaire, squatté, salle de classe rénovée",
+    "Le Jardin Zen, Jardin public de nuit, lanternes de pierre, bruit de fontaine",
+    "La Chapelle des Oubliés, Église abandonnée du Barrens, icônes brûlées, autel intact",
+    "Le Terminal 9, Hangar désaffecté de l'aéroport, avion-carcasse servant de bureau",
+    "The Neon Dragon, Restaurant chinois de luxe, box privés insonorisés, aquariums",
+    "Le Sous-Marin Jaune, Ancien sous-marin musée, pont inférieur transformé en QG secret",
+    "The BTL Den, Appartement crasseux, équipement de simulation, réalité altérée",
+    "La Terrasse du 88, Rooftop avec jardin hydroponique privé, accès par hélicoptère",
+    "Le Tunnel du Vieux Monde, Ancien tunnel ferroviaire, wagon-restaurant abandonné",
+    "The Clean Room, Clinique médicale de nuit, salle d'opération inutilisée, stérile",
+    "Le Cimetière des Écrans, Décharge d'électronique, écrans allumés formant un mur lumineux",
+    "The Void, Lieu non identifié, coordonnées GPS brouillées, apparence changeante"
+  ],
+  type_run: [
+    "Extraction - Kidnapper une personne vivante et la sortir de la zone",
+    "Infiltration - Entrer, prendre l'objectif, sortir sans laisser de traces",
+    "Sabotage - Détruire ou désactiver un équipement critique",
+    "Vol de données - Pirater un serveur sécurisé et extraire des fichiers",
+    "Livraison - Transporter un colis de A à B en évitant les interceptions",
+    "Protection - Garder une cible en vie pendant un nombre d'heures défini",
+    "Assassinat - Éliminer discrètement (ou non) une cible désignée",
+    "Récupération - Récupérer un objet volé ou perdu dans une zone hostile",
+    "Surveillance - Observer une cible 24h/24 et rapporter ses mouvements",
+    "Détournement - Intercepter et rediriger un convoi ou un véhicule",
+    "Sauvetage - Extraire une personne d'une zone de guerre ou de détention",
+    "Chantage - Récupérer des preuves compromettantes pour faire pression",
+    "Contre-espionnage - Découvrir qui espionne l'employeur et comment",
+    "Fausse piste - Planter des preuves fausses pour incriminer un innocent",
+    "Négociation - Récupérer quelque chose en parlant, sans violence apparente",
+    "Destruction massive - Faire sauter un bâtiment, un convoi ou une infrastructure",
+    "Test d'entrée - C'est un test pour intégrer une équipe de runners d'élite",
+    "Rituel - Accomplir une action magique précise à un endroit et moment donnés",
+    "Plongée RV - Mission exclusivement en Réalité Virtuelle / Matrix",
+    "Astral - Mission nécessitant la projection astrale dans un domaine hostile"
+  ],
+  cible: [
+    "Un scientifique corp ayant des secrets dans sa tête",
+    "Un prototype d'arme biologique non déclaré",
+    "Les données financières d'une corporation rivale",
+    "Un enfant métatype rare avec un don magique inné",
+    "Un artefact magique ancien scellé dans une chambre forte",
+    "Un compte crypté contenant des millions en Nuyen",
+    "Un virus informatique capable de paralyser une ville",
+    "Un lot de cyberware militaire de contrebande",
+    "Les plans d'un nouveau gratte-ciel avec ses failles de sécurité",
+    "Un témoin clé dans un procès contre le crime organisé",
+    "Un drone de guerre autonome déprogrammé",
+    "Une formule de drogue synthétique non encore commercialisée",
+    "Un politicien qui a trop parlé lors d'une soirée arrosée",
+    "Les registres génétiques d'une lignée elfique ancienne",
+    "Un fragment de code source d'une IA de niveau corporatiste",
+    "Un véhicule de transport blindé contenant un colis mystérieux",
+    "Un esprit lié à un objet qui refuse de partir",
+    "Les dossiers médicaux d'une expérience secrète sur des SINless",
+    "Un decker ayant volé des données et caché dans la Matrice",
+    "Une relique religieuse convoitée par plusieurs factions"
+  ],
+  lieu_general: [
+    "Downtown Seattle - Centre-ville corporatiste, haute sécurité",
+    "Redmond Barrens - Terre désolée, gangs, loi du plus fort",
+    "Puyallup - Zone industrielle polluée, usines abandonnées",
+    "Tacoma - Port et docks, contrebande, syndicats",
+    "Snohomish - Banlieue rurale, fermes et communautés isolées",
+    "Auburn - Zone résidentielle délabrée, squats et taudis",
+    "Fort Lewis - Zone militaire, accès restreint, patrouilles",
+    "Asie","Europe",
+    "Le Métro - Tunnels, stations oubliées, réfugiés des bas-fonds",
+    "Zone industrielle abandonnée - Usines désaffectées, squatteurs",
+    "Arcologie - Ville fermée, contrôle total, population captive",
+    "Territoire tribal - Terres amérindiennes, traditions",
+    "Ork Underground - Sous Seattle, réseau de tunnels ork",
+    "Bar à thème corporatiste - Lieu public avec haute surveillance",
+    "Clinic de rue - Hôpital de fortune, bioware d'occasion, virus",
+    "Club de nuit underground - Musique, drogues, rencontres dangereuses",
+    "Décharge publique - Détritus, toxines, chasseurs de métal",
+    "Aéroport / Spatioport - Zone de haute sécurité, douanes",
+    "Frontière - Entre deux nations, zone grise, patrouilles sporadiques"
+  ],
+  lieu_specifique: [
+    "Sous-sol d'un parking corporatiste avec accès aux conduits",
+    "Laboratoire secret sous une clinique de quartier",
+    "Penthouse au 120ème étage avec vue sur la baie",
+    "Serveur principal dans un data-center sous-marin",
+    "Ancienne station de métro inondée et habitée par des goules",
+    "Entrepôt de docks avec conteneurs empilés en labyrinthe",
+    "Église abandonnée servant de couverture à un culte",
+    "Usine de recyclage chimique avec nuages de vapeur toxique",
+    "Bibliothèque universitaire avec section occulte scellée",
+    "Casino flottant sur la baie avec sécurité privée lourde",
+    "Complexe résidentiel de luxe avec drones de surveillance",
+    "Mine désaffectée avec gisements d'orichalque",
+    "Hôpital psychiatrique avec patients 'spéciaux'",
+    "Tour de bureaux avec ascenseurs verrouillés et escaliers piégés",
+    "Base militaire souterraine oubliée depuis la guerre Dis",
+    "Jardin botanique avec plantes génétiquement modifiées carnivores",
+    "Ancien théâtre transformé en marché noir temporaire",
+    "Égouts principaux avec accès aux tunnels du gouvernement",
+    "Station spatiale orbitale de basse altitude (accès par fusée)",
+    "Manoir isolé dans la forêt avec système de défense métaprédateur"
+  ],
+  opposition: [
+    "Sécurité corporatiste (Lone Star ou Knight Errant)",
+    "Gang de rue local contrôlant le quartier",
+    "Mercenaires indépendants payés à la journée",
+    "Adepte d'élite gardien du site",
+    "Mage de sécurité avec esprits liés",
+    "Decker de sécurité surveillant la Matrice locale",
+    "Rigger avec drones de combat en patrouille",
+    "Esprit gardien ancien lié au lieu",
+    "Paranimal dangereux (barghest, basilic, cockatrice)",
+    "Infecté (vampire, goule) caché dans la structure",
+    "Autre équipe de runners envoyée par un concurrent",
+    "Syndicat du crime (Yakuza, Mafia, Triade)",
+    "Milice citoyenne armée et paranoïaque",
+    "IA de défense autonome du bâtiment",
+    "Chasseur de primes professionnel sur ta tête",
+    "Troll cybernétique en armure lourde",
+    "Unité d'élite militaire en exercice (mauvais timing)",
+    "Culte fanatique prêt à mourir pour défendre le site",
+    "Le lapin tueur ! Mignon mais mortel ! (un tueur vous traque, vous devenez la proie)",
+    "Aucune opposition visible… trop facile ? (piège)"
+  ],
+  secu_physique: [
+    "Gardes armés en patrouille régulière (tous les 10 min)",
+    "Caméras de surveillance avec reconnaissance faciale",
+    "Détecteurs de mouvement infrarouges dans les couloirs",
+    "Chiens cybernétiques dressés à l'attaque",
+    "Portes blindées avec serrures biométriques",
+    "Champs de mines antipersonnel dans les zones périphériques",
+    "Tourelles automatiques avec identification amie/ennemie",
+    "Drones de surveillance volants en patrouille aérienne",
+    "Barbelés électrifiés et murs anti-graffiti",
+    "Gardes en armure lourde avec boucliers balistiques",
+    "Sas de décontamination avec scan corporel complet",
+    "Pont-levis / portes coulissantes à commande manuelle",
+    "Gardiens trolls en armure avec mitrailleuses lourdes",
+    "Système d'alarme silencieux relié à la police en 2 min",
+    "Pièges à pression dans les couloirs secondaires",
+    "Gaz incapacitant dans le système de ventilation (contrôlable)",
+    "Robots de sécurité autonomes avec IA limitée",
+    "Mur de feu physique (barrière enflammée)",
+    "Système de verrouillage par ondes électromagnétiques",
+    "Aucune sécurité visible… c'est louche (piège caché)"
+  ],
+  secu_matrix: [
+    "GLACE de niveau corporatiste (Firewall 5+, Attaque 5+)",
+    "Système de biofeedback en hot-sim pour les intrus",
+    "Brouillage sélectif empêchant les connexions sans-fil",
+    "Bombe matricielle sur les fichiers sensibles",
+    "Agent de patrouille IA avec apparence de gardien",
+    "Nœuds de données cryptés avec clés changeantes toutes les heures",
+    "Piège à honeypot attirant les deckers vers une zone piégée",
+    "Surveillance du DIEU active avec traçage en temps réel",
+    "Réseau isolé nécessitant une connexion physique (pas de sans-fil)",
+    "Formes complexes hostiles maintenues par un technomancien",
+    "Virus rétroactif infectant les cyberdecks des intrus",
+    "Simulation de réalité virtuelle piège (loop infini)",
+    "Proxy chains empêchant le traçage de l'origine",
+    "Droits d'accès hiérarchiques stricts (admin requis)",
+    "Système de reconnaissance d'empreinte matricielle",
+    "Attribution automatique de primes sur la tête des intrus détectés",
+    "Déconnexion forcée avec dommages de biofeedback",
+    "Data-bomb sur les fichiers secondaires (distraction)",
+    "Réseau mesh nécessitant de pirater plusieurs nœuds simultanément",
+    "Aucune GLACE visible… le système est vide ou c'est un piège"
+  ],
+  secu_magie: [
+    "Barrière astrale scellant le plan astral autour du site",
+    "Esprit gardien lié au lieu (type selon l'environnement)",
+    "Wards magiques sur toutes les entrées principales",
+    "Mage de garde en perception astrale permanente (ou presque)",
+    "Aura de mana instable augmentant le drain de 1",
+    "Mage avec Focus de garde activés en permanence (armes spirituelles)",
+    "Zone de mana sauvage avec effets imprévisibles",
+    "Esprits des lieux sont corrompus",
+    "Rituel de protection collectif maintenu par un cercle de mages",
+    "Alarme astrale déclenchée par toute forme astrale",
+    "Sigil d'une complexité importante (un génie se cache dans ce lieu)",
+    "Totem gardien physique sculpté dans la pierre (lien spirituel)",
+    "Double astral, le lieu est différent dans le plan astral",
+    "Goule éveillée, un vampire",
+    "Zone de mana toxique (pollution, souffrance, mort)",
+    "Paraprédateur",
+    "Esprit lié à un objet spécifique (Tengu)",
+    "Mage adepte en patrouille avec perception magique",
+    "Champ de dissuasion mentale (un chant étrange perturbe votre esprit : désavantage logique interaction sociale)",
+    "Aucune protection magique… ce qui est suspect en 2070"
+  ],
+  twist: [
+    "La cible a été déplacée il y a 2 heures, elle est ailleurs",
+    "Le Johnson nous trahit et a prévenu la cible de notre arrivée",
+    "Un témoin non prévu nous a repérés et a déclenché l'alarme",
+    "Une autre équipe de runners est sur le même coup en ce moment",
+    "La cible est un proche du runner (frère, sœur, ancien amant)",
+    "C'était un piège pour capturer des runners pour les expérimenter",
+    "Une éruption de mana rend la magie instable et dangereuse",
+    "La sécurité est deux niveaux au-dessus de ce qu'on nous a dit",
+    "La cible est déjà morte, quelqu'un d'autre est passé avant",
+    "Une fuite de données a exposé notre plan à la presse",
+    "Un esprit gardien caché se réveille pendant l'infiltration",
+    "Un tiers (gang, corp) attaque le lieu en même temps que nous",
+    "La cible veut négocier et propose le double du paiement",
+    "Un virus matriciel infecte les implants du decker en pleine run",
+    "Un membre de l'équipe est révélé comme taupe à la solde adverse",
+    "Le bâtiment a changé de propriétaire ce matin, les accès ont changé",
+    "Un gang en guerre verrouille le quartier, personne ne sort",
+    "La cible est un enfant, créant un dilemme éthique immédiat",
+    "Un drone kamikaze autonome attaque indistinctement tout le monde",
+    "Le compte de paiement est vide, le Johnson a disparu"
+  ],
+  enjeu: [
+    "Délai de 4 heures avant que la cible ne soit transférée ailleurs",
+    "La cible sera exécutée à l'aube si personne n'intervient",
+    "Les données seront effacées automatiquement dans 2 heures",
+    "Une équipe d'assaut corp arrive dans 30 minutes",
+    "La run doit se faire avant l'éclipse lunaire (condition rituelle)",
+    "Le témoin clé part en exil demain matin",
+    "Le virus sera déployé sur la ville dans 6 heures",
+    "La preuve sera détruite lors d'une réunion corporatiste ce soir",
+    "Un proche du runner est pris en otage par l'employeur",
+    "La réputation de l'équipe est en jeu après un échec récent",
+    "Un rival a mis une prime sur la tête de l'équipe (délai 24h)",
+    "La zone sera rasée par bombardement dans 12 heures",
+    "Le contrat expire à minuit, après c'est annulation totale",
+    "La cible est malade, chaque heure compte pour sa survie",
+    "Un autre runner a déjà accepté le contrat concurrent",
+    "La police ferme toutes les routes dans 1 heure (check-point)",
+    "Le serveur cible sera mis hors ligne pour maintenance dans 3h",
+    "La cible est enceinte / porte un implant vital à extraire vite",
+    "Un tremblement de terre est prévu par les sismologues (imminent)",
+    "Aucune urgence apparente… ce qui rend tout le monde paranoïaque"
+  ],
+  recompense: [
+    "20 000 Nuyen en cryptomonnaie non traçable",
+    "100 000 Nuyen mais en deux versements (50% main, 50% après)",
+    "Cyberware militaire d'occasion (valeur 75 000¥)",
+    "Un contact de haut niveau dans une corporation (SIN vierge)",
+    "Des informations compromettantes sur un politicien ennemi",
+    "Accès permanent à un safe-house sécurisé dans le quartier",
+    "Un focus de sorcellerie (valeur inestimable)",
+    "Un véhicule blindé avec faux papiers complets",
+    "Un cyberdeck militaire de surplus",
+    "Une dette effacée auprès d'un syndicat du crime",
+    "Des données sur la localisation d'un ancien runner disparu",
+    "Un lot de drogues éveillées de contrebande (valeur 40 000¥)",
+    "Un contrat d'exclusivité avec un fixer de renom",
+    "Des plans d'accès aux tunnels secrets du gouvernement",
+    "Un rituel magique",
+    "Une arme unique",
+    "La libération d'un proche d'un runner",
+    "Acte de propriété d'un atelier de tatouage",
+    "Des vaccins expérimentaux contre un virus corp en développement",
+    "Rien de matériel… mais une promesse de retour d'ascenseur vital"
+  ],
+  contrainte: [
+    "Nuit sans lune, visibilité réduite, parfait pour la discrétion",
+    "Pleine lune, les paranimaux sont agités et dangereux",
+    "Éclipse solaire partielle, la magie est perturbée",
+    "Heure de pointe, la zone est bondée de civils",
+    "3 heures du matin, les gardes sont fatigués et distraits",
+    "Jour de fête corporatiste, sécurité renforcée mais festive",
+    "Orage électrique, les drones sont cloués au sol",
+    "Canicule, les systèmes de refroidissement sont surchargés",
+    "Nouvel An chinois, les Triades contrôlent les rues",
+    "Jour de vote électoral, la police est partout",
+    "Éclipse lunaire totale, condition nécessaire pour un rituel",
+    "Blackout programmé, le quartier sera sans électricité 2h",
+    "Alerte météo : tempête de sable en approche",
+    "Nuit de Halloween, les gangs déguisés patrouillent",
+    "Heure du déjeuner, rotation des gardes (fenêtre de 20 min)",
+    "Anniversaire du fondateur de la corp, cérémonie obligatoire",
+    "Grève des transports, seuls les drones circulent",
+    "Nuit de pleine lune des loups-garous (légende urbaine ?)",
+    "Synchronisation avec un satellite d'espionnage (fenêtre de 5 min)",
+    "Aucune contrainte temporelle… le MJ peut faire durer la tension"
+  ],
+  condition: [
+    "Aucune mort, la cible doit être récupérée vivante",
+    "Discrétion totale, aucun témoin, aucune trace, aucune caméra",
+    "Pas de magie, la zone est sensible, aucun sort autorisé",
+    "Pas de cyberware visible, contrôles de sécurité stricts aux entrées",
+    "Délai impossible, il faut entrer et sortir en moins de 15 minutes",
+    "Équipement fourni uniquement, tu ne peux pas utiliser ton matos perso",
+    "Les objets inestimables ne devront pas être détruits ou volés",
+    "Pas de contact avec la cible, observer uniquement, ne pas interagir",
+    "Fausse identité obligatoire, tu dois te faire passer pour quelqu'un d'autre",
+    "Pas de violence, uniquement social, ingénierie, ou magie douce",
+    "Récupération uniquement, ne rien détruire, ne rien laisser",
+    "Preuve visuelle obligatoire, photo/vidéo de chaque étape",
+    "Sacrifice nécessaire, un membre doit rester en arrière-garde",
+    "Double objectif, deux cibles simultanées dans deux endroits différents",
+    "Contenu sensible biologique, risque de contamination, équipement NBC requis",
+    "Zone sous juridiction extraterritoriale, pas d'appel à la police",
+    "Une école ou un groupe d'enfants est dans les lieux, il faut veiller à leur sécurité",
+    "Témoin obligatoire, un innocent doit accompagner l'équipe",
+    "Armes non létales uniquement, munitions étourdissantes seulement",
+    "Aucune condition spéciale… ce qui est le plus inquiétant de tout"
+  ],
+  complication: [
+    "Incendie dans le bâtiment adjacent, évacuation en cours",
+    "Inondation partielle, niveau d'eau montant dans les sous-sols",
+    "Effondrement structurel récent, certains couloirs sont instables",
+    "Nuage de gaz toxique détecté dans le secteur (fuite industrielle)",
+    "Tempête de sable / neige rendant la visibilité quasi nulle",
+    "Canicule extrême, surchauffe des implants et équipements",
+    "Tremblement de terre mineur, structures fissurées",
+    "Brouillard épais à base chimique, perception réduite",
+    "Végétation envahissante génétiquement modifiée bloquant les passages",
+    "Zone irradiée, équipement de protection obligatoire",
+    "Pont-levis bloqué en position ouverte/fermée",
+    "Ascenseurs hors service, escalier de 80 étages à grimper",
+    "Climatisation défectueuse, chaleur suffocante dans les locaux",
+    "Pluie acide, armures et véhicules s'abîment rapidement",
+    "Avalanche / coulée de boue bloquant les routes de fuite",
+    "Grue de chantier bloquant la rue principale de fuite",
+    "Odeur de gaz suspecte dans le sous-sol (risque d'explosion)",
+    "Portes coupe-feu automatiques verrouillées par l'incendie",
+    "Champ magnétique puissant désactivant les implants électroniques",
+    "Plafond bas dans les couloirs (1m80), pénalisant les trolls"
+  ],
+  allie: [
+    "Gardien de sécurité corrompu prêt à fermer les yeux pour 5000¥",
+    "Technomancien caché dans les conduits qui déteste l'employeur",
+    "Ancien collègue de la cible qui veut l'aider à s'échapper",
+    "Goule civilisée vivant dans les sous-sols connaissant tous les passages",
+    "Enfant des rues qui connaît un passage secret pour entrer",
+    "Drone de livraison autonome détourné de sa route par un hacker",
+    "Esprit des lieux prêt à aider si on respecte un pacte ancien",
+    "Médecin de rue avec un plan de l'immeuble et des sédatifs",
+    "Ancien runner à la retraite vivant en face avec des jumelles",
+    "IA de maintenance du bâtiment qui veut se venger de ses propriétaires",
+    "Agent de sécurité sous-payé prêt à vendre ses codes d'accès",
+    "Paranimal apprivoisé (chien cybernétique) ayant pris la fuite",
+    "Scientifique démissionnaire avec les codes de la salle serveur",
+    "Gang rival qui déteste l'opposition et accepte de créer une diversion",
+    "Projection astrale d'un mage ami qui peut espionner l'intérieur",
+    "Ancien amant de la cible qui veut la sauver contre l'employeur",
+    "Chauffeur de livraison corrompu avec accès aux zones de service",
+    "Esprit mineur perdu cherchant un nouveau maître pour le libérer",
+    "Technicien de maintenance ayant laissé une porte déverrouillée",
+    "Chat errant"
+  ],
+  gang: [
+    "Brain Eaters - Gangers psychotropes, violents et imprévisibles",
+    "405 Hellhounds - Motards du highway 405, territoire autoroutier",
+    "Ancients - Gang elfe suprémaciste, très organisé et dangereux",
+    "Cutters - Gangers cybernétiques, amateurs de combat rapproché",
+    "Disassemblers - Trolls brutaux spécialisés dans la destruction",
+    "Eye-Fivers - Gang de deckers, contrôle le cybercrime local",
+    "First Nation - Gang amérindien, liens avec la magie traditionnelle",
+    "Goblin Rockers - Gang ork/troll fan de métal, bruyants et fiers",
+    "Halloweeners - Fanatiques d'Halloween, masques et terreur",
+    "Kozak - Mercenaires d'origine russe, discipline militaire",
+    "Laésa - Gang elfe irlandais, liens avec la mafia locale",
+    "Rusted Stilettos - Gangers femmes, redoutables et solidaires",
+    "Spikes - Adeptes du combat à mains nues, arts martiaux urbains",
+    "Tacoma Caballeros - Gang hispanique protégeant son quartier",
+    "Vory v Zakone - Mafia russe, organisation criminelle structurée",
+    "Reality Hackers - Gangers deckers, réalité augmentée comme arme",
+    "Troll Killers - Suprémacistes humains, chassent les métatypes",
+    "Blood Mountain Boys - Gangers montagnards, territoire escarpé",
+    "Strippers - Gangers femmes utilisant la séduction comme couverture",
+    "Wreckers - Spécialistes du sabotage et de la destruction"
+  ],
+  corporation: [
+    "Ares Macrotechnology - Militaire, armement, mercenaires",
+    "Aztechnology - Magie sanglante, Amérique latine, secrets occultes",
+    "Evo - Bioware, transhumanisme, métatypes non-humains",
+    "Horizon - Médias, divertissement, manipulation de l'opinion",
+    "Mitsuhama Computer Technologies - Drones, robots, cybernétique",
+    "NeoNET (restes) - Data en fuite",
+    "Renraku Computer Systems - IA, serveurs, culture japonaise stricte",
+    "Saeder-Krupp - Industrie lourde, propriété du dragon Lofwyr",
+    "Shiawase - Énergie, biotech, famille corporatiste traditionnelle",
+    "Spinrad Global - Biotech de luxe, célébrités, produits haut de gamme",
+    "Wuxing - Finance, feng shui, magie orientale, ports",
+    "Zeta-ImpChem - Chimie, drogues, armes chimiques, pollution",
+    "Cross Applied Technologies (CATCo) - Électronique, Québec",
+    "Universal Omnitech - Bioware, clonage, recherche génétique",
+    "Proteus AG - Bioconstruction, habitats sous-marins, expérimentation",
+    "Yamatetsu (Evo ancien) - Biotech, transhumanisme, métatypes",
+    "Fuchi Industrial Electronics - Débris électroniques, restes de data",
+    "Novatech - Restes de NeoNET, technologies de communication",
+    "Corporation AA","Corporation A"
+  ],
+  paranimal: [
+    "Barghest - Chien spectral, hurlement paralysant, territoire nocturne",
+    "Basilic - Regard pétrifiant, écailles blindées",
+    "Cockatrice - Plumes venimeuses, contact mortel, nid caché",
+    "Chien de l'enfer - Créature démoniaque, feu",
+    "Rat du diable - Nuée vorace, porteurs de maladies, égouts",
+    "Tigre cyber-augmenté - Félin avec implants militaires, laboratoire",
+    "Biodrone Shiawase","Jeune dragon - Intelligent, magique, extrêmement dangereux",
+    "Goule sauvage - Cannibale, contagieuse, ruines urbaines",
+    "Zoocantrope","Vampire","Chupacabra","Golem","Tengu",
+    "Esprit toxique - Corruption, maladie, zones polluées",
+    "Gargouille - Créature de pierre vivante, toits des gratte-ciel",
+    "Loup-garou","Griffon - Aigle-lion, territoire aérien, nid inaccessible",
+    "Hydre - Régénération, têtes multiples, égouts profonds",
+    "Manticore - Scorpion-lion, venin paralysant, décharges"
+  ],
+  evenement: [
+    "Coupure de courant générale pendant 30 secondes",
+    "Sirène de police qui approche… puis s'éloigne (faux espoir)",
+    "Appel anonyme sur le commlink d'un runner (menace ou info ?)",
+    "Pluie soudaine, visibilité réduite, rues glissantes",
+    "Explosion au loin, diversion ou autre run en cours ?",
+    "Rencontre fortuite avec un ancien contact (ami ou ennemi ?)",
+    "Drone de presse qui filme la zone au mauvais moment",
+    "Message d'urgence du Johnson modifiant les objectifs",
+    "Civile perdue qui demande de l'aide au pire moment",
+    "Chien errant qui suit l'équipe et aboie au mauvais moment",
+    "Panne d'ascenseur bloquant l'équipe entre deux étages",
+    "Feu de forêt / incendie urbain qui se propage vers la zone",
+    "Manifestation soudaine de civils bloquant les rues",
+    "Accident de voiture créant un embouteillage monstre",
+    "Éruption de mana locale, sorts qui réussissent bizarrement",
+    "Tremblement de terre mineur secouant les fondations",
+    "Appel du Johnson annulant la mission à mi-parcours",
+    "Rencontre avec un autre runner sur la même cible (négociation ?)",
+    "Panne de courant localisée créant une zone d'ombre totale",
+    "Message d'alerte générale : évasion de prisonniers dangereux"
+  ],
+  objet_cle: [
+    "Clé cryptée sur un commlink jetable (code à 12 chiffres)",
+    "Carte d'accès biométrique volée sur un cadre corp",
+    "Fragment de données sur une puce cachée dans un bijou",
+    "Code vocal enregistré sur un ancien enregistreur analogique",
+    "Clé physique en orichalque ouvrant une salle secrète",
+    "Empreinte rétinienne conservée dans une solution chimique",
+    "Mot de passe écrit sur un papier dans une langue morte",
+    "Puce de données cachée dans la prothèse d'un PNJ",
+    "Clé de déchiffrement répartie sur 3 personnes différentes",
+    "Objet magique servant de focus et de clé (anneau, amulette)",
+    "Séquence ADN nécessaire pour ouvrir une porte biologique",
+    "Code transmis par ondes courtes à heure fixe (radio pirate)",
+    "Clé matricielle sous forme de forme complexe maintenue",
+    "Empreinte digitale conservée dans de la cire d'abeille synthétique",
+    "Parole de passe changée quotidiennement par un algorithme",
+    "Clé gravée dans l'ADN d'un animal de compagnie de la cible",
+    "Code transmis par pulsations lumineuses dans un néon défectueux",
+    "Clé cachée dans la mémoire d'un BTL ancien et rare",
+    "Empreinte vocale nécessitant une phrase précise en langue morte",
+    "Fragment de code réparti sur plusieurs drones de livraison"
+  ],
+  faiblesse: [
+    "La cible est claustrophobe, les espaces confinés la paralysent",
+    "Addiction à une drogue rare, période de manque imminente",
+    "A un rendez-vous galant secret à une heure précise",
+    "Confie ses secrets à un assistant trop bavard",
+    "Dort seulement 3 heures par nuit, fatiguée et distraite",
+    "A peur des paranimaux, une menace fictive suffit",
+    "Collectionneur compulsif, distrait par les objets de valeur",
+    "A une famille (enfant/conjoint) qu'elle protège avant tout",
+    "Cyberware obsolète avec faille de sécurité connue",
+    "A une dette envers un gang local (chantage possible)",
+    "Superstitieux, croit aux signes et aux présages",
+    "A un double vie (autre identité, autre famille)",
+    "Implant neural défectueux, sujet à des migraines violentes",
+    "A trahi quelqu'un de puissant qui cherche à se venger",
+    "Allergique à un composant courant (latex, nickel, pollen)",
+    "Fan de BTL, facilement distrait par une dose gratuite",
+    "A un animal de compagnie (chien cybernétique) très protecteur",
+    "Collectionne les antiquités du 20ème siècle, distrait par les vieux objets",
+    "A une phobie des hauteurs, évite les étages supérieurs",
+    "Cyberware incompatible créant des douleurs chroniques (distrait)"
+  ]
+};
+
+// ==================== CONFIGURATION DES CARTES ====================
+const CATEGORIES = [
+  { key: 'johnson', label: 'M. Johnson', num: '01', prefix: 'Votre commanditaire est', template: 'Votre commanditaire est <span class="result">{val}</span>.' },
+  { key: 'contexte', label: 'Contexte de rencontre', num: '02', prefix: 'Le rendez-vous se déroule', template: 'Le rendez-vous se déroule <span class="result">{val}</span>.' },
+  //{ key: 'lieu_rencontre', label: 'Lieu de rencontre', num: '03', prefix: 'Rendez-vous fixé au', template: 'Rendez-vous fixé au <span class="result">{val}</span>.' },
+  { key: 'type_run', label: 'Type de Run', num: '04', prefix: 'La mission est', template: 'La mission est <span class="result">{val}</span>.' },
+  { key: 'cible', label: 'Cible Principale', num: '05', prefix: "L'objectif est", template: "L'objectif visé est <span class=\"result\">{val}</span>." },
+  { key: 'lieu_general', label: 'Lieu Général', num: '06', prefix: 'Zone générale', template: 'Zone générale : <span class="result">{val}</span>.' },
+  { key: 'lieu_specifique', label: 'Lieu Spécifique', num: '07', prefix: 'Site exact', template: 'Site exact : <span class="result">{val}</span>.' },
+  { key: 'opposition', label: 'Opposition Principale', num: '08', prefix: 'Opposition', template: 'Vous devrez affronter <span class="result">{val}</span>.' },
+  { key: 'secu_physique', label: 'Sécurité Physique', num: '09', prefix: 'Sécurité physique', template: 'Sécurité physique : <span class="result">{val}</span>.' },
+  { key: 'secu_matrix', label: 'Sécurité Matricielle', num: '10', prefix: 'Sécurité matricielle', template: 'Défenses matricielles : <span class="result">{val}</span>.' },
+  { key: 'secu_magie', label: 'Sécurité Magique', num: '11', prefix: 'Sécurité magique', template: 'Protection magique : <span class="result">{val}</span>.' },
+  { key: 'twist', label: 'Twist Principal', num: '12', prefix: 'Twist', template: '<strong>Twist</strong> : <span class="result">{val}</span>.' },
+  { key: 'enjeu', label: 'Enjeu / Urgence', num: '13', prefix: 'Urgence', template: '<strong>Urgence</strong> : <span class="result">{val}</span>.' },
+  { key: 'recompense', label: 'Récompense', num: '14', prefix: 'Récompense', template: '<strong>Récompense</strong> : <span class="result">{val}</span>.' },
+  { key: 'contrainte', label: 'Contrainte Temporelle', num: '15', prefix: 'Contrainte', template: '<strong>Contrainte temporelle</strong> : <span class="result">{val}</span>.' },
+  { key: 'condition', label: 'Condition Spéciale', num: '16', prefix: 'Condition', template: '<strong>Condition spéciale</strong> : <span class="result">{val}</span>.' },
+  { key: 'complication', label: 'Complication Physique', num: '17', prefix: 'Complication', template: '<strong>Complication</strong> : <span class="result">{val}</span>.' },
+  { key: 'allie', label: 'Allié Potentiel', num: '18', prefix: 'Allié', template: '<strong>Allié potentiel</strong> : <span class="result">{val}</span>.' },
+  { key: 'gang', label: 'Gang Local', num: '19', prefix: 'Gang', template: '<strong>Gang local</strong> : <span class="result">{val}</span>.' },
+  { key: 'corporation', label: 'Corporation Impliquée', num: '20', prefix: 'Corporation', template: '<strong>Corporation impliquée</strong> : <span class="result">{val}</span>.' },
+  { key: 'paranimal', label: 'Paranimal', num: '21', prefix: 'Paranimal', template: '<strong>Paranimal</strong> : <span class="result">{val}</span>.' },
+  { key: 'evenement', label: 'Événement Aléatoire', num: '22', prefix: 'Événement', template: '<strong>Événement aléatoire</strong> : <span class="result">{val}</span>.' },
+  { key: 'objet_cle', label: 'Objet Clé', num: '23', prefix: 'Objet clé', template: '<strong>Objet clé</strong> : <span class="result">{val}</span>.' },
+  { key: 'faiblesse', label: 'Faiblesse de la Cible', num: '24', prefix: 'Faiblesse', template: '<strong>Faiblesse exploitable</strong> : <span class="result">{val}</span>.' }
+];
+
+// ==================== ÉTAT ====================
+let runState = {};
+let visibility = {};
+
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function generateRunId() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return '#RUN-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+}
+
+function pickFor(key) { return rand(DATA[key]); }
+
+function generateFullRun() {
+  runState = {};
+  CATEGORIES.forEach(cat => {
+    runState[cat.key] = pickFor(cat.key);
+    visibility[cat.key] = true;
+  });
+  document.getElementById('run-id').textContent = generateRunId();
+  render();
+  buildNarrative();
+}
+
+function reroll(key) {
+  runState[key] = pickFor(key);
+  render();
+  buildNarrative();
+}
+
+function toggleVis(key) {
+  visibility[key] = !visibility[key];
+  render();
+  buildNarrative();
+}
+
+function toggleAll(show) {
+  CATEGORIES.forEach(cat => visibility[cat.key] = show);
+  render();
+  buildNarrative();
+}
+
+function render() {
+  const grid = document.getElementById('run-grid');
+  grid.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const val = runState[cat.key] || '-';
+    const visible = visibility[cat.key] !== false;
+    const card = document.createElement('div');
+    card.className = 'run-card' + (visible ? '' : ' hidden-card');
+    card.innerHTML = `
+      <div class="run-card-header">
+        <div class="run-card-title">
+          <span class="run-card-num">${cat.num}</span>
+          ${cat.label}
+        </div>
+        <div class="run-card-actions">
+          <button class="card-btn ${visible ? 'active-toggle' : ''}" title="${visible ? 'Masquer' : 'Afficher'}" onclick="toggleVis('${cat.key}')">${visible ? 'MAS' : 'AFF'}</button>
+          <button class="card-btn" title="Relancer cette ligne" onclick="reroll('${cat.key}')">REL</button>
+        </div>
+      </div>
+      <div class="run-card-body">
+        ${cat.template.replace('{val}', val)}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function buildNarrative() {
+  const n = runState;
+  if (!n.johnson) return;
+  const text = document.getElementById('narrative-text');
+  const paragraphs = [];
+
+  // PARAGRAPHE 1 : Le contrat
+  let p1 = [];
+  if (visibility.johnson) {
+    p1.push(`C'est <strong>${n.johnson}</strong> qui vous contacte pour ce boulot.`);
+  }
+  if (visibility.contexte) {
+    let ctx = n.contexte;
+    if (!ctx.toLowerCase().startsWith('dans') && !ctx.toLowerCase().startsWith('via') && !ctx.toLowerCase().startsWith('le') && !ctx.toLowerCase().startsWith('la') && !ctx.toLowerCase().startsWith('the') && !ctx.toLowerCase().startsWith("l'")) {
+      ctx = 'dans ' + ctx;
+    }
+    p1.push(`Le rendez-vous se passe ${ctx}.`);
+  }
+  if (visibility.type_run) {
+    p1.push(`La mission est une <strong>${n.type_run}</strong>.`);
+  }
+  if (visibility.cible) {
+    p1.push(`Votre objectif : <strong>${n.cible}</strong>.`);
+  }
+  if (p1.length) paragraphs.push(p1.join(' '));
+
+  // PARAGRAPHE 2 : Le terrain
+  let p2 = [];
+  if (visibility.lieu_general || visibility.lieu_specifique) {
+    let lieu = [];
+    if (visibility.lieu_general) lieu.push(n.lieu_general);
+    if (visibility.lieu_specifique) lieu.push(n.lieu_specifique);
+    p2.push(`L'opération se déroule <strong>${lieu.join(', plus précisément au ')}</strong>.`);
+  }
+  if (visibility.complication) {
+    p2.push(`Mauvaise nouvelle, le site est affecté par <strong>${n.complication}</strong>.`);
+  }
+  if (p2.length) paragraphs.push(p2.join(' '));
+
+  // PARAGRAPHE 3 : Les défenses
+  let p3 = [];
+  const hasPhys = visibility.secu_physique;
+  const hasMatrix = visibility.secu_matrix;
+  const hasMagie = visibility.secu_magie;
+  if (hasPhys || hasMatrix || hasMagie) {
+    let defs = [];
+    if (hasPhys) defs.push(`côté physique, ${n.secu_physique.toLowerCase().startsWith('aucune') ? 'rien de visible' : n.secu_physique}`);
+    if (hasMatrix) defs.push(`côté Matrix, ${n.secu_matrix.toLowerCase().startsWith('aucune') ? 'rien de visible' : n.secu_matrix}`);
+    if (hasMagie) defs.push(`côté magie, ${n.secu_magie.toLowerCase().startsWith('aucune') ? 'rien de visible' : n.secu_magie}`);
+    if (defs.length === 1) {
+      p3.push(`Les défenses du site : ${defs[0]}.`);
+    } else if (defs.length === 2) {
+      p3.push(`Les défenses du site sont multiples, ${defs.join(' et ')}.`);
+    } else {
+      p3.push(`Les défenses du site sont redoutables : ${defs.join(', et ')}.`);
+    }
+  }
+  if (p3.length) paragraphs.push(p3.join(' '));
+
+  // PARAGRAPHE 4 : L'adversaire et le contexte local
+  let p4 = [];
+  if (visibility.opposition) {
+    p4.push(`Vous devrez affronter <strong>${n.opposition}</strong>.`);
+  }
+  if (visibility.gang) {
+    p4.push(`Dans le coin, le <strong>${n.gang}</strong> rôde et pourrait s'en mêler.`);
+  }
+  if (visibility.corporation) {
+    p4.push(`En coulisses, <strong>${n.corporation}</strong> tire les ficelles.`);
+  }
+  if (visibility.paranimal) {
+    p4.push(`Et pour corser le tout, un <strong>${n.paranimal}</strong> a été signalé dans les parages.`);
+  }
+  if (p4.length) paragraphs.push(p4.join(' '));
+
+  // PARAGRAPHE 5 : Atouts et opportunités
+  let p5 = [];
+  if (visibility.allie) {
+    p5.push(`Cependant, <strong>${n.allie}</strong> pourrait vous prêter main-forte.`);
+  }
+  if (visibility.faiblesse) {
+    p5.push(`La cible a une faille exploitable : <strong>${n.faiblesse}</strong>.`);
+  }
+  if (visibility.objet_cle) {
+    p5.push(`Pour accéder au cœur du site, il vous faudra mettre la main sur <strong>${n.objet_cle}</strong>.`);
+  }
+  if (p5.length) paragraphs.push(p5.join(' '));
+
+  // PARAGRAPHE 6 : Contraintes et urgence
+  let p6 = [];
+  if (visibility.contrainte) {
+    p6.push(`Le timing est serré : <strong>${n.contrainte}</strong>.`);
+  }
+  if (visibility.condition) {
+    p6.push(`Votre employeur impose une règle d'or : <strong>${n.condition}</strong>.`);
+  }
+  if (visibility.enjeu) {
+    p6.push(`L'urgence est réelle, <strong>${n.enjeu}</strong>.`);
+  }
+  if (p6.length) paragraphs.push(p6.join(' '));
+
+  // PARAGRAPHE 7 : Twist et imprévu
+  let p7 = [];
+  if (visibility.twist) {
+    p7.push(`<em>Mais attention… ${n.twist}</em>`);
+  }
+  if (visibility.evenement) {
+    p7.push(`<em>Sans compter que, en pleine action, ${n.evenement.toLowerCase()}.</em>`);
+  }
+  if (p7.length) paragraphs.push(p7.join(' '));
+
+  // PARAGRAPHE 8 : La récompense
+  let p8 = [];
+  if (visibility.recompense) {
+    p8.push(`Si vous ramenez le bébé, la récompense est <strong>${n.recompense}</strong>.`);
+  }
+  if (p8.length) paragraphs.push(p8.join(' '));
+
+  text.innerHTML = paragraphs.length
+    ? paragraphs.map(p => `<p style="margin-bottom:10px;">${p}</p>`).join('')
+    : 'Tous les éléments sont masqués. Affichez-en au moins un pour voir le résumé narratif.';
+}
+
+// Initialisation
+generateFullRun();
+</script>
+</body>
+</html>
