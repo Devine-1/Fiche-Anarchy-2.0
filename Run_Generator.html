@@ -344,7 +344,9 @@
     </div>
 
     <script>
+      // =================================================
       // ==================== DONNÉES ====================
+      // =================================================
       const DATA = {
         johnson: [
           "Corp anonyme en costume gris, paie en Nuyen propres via compte offshore",
@@ -371,7 +373,7 @@
           "Technomancien isolé qui a besoin d'aide",
           "Goule civilisée qui veut de la bioware fraîche ou des données médicales",
           "Enfant des rues qui a entendu quelque chose, paie en bric-à-brac trouvé dans la rue",
-          "Ancien militaire pour mission de récupération avec règles de conduite strictes",
+          "Ancien militaire avec règles de conduite strictes",
           "Culte ésotérique qui a besoin d'un artefact pour un rituel",
           "IA sauvage échappée dont l'objectif est incompréhensible, récompense en data rare",
           "Toi-même tu as découvert l'info par hasard, c'est ta run personnelle",
@@ -398,15 +400,15 @@
           "un agent des services secret",
           "la nounou de votre enfant",
           "quelqu'un de vraiment important",
-          "une personalité",
+          "une Rock star",
         ],
         contexte: [
           "Dans un bar à thème corporatiste bondé, bruit de fond assourdissant, M. Johnson arrive avec 10 minutes de retard",
           "Dans une ruelle sombre derrière une clinique de rue, éclairage au néon clignotant, odeur de détritus",
           "Dans une cabine de Matrix virtuelle décorée comme un bureau des années 2020, avatar flou et voix modifiée",
           "la Matrice",
-          "une forêt",
-          "une exposition d'art",
+          "dans une forêt",
+          "une exposition d'art postcyber",
           "Dans un véhicule autonome en mouvement constant, destination inconnue, fenêtres occultées",
           "Dans un club de nuit underground, musique à fond, M. Johnson porte un masque de fête",
           "Dans un parking souterrain désert au niveau -5, seul le bruit des conduits d'aération rompt le silence",
@@ -469,7 +471,7 @@
           "Plongée RV - Mission exclusivement en Réalité Virtuelle / Matrix",
           "Astral - Mission nécessitant la projection astrale dans un domaine hostile",
           "Enquêtes - la mission consiste à résoudre un mystère.",
-          "Guerrilla/assaut – dans tous les cas, ça sent la poudre et le sang. Ps : les défonceurs de portes ouvertes ne sont pas la seule stratégie !",
+          "Guerrilla/assaut - dans tous les cas, ça sent la poudre et le sang. Ps : les défonceurs de portes ouvertes ne sont pas la seule stratégie !",
         ],
         cible: [
           "Un scientifique corp ayant des secrets dans sa tête",
@@ -517,15 +519,18 @@
           "Afrique",
           "Terre australe",
           "dans un métaplan",
+          "Russie",
+          "camp",
+          "village",
+          "ville",
+          "ville isolée",
+          "mégalopole",
+          "Pôle Arctique, Antarctique",
           "Le Métro - Tunnels, stations oubliées, réfugiés des bas-fonds",
           "Zone industrielle abandonnée - Usines désaffectées, squatteurs",
           "Arcologie - Ville fermée, contrôle total, population captive",
           "Territoire tribal - Terres amérindiennes, traditions",
           "Ork Underground - Sous Seattle, réseau de tunnels ork",
-          "Bar à thème corporatiste - Lieu public avec haute surveillance",
-          "Clinic de rue - Hôpital de fortune, bioware d'occasion, virus",
-          "Club de nuit underground - Musique, drogues, rencontres dangereuses",
-          "Décharge publique - Détritus, toxines, chasseurs de métal",
           "Aéroport / Spatioport - Zone de haute sécurité, douanes",
           "Frontière - Entre deux nations, zone grise, patrouilles sporadiques",
         ],
@@ -533,6 +538,7 @@
           "dans un zeppelin survolant la zone",
           "dans la Matrice",
           "Sous-sol d'un parking corporatiste avec accès aux conduits",
+          "Salon de thés priver (bar a espion)",
           "Laboratoire secret sous une clinique de quartier",
           "Penthouse au 120ème étage avec vue sur la baie",
           "Serveur principal dans un data-center sous-marin",
@@ -546,9 +552,14 @@
           "Mine désaffectée avec gisements d'orichalque",
           "Hôpital psychiatrique avec patients 'spéciaux'",
           "dans un quartier général",
+          "Yath",
+          "paquebot",
+          "porte-conteneurs",
           "dans une villa",
           "dans un centre commercial",
           "dans une prison",
+          "Faille vers le centre de la Terre",
+          "Aéronef en plein vol",
           "Tour de bureaux avec ascenseurs verrouillés et escaliers piégés",
           "Base militaire souterraine oubliée depuis la guerre Dis",
           "Jardin botanique avec plantes génétiquement modifiées carnivores",
@@ -556,6 +567,10 @@
           "Égouts principaux avec accès aux tunnels du gouvernement",
           "Station spatiale orbitale de basse altitude (accès par fusée)",
           "Manoir isolé dans la forêt avec système de défense métaprédateur",
+          "Bar à thème corporatiste - Lieu public avec haute surveillance",
+          "Clinic de rue - Hôpital de fortune, bioware d'occasion, virus",
+          "Club de nuit underground - Musique, drogues, rencontres dangereuses",
+          "Décharge publique - Détritus, toxines, chasseurs de métal",
         ],
         opposition: [
           "rien, tout se passe bien ! C'est louche.",
@@ -564,6 +579,9 @@
           "Sécurité corporatiste (Lone Star ou Knight Errant)",
           "Un justicier masqué, persuadé de faire le bien autour de lui.",
           "police est impliquée",
+          "nuée de nanodrones autonomes",
+          "flic ripou",
+          "cyberpsycho, un ancien vétéran, héros de guerre",
           "Gang de rue local contrôlant le quartier",
           "Mercenaires indépendants payés à la journée",
           "Adepte d'élite gardien du site",
@@ -571,7 +589,7 @@
           "Decker de sécurité surveillant la Matrice locale",
           "Rigger avec drones de combat en patrouille",
           "Esprit gardien ancien lié au lieu",
-          "Paranimal dangereux (barghest, basilic, cockatrice)",
+          "Paranimal dangereux (barghest, basilic, cockatrice...)",
           "Infecté (vampire, goule) caché dans la structure",
           "Autre équipe de runners envoyée par un concurrent",
           "Syndicat du crime (Yakuza, Mafia, Triade)",
@@ -581,7 +599,7 @@
           "Troll cybernétique en armure lourde",
           "Unité d'élite militaire en exercice (mauvais timing)",
           "Culte fanatique prêt à mourir pour défendre le site",
-          "Le lapin tueur ! Mignon mais mortel ! (un tueur vous traque, vous devenez la proie)",
+          "Le lapin tueur ! Mignon mais mortel ! (un tueur vous traque, vous devenez la proie) (slasher)",
           "Aucune opposition visible… trop facile ? (piège)",
         ],
         secu_physique: [
@@ -647,7 +665,7 @@
           "Double astral, le lieu est différent dans le plan astral",
           "Goule éveillée, un vampire",
           "Zone de mana toxique (pollution, souffrance, mort)",
-          "Paraprédateur",
+          "Paraprédateur issue de la mythologie populaire",
           "Esprit lié à un objet spécifique (Tengu)",
           "Mage adepte en patrouille avec perception magique",
           "Champ de dissuasion mentale (un chant étrange perturbe votre esprit : désavantage logique interaction sociale)",
@@ -797,6 +815,7 @@
         ],
         allie: [
           "Gardien de sécurité corrompu prêt à fermer les yeux pour 5000¥",
+          "SDF, ancien génie mis à la retraite pour cause d'instabilité.",
           "Technomancien caché dans les conduits qui déteste l'employeur",
           "Ancien collègue de la cible qui veut l'aider à s'échapper",
           "Goule civilisée vivant dans les sous-sols connaissant tous les passages",
@@ -952,8 +971,9 @@
           "Cyberware incompatible créant des douleurs chroniques (distrait)",
         ],
       };
-
+      // ==================================================================
       // ==================== CONFIGURATION DES CARTES ====================
+      // ==================================================================
       const CATEGORIES = [
         {
           key: "johnson",
@@ -1134,8 +1154,9 @@
             '<strong>Faiblesse exploitable</strong> : <span class="result">{val}</span>.',
         },
       ];
-
-      // ==================== ÉTAT ====================
+      // =================================================
+      // ==================== ÉTAT =======================
+      // =================================================
       let runState = {};
       let visibility = {};
 
