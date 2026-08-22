@@ -28,14 +28,14 @@ const SHADOWRUN_GEAR = {
       "Catégorie": "INFILTRATION",
       "COUT_Atout": "Atout 4",
       "COUT_Yen": "22 500¥",
-      "EFFETS": "RR 1 aux tests  de Survie"
+      "EFFETS": "RR 2 Furtivité (crochetage)"
     },
 {
       "Atout": "Kit de survie en milieu hostile ",
       "Catégorie": "INFILTRATION",
       "COUT_Atout": "Atout 2",
       "COUT_Yen": "10 000¥",
-      "EFFETS": "RR 2 Furtivité (crochetage)"
+      "EFFETS": "RR 1 aux tests  de Survie"
     },
 {
       "Atout": "Matériel d'escalade",

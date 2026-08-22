@@ -145,27 +145,50 @@ const SHADOWRUN_DATA = {
       },
       {
         "Type": "Émergé",
-        //"Cout_Atout": "2",
+        "Cout_Atout": "3",
+        "Cout_Nuyen": "15 000",
         "Description": "Seuls les personnages Émergés peuvent accéder à la Matrice par la seule force de leur esprit, y tisser des formes complexes et compiler des sprites."
       },
       {
         "Type": "Magicien",
-        //"Cout_Atout": "2",
+        "Cout_Atout": "3",
+        "Cout_Nuyen": "25 000",
+        "competence_autoriser" : "Perception astral;Projection astrale;Sorcellerie;Conjuration",
         "Description": "Sorcellerie, Conjuration, perception et projection astrales."
       },
       {
-        "Type": "Magicien spécialisé",
-        //"Cout_Atout": "1",
-        "Description": "Sorcellerie ou Conjuration, perception astrales."
+        "Type": "Sorcier",
+        "Cout_Atout": "1",
+        "Cout_Nuyen": "10 000",
+        "competence_autoriser" : "Perception astral;Sorcellerie",
+        "Description": "Sorcellerie, perception astrales."
+      },
+      {
+        "Type": "Conjurateur",
+        "Cout_Atout": "1",
+        "Cout_Nuyen": "15 000",
+        "competence_autoriser" : "Perception astral;Conjuration",
+        "Description": "Conjuration, perception astrales."
+      },
+      {
+        "Type": "Clairvoyant",
+        "Cout_Atout": "2",
+        "Cout_Nuyen": "10 000",
+        "competence_autoriser" : "Perception astral;Projection astrale",
+        "Description": "perception et projection astrales."
       },
       {
         "Type": "Adepte mystique",
-        //"Cout_Atout": "2",
+        "Cout_Atout": "2",
+        "Cout_Nuyen": "20 000",
+        "competence_autoriser" : "Adepte;Sorcellerie;Conjuration",
         "Description": "Sorcellerie, Conjuration, pouvoirs d'adepte."
       },
       {
         "Type": "Adepte",
-        //"Cout_Atout": "1",
+        "Cout_Atout": "1",
+        "Cout_Nuyen": "5 000",
+        "competence_autoriser" : "Adepte",
         "Description": "Pouvoirs d'adepte."
       }
     ]

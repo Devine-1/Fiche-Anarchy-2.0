@@ -2113,8 +2113,15 @@ function calculateSpentNuyen() {
   let spent = 0;
 
   if (character.concept) {
-    const conceptCost = parseInt(character.concept.Cout_Atout) || 0;
-    spent += conceptCost * 5000;
+    if (creationMode === 'libre' && character.concept.Cout_Nuyen) {
+      // Mode libre : coût nuyen direct depuis les données du concept
+      const nuyenStr = String(character.concept.Cout_Nuyen).replace(/[^0-9]/g, '');
+      spent += parseInt(nuyenStr) || 0;
+    } else {
+      // Mode précalculé : pts d'atout × 5000 ¥ (parseFloat pour les décimales)
+      const conceptCost = parseFloat(character.concept.Cout_Atout) || 0;
+      spent += conceptCost * 5000;
+    }
   }
 
   // === ATTRIBUTS EN MODE LIBRE ===
@@ -2143,6 +2150,7 @@ function calculateSpentNuyen() {
   }
 
   attrs.forEach(attr => {
+    if (attr === 'Anarchy') return; // Anarchy fixe et gratuite selon le métatype
     const val = character.attributs[attr] || 0;
     const bonus = baseBonuses[attr] || 0;
     const metaMax = parseInt(maxMap[attr]) || 6;
@@ -2174,7 +2182,7 @@ function calculateSpentNuyen() {
     // Spécialisations
     if (s.specialisations) {
       s.specialisations.forEach(spec => {
-        if (spec.selected && s.rang >= 2) {
+        if (spec.selected && s.rang >= 1) {
           spent += COUTS_LIBRE.specialisation;
         }
       });
@@ -2725,14 +2733,20 @@ function applyMetatypeBonuses() {
   // Réinitialiser les attributs à 0 (base Anarchy 2.0)
   character.attributs = { Force: 0, Agilite: 0, Volonte: 0, Logique: 0, Charisme: 0, Anarchy: 0 };
 
-  // Chercher la ligne de bonus pour ce métatype
+  // === ANARCHY : valeur fixe directement depuis le métatype (Humain=4, autres=3) ===
+  const anaVal = parseInt(character.metatype.ANA) || 0;
+  if (anaVal > 0) {
+    character.attributs.Anarchy = anaVal;
+  }
+
+  // Chercher la ligne de bonus pour ce métatype (FOR, AGI, VOL, LOG, CHA uniquement)
   const bonusRow = dataBonus.find(b => b.Métatype === character.metatype.Métatype);
   if (!bonusRow) return;
 
-  const attrMap = {FOR:'Force', AGI:'Agilite', VOL:'Volonte', LOG:'Logique', CHA:'Charisme', ANA:'Anarchy'};
+  const attrMap = {FOR:'Force', AGI:'Agilite', VOL:'Volonte', LOG:'Logique', CHA:'Charisme'};
 
-  // Appliquer chaque bonus non vide
-  ['FOR','AGI','VOL','LOG','CHA','ANA'].forEach(key => {
+  // Appliquer chaque bonus non vide (sans ANA qui est déjà traité ci-dessus)
+  ['FOR','AGI','VOL','LOG','CHA'].forEach(key => {
     if (bonusRow[key] && bonusRow[key].trim() !== '') {
       const bonus = parseInt(bonusRow[key]) || 0;
       if (bonus !== 0) {
@@ -2880,6 +2894,7 @@ function renderStep3(container) {
 }
 
 function updateAttr(attr, value, usableMax, metaMax, maxAttrAtMax) {
+  if (attr === 'Anarchy') return; // Anarchy fixe par métatype, non modifiable
   let val = parseInt(value) || 0;
 
   // Limiter à la plage autorisée
@@ -2948,8 +2963,10 @@ function renderStep4(container) {
   }
 
   // Calculer les points utilisés (somme des valeurs au-dessus de 0, sans compter les bonus métatype)
+  // L'Anarchy est exclue car elle est fixe et gratuite selon le métatype
   let usedPoints = 0;
   attrs.forEach(attr => {
+    if (attr === 'Anarchy') return; // Anarchy fixe et gratuite
     const val = character.attributs[attr] || 0;
     const bonus = baseBonuses[attr] || 0;
     // Les points dépensés = valeur - bonus (car les bonus sont gratuits)
@@ -2999,6 +3016,20 @@ function renderStep4(container) {
     const bonus = baseBonuses[attr] || 0;
     const bonusText = bonus !== 0 ? (bonus > 0 ? `+${bonus} bonus métatype` : `${bonus} malus`) : '';
 
+    // === CAS SPÉCIAL : ANARCHY (fixe et gratuite selon le métatype) ===
+    if (attr === 'Anarchy') {
+      const fixedVal = character.attributs[attr] || 0;
+      html += `<div class="attr-box" style="background:#FFF8E1; border-color:var(--yellow-dark);">
+        <div class="attr-name">${attr}</div>
+        <div class="attr-max">Max métatype: ${max}</div>
+        <div class="attr-bonus">Fixe — gratuit</div>
+        <input type="number" value="${fixedVal}" readonly 
+          style="width:60px; height:40px; border:2px solid var(--yellow-dark); border-radius:8px; text-align:center; font-family:'Roboto Mono', monospace; font-size:18px; font-weight:700; background:#FFF8E1; cursor:not-allowed; color:var(--gray-dark);">
+        <div style="font-size:10px;color:var(--gray-mid);margin-top:4px;">Défini par le métatype</div>
+      </div>`;
+      return;
+    }
+
     // Valeur effective max = max métatype + bonus
     const effectiveMax = max + Math.max(0, bonus);
 
@@ -3031,6 +3062,27 @@ function renderStep4(container) {
 // ============================================
 // ÉTAPE 5 : COMPÉTENCES
 // ============================================
+// Récupère la liste des compétences/spécialisations autorisées par le concept
+function getConceptAllowedCompetences() {
+  if (!character.concept) return [];
+  // Le champ dans les données a un accent : compétence_autoriser
+  const raw = character.concept['compétence_autoriser'] || character.concept.competence_autoriser || '';
+  if (!raw) return [];
+  const list = String(raw)
+    .split(';')
+    .map(s => normalizeString(s.trim()))
+    .filter(s => s);
+
+  // Combat astral est obligatoire si Conjuration ou Projection astrale est présente
+  const hasConjuration = list.includes('conjuration');
+  const hasProjectionAstrale = list.some(a => a.includes('projection') && a.includes('astral'));
+  if ((hasConjuration || hasProjectionAstrale) && !list.includes('combat astral')) {
+    list.push('combat astral');
+  }
+
+  return list;
+}
+
 function renderStep5(container) {
   if (!character.niveauJeu) {
     container.innerHTML = `<div class="alert error">Veuillez d'abord choisir un niveau de jeu.</div>`;
@@ -3065,26 +3117,31 @@ function renderStep5(container) {
     });
   }
 
-  // Compter les points utilisés (somme des rangs + 1 par spécialisation si rang >= 2)
+  // Compter les points utilisés (somme des rangs + 1 par spécialisation si rang >= 1)
   const usedPoints = character.competences.reduce((sum, s) => {
     let pts = 0;
     if (s.selected) pts = s.rang;
     if (s.specialisations) {
       s.specialisations.forEach(spec => {
-        if (spec.selected && s.rang >= 2) pts += 1;
+        if (spec.selected && s.rang >= 1) pts += 1;
       });
     }
     return sum + pts;
   }, 0) + (character.hasKnowledge ? 1 : 0);
 
   const remaining = totalPoints - usedPoints;
+
+  // === RESTRICTIONS SELON LE CONCEPT ===
+  const allowedComps = getConceptAllowedCompetences();
+  const hasConceptRestriction = allowedComps.length > 0;
+
   const selectedCount = character.competences.filter(s => s.selected).length;
   const specCount = character.competences.reduce((sum, s) => {
     return sum + (s.specialisations ? s.specialisations.filter(sp => sp.selected).length : 0);
   }, 0);
 
   let html = `<div class="step-title">5. Compétences</div>
-    <div class="step-subtitle">Répartissez ${totalPoints} points de compétence. Max ${maxRank-1} sauf 1 compétence au rang ${maxRank} pour Runner.</div>
+    <div class="step-subtitle">Répartissez ${totalPoints} points de compétence. Rang maximum : ${maxRank}.</div>
     <div class="step-subtitle" style="font-size:11px; color:#9E9E9E;">Spécialisation : coûte 1 pt (mode précalculé) ou 2 500 ¥ (mode libre), requiert indice ≥ 2. Donne +2 dés.</div>`;
 
   if (armorBonus !== 0) {
@@ -3117,13 +3174,7 @@ function renderStep5(container) {
     }
   }
 
-  // Alerte pour les compétences au maximum
-  const skillsAtMaxCount = character.competences.filter(s => s.selected && s.rang >= maxRank).length;
-  if (maxCompAtMax > 0 && skillsAtMaxCount >= maxCompAtMax) {
-    html += `<div class="alert info" style="background:#FFF3E0; color:#E65100; border-color:#FFB74D;">⚠️ Limite atteinte : ${skillsAtMaxCount}/${maxCompAtMax} compétence(s) au rang ${maxRank}.</div>`;
-  } else if (maxCompAtMax === 0 && skillsAtMaxCount > 0) {
-    html += `<div class="alert error">En tant que ${character.niveauJeu.Niveau}, aucune compétence ne peut atteindre le rang ${maxRank}. Veuillez réduire à ${maxRank - 1}.</div>`;
-  }
+  // (Ancienne limite Compétences_au_max retirée — seul le rang max compte)
 
   // Grouper par Catégorie principale
   const mainCatOrder = [
@@ -3164,11 +3215,24 @@ function renderStep5(container) {
       const restrictionNorm = normalizeString(skill.restriction || '');
       let restricted = false;
       let restrictionText = '';
-      if (restrictionNorm.includes('eveille') && !isEveille) { 
+
+      // === RESTRICTION SELON LE CONCEPT (types éveillés avec compétences limitées) ===
+      if (hasConceptRestriction) {
+        const compNameNorm = normalizeString(skill.nom);
+        // Compétences magiques = catégorie magique OU nom contenant "astral" / "astrale"
+        const isMagical = skill.categorie_principale === 'Compétences magiques' ||
+                          compNameNorm.includes('astral') || compNameNorm.includes('astrale');
+        if (isMagical && !allowedComps.includes(compNameNorm)) {
+          restricted = true;
+          restrictionText = 'Non autorisé (' + (character.concept ? character.concept.Type : '') + ')';
+        }
+      }
+
+      if (!restricted && restrictionNorm.includes('eveille') && !isEveille) { 
         restricted = true; 
         restrictionText = 'Éveillés uniquement'; 
       }
-      else if (restrictionNorm.includes('emerge') && !isEmerge) { 
+      else if (!restricted && restrictionNorm.includes('emerge') && !isEmerge) { 
         restricted = true; 
         restrictionText = 'Émergés uniquement'; 
       }
@@ -3201,7 +3265,7 @@ function renderStep5(container) {
         }
         if (skill.specialisations) {
           skill.specialisations.forEach(spec => {
-            if (spec.selected && skill.rang >= 2) cost += COUTS_LIBRE.specialisation;
+            if (spec.selected && skill.rang >= 1) cost += COUTS_LIBRE.specialisation;
           });
         }
         nuyenCost = `<span style="font-size:10px;color:var(--yellow-dark);font-weight:700;margin-left:6px;">${cost.toLocaleString('fr-FR')} ¥</span>`;
@@ -3235,15 +3299,49 @@ function renderStep5(container) {
           const specRestrictionNorm = normalizeString(spec.restriction || '');
           let specRestricted = false;
           let specRestrictionText = '';
-          if (specRestrictionNorm.includes('eveille') && !isEveille) {
+
+          // === RESTRICTION SELON LE CONCEPT (spécialisations) ===
+          if (hasConceptRestriction) {
+            const specNameNorm = normalizeString(spec.nom);
+            const compNameNorm = normalizeString(skill.nom);
+            const fullNameNorm = normalizeString(compNameNorm + ' ' + specNameNorm);
+
+            // La compétence parente est-elle magique ?
+            const isMagicalParent = skill.categorie_principale === 'Compétences magiques' ||
+                                    compNameNorm.includes('astral') || compNameNorm.includes('astrale');
+            // Cas spécial : Perception astral
+            const isAstralPerception = compNameNorm === 'perception' && specNameNorm === 'astral';
+
+            if (isMagicalParent) {
+              // Si la compétence parente est autorisée → TOUTES ses spécialisations le sont
+              const isParentAllowed = allowedComps.includes(compNameNorm);
+              if (isParentAllowed) {
+                specRestricted = false;
+              } else if (isAstralPerception) {
+                // Vérifier "perception astral" spécifiquement
+                const isAstralAllowed = allowedComps.some(a => a.includes('perception') && a.includes('astral'));
+                if (!isAstralAllowed) {
+                  specRestricted = true;
+                  specRestrictionText = 'Non autorisé (' + (character.concept ? character.concept.Type : '') + ')';
+                }
+              } else {
+                // Compétence magique non autorisée → spécialisation bloquée
+                specRestricted = true;
+                specRestrictionText = 'Non autorisé (' + (character.concept ? character.concept.Type : '') + ')';
+              }
+            }
+            // Si la compétence parente n'est pas magique, pas de restriction sur les spécialisations
+          }
+
+          if (!specRestricted && specRestrictionNorm.includes('eveille') && !isEveille) {
             specRestricted = true;
             specRestrictionText = 'Éveillés uniquement';
-          } else if (specRestrictionNorm.includes('emerge') && !isEmerge) {
+          } else if (!specRestricted && specRestrictionNorm.includes('emerge') && !isEmerge) {
             specRestricted = true;
             specRestrictionText = 'Émergés uniquement';
           }
 
-          const canSpec = skill.selected && skill.rang >= 2 && !restricted && !specRestricted;
+          const canSpec = skill.selected && skill.rang >= 1 && !restricted && !specRestricted;
           const specSelected = spec.selected;
           const poolSpec = poolBase + 2;
 
@@ -3307,21 +3405,8 @@ function toggleSkillSelected(idx) {
 function updateSkillRank(idx, value, max) {
   const val = parseInt(value) || 0;
   const maxRank = parseInt(character.niveauJeu.Compétence_max) || 5;
-  const maxCompAtMax = parseInt(character.niveauJeu.Compétences_au_max) || 0;
 
-  if (val >= maxRank) {
-    const currentAtMax = character.competences.filter((s, i) => i !== idx && s.selected && s.rang >= maxRank).length;
-    if (currentAtMax >= maxCompAtMax) {
-      if (maxCompAtMax === 0) {
-        alert(`En tant que ${character.niveauJeu.Niveau}, aucune compétence ne peut atteindre le rang ${maxRank}. Le maximum est ${maxRank - 1}.`);
-      } else {
-        alert(`Limite atteinte : maximum ${maxCompAtMax} compétence(s) peuvent atteindre le rang ${maxRank}.`);
-      }
-      renderStep();
-      return;
-    }
-  }
-
+  // Seul le rang max compte — pas de limite sur le nombre de compétences au rang max
   character.competences[idx].rang = Math.max(0, Math.min(val, max));
   if (character.competences[idx].rang === 0) {
     character.competences[idx].selected = false;
@@ -3340,7 +3425,7 @@ function toggleSkillSpec(compIdx, specIdx) {
   if (spec.selected) {
     spec.selected = false;
   } else {
-    if (skill.rang >= 2) {
+    if (skill.rang >= 1) {
       spec.selected = true;
     }
   }
@@ -3493,7 +3578,7 @@ function renderStep6(container) {
   }
 
   const totalPoints = parseInt(character.niveauJeu.Atouts);
-  const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+  const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
   const availablePoints = totalPoints - conceptCost;
   const pimpCostsStep6 = calculateAllPimpCosts();
   const armorAtoutCost = getArmorAtoutCost();
@@ -3945,7 +4030,7 @@ function renderStep8(container) {
 
   // Calcul des points d'atout utilisés (étape 6 + matos rigger + contacts + pimp)
   const totalAtoutPoints = parseInt(character.niveauJeu.Atouts) || 0;
-  const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+  const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
   const atoutsUsedStep6 = character.atouts.reduce((sum, a) => sum + (a.cout || 0), 0);
   const atoutsUsedRigger = getEquipAtoutsTotalCost();
   const contactsPointsUsed = character.contactsAchetes ? character.contactsAchetes.reduce((sum, c) => sum + c.coutAtout, 0) : 0;
@@ -4066,7 +4151,7 @@ function selectMatosRigger(catKey, idx) {
   // Vérification des points d'atout en mode précalculé
   if (creationMode !== 'libre') {
     const totalAtoutPoints = parseInt(character.niveauJeu.Atouts) || 0;
-    const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+    const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
     const atoutsUsedStep6 = character.atouts.reduce((sum, a) => sum + (a.cout || 0), 0);
     const atoutsUsedRigger = getEquipAtoutsTotalCost();
     const contactsPointsUsed = character.contactsAchetes ? character.contactsAchetes.reduce((sum, c) => sum + c.coutAtout, 0) : 0;
@@ -4129,7 +4214,7 @@ function renderStep9(container) {
   });
 
   const totalAtoutPoints = parseInt(character.niveauJeu.Atouts) || 0;
-  const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+  const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
   const atoutsUsedStep6 = character.atouts.reduce((sum, a) => sum + (a.cout || 0), 0);
   const atoutsUsedRigger = getEquipAtoutsCount();
   const armorAtoutCost = getArmorAtoutCost();
@@ -4242,7 +4327,7 @@ function addContactAchete(levelIdx) {
     }
   } else {
     const totalAtoutPoints = parseInt(character.niveauJeu.Atouts) || 0;
-    const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+    const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
     const atoutsUsedStep6 = character.atouts.reduce((sum, a) => sum + (a.cout || 0), 0);
     const atoutsUsedRigger = getEquipAtoutsTotalCost();
     const contactsPointsUsed = character.contactsAchetes ? character.contactsAchetes.reduce((sum, c) => sum + c.coutAtout, 0) : 0;
@@ -4382,7 +4467,7 @@ function toggleArmorExtra(idx) {
   } else {
     if (creationMode !== 'libre') {
       const totalAtoutPoints = parseInt(character.niveauJeu.Atouts) || 0;
-      const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+      const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
       const atoutsUsedStep6 = character.atouts.reduce((sum, a) => sum + (a.cout || 0), 0);
       const contactsPointsUsed = character.contactsAchetes ? character.contactsAchetes.reduce((sum, c) => sum + c.coutAtout, 0) : 0;
       const pimpCosts = calculateAllPimpCosts();
@@ -4451,7 +4536,7 @@ function renderStep12(container) {
     </div>`;
   } else {
     const totalAtoutPoints = parseInt(character.niveauJeu.Atouts) || 0;
-    const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+    const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
     const atoutsUsedStep6 = character.atouts.reduce((sum, a) => sum + (a.cout || 0), 0);
     const contactsPointsUsed = character.contactsAchetes ? character.contactsAchetes.reduce((sum, c) => sum + c.coutAtout, 0) : 0;
     const pimpCosts = calculateAllPimpCosts();
@@ -4729,7 +4814,7 @@ function toggleArmeUpgrade(armeId, upgradeIdx) {
 
         if (atoutCost > 0) {
           const totalAtoutPoints = parseInt(character.niveauJeu.Atouts) || 0;
-          const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+          const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
           const atoutsUsedStep6 = character.atouts.reduce((sum, a) => sum + (a.cout || 0), 0);
           const atoutsUsedRigger = getEquipAtoutsTotalCost();
           const contactsPointsUsed = character.contactsAchetes ? character.contactsAchetes.reduce((sum, c) => sum + c.coutAtout, 0) : 0;
@@ -5198,7 +5283,7 @@ function finishCharacter() {
   let atoutTotal = 0, atoutSpent = 0, atoutRemaining = 0;
   if (creationMode !== 'libre' && character.niveauJeu) {
     atoutTotal = parseInt(character.niveauJeu.Atouts) || 0;
-    const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+    const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
     atoutSpent = character.atouts.reduce((s, a) => s + (a.cout || 0), 0)
       + (character.tatouagesFocus ? character.tatouagesFocus.reduce((s, t) => s + t.coutAtout, 0) : 0)
       + getEquipAtoutsTotalCost()
@@ -6557,7 +6642,7 @@ function togglePimpUpgrade(itemId, upgradeIdx) {
         if (atoutCost > 0) {
           // Verifier les points d'atout disponibles
           const totalAtoutPoints = parseInt(character.niveauJeu.Atouts) || 0;
-          const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+          const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
           const atoutsUsedStep6 = character.atouts.reduce((sum, a) => sum + (a.cout || 0), 0);
           const atoutsUsedStep7 = getEquipAtoutsCount();
           const contactsPointsUsed = character.contactsAchetes ? character.contactsAchetes.reduce((sum, c) => sum + c.coutAtout, 0) : 0;
@@ -6862,7 +6947,7 @@ function toggleTatouageFocusAtout(nomFocus) {
       }
     } else {
       const totalAtoutPoints = parseInt(character.niveauJeu.Atouts) || 0;
-      const conceptCost = parseInt(character.concept ? character.concept.Cout_Atout : 0) || 0;
+      const conceptCost = parseFloat(character.concept ? character.concept.Cout_Atout : 0) || 0;
       const atoutPointsUsed = character.atouts.reduce((sum, a) => sum + (a.cout || 0), 0);
       const contactPointsUsed = character.contactsAchetes ? character.contactsAchetes.reduce((sum, c) => sum + c.coutAtout, 0) : 0;
       const tattooPointsUsed = character.tatouagesFocus.reduce((sum, t) => sum + t.coutAtout, 0);
