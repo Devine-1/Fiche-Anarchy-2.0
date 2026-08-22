@@ -1,0 +1,514 @@
+{
+  "version": "1.0",
+  "source": "bestiaire-custom",
+  "creatures": [
+    {
+      "id": "custom-fee-des-dents",
+      "nom": "FÉE DES DENTS",
+      "metatype": "Fée des dents",
+      "categorie": "Paranimal",
+      "attributs": {
+        "FOR": {
+          "base": 1
+        },
+        "AGI": {
+          "base": 5
+        },
+        "VOL": {
+          "base": 2
+        },
+        "LOG": {
+          "base": 1
+        },
+        "CHA": {
+          "base": 1
+        }
+      },
+      "competences": [
+        {
+          "nom": "Athlétisme",
+          "indice": 3,
+          "attribut": "FOR",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Vol",
+              "indice": 5,
+              "attribut": "AGI",
+              "rr": 1
+            },
+            {
+              "nom": "Défense à distance",
+              "indice": 5,
+              "attribut": "AGI",
+              "rr": 1
+            }
+          ]
+        },
+        {
+          "nom": "Perception",
+          "indice": 4,
+          "attribut": "LOG",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Physique",
+              "indice": 6,
+              "attribut": "LOG",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Furtivité",
+          "indice": 5,
+          "attribut": "AGI",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Discrétion physique",
+              "indice": 7,
+              "attribut": "AGI",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Combat rapproché",
+          "indice": 3,
+          "attribut": "AGI",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Morsure",
+              "indice": 5,
+              "attribut": "AGI",
+              "rr": 0
+            }
+          ]
+        }
+      ],
+      "atouts": [
+        {
+          "nom": "Vol",
+          "effet": "Peut voler et ignorer les obstacles au sol. RR 1 aux tests d’Athlétisme (vol)."
+        },
+        {
+          "nom": "Petite taille",
+          "effet": "RR 1 aux tests de défense à distance (difficile à toucher). Les attaques de zone lui infligent des dommages normaux."
+        },
+        {
+          "nom": "Morsure vorace",
+          "effet": "Combat rapproché (morsure) : VD +1. Si la cible subit une blessure grave, la Fée gagne 1 points Anarchy de combat."
+        },
+        {
+          "nom": "Sens des dents",
+          "effet": "Perception (physique) : détecte automatiquement les créatures avec des dents ou des os apparents."
+        }
+      ],
+      "armes": [
+        {
+          "nom": "Morsure",
+          "vd": 3,
+          "rr": [
+            "OK",
+            "-",
+            "-",
+            "-"
+          ]
+        }
+      ],
+      "equipement": [],
+      "description": "**FÉE DES DENTS**  \nParanormale minuscule, corps insectoïde recouvert d’écailles noires irisées, quatre ailes membraneuses transparentes, mâchoire disproportionnée garnie de rangées de dents.\n\n**Comportement** : Nocturne et grégaire.Attirée par le calcium d'origine organique. Attaque en silence, préfère les proies endormies ou immobilisées.\n\n**Habitat** : La Forêts Noirs, caves, égouts, laboratoire oubliés, sous les ponts de banlieue.\n\n**Tactique** : Se pose sur le visage de sa victime, arrache les dents en premier, puis s’enfuit dans les airs. En groupe, elle déchiquette la chair exposée pour atteindre les os.\n\n**Faiblesse** : Lumière vive et feu. Subit un désavantage à la Perception et perd  l’Initiative sous la lumière du jour ou les projecteurs. Le froid l'endors (désavantage à l’AGI sous 0°C).\n\n**Légende** : Les enfants Berlinois mettent leurs dents de lait sous l’oreiller… mais dans la Forêt Noire, ce ne sont pas les parents qui viennent les chercher. Les corps retrouvés présentent une cavité buccale vide et des marques de griffes autour des lèvres. Dans les galeries du métro, on retrouve rarement seuls des amas de chair sans un seul os pour identifier la victime.\nÉtrangement, à Spandau, une ville voisine de Berlin et contrôlée par Aztechnologie, les amas de chair se font de plus en plus nombreux.",
+      "blessures": {
+        "combativite": "faible",
+        "combativiteAlt": "",
+        "armurePrincipale": 0,
+        "armureSecondaire": 0,
+        "protectionMentale": 0,
+        "physiques": {
+          "cases": {
+            "legeres": 3,
+            "graves": 2,
+            "incapacite": 1
+          }
+        },
+        "mentales": {
+          "cases": {
+            "legeres": 3,
+            "graves": 2,
+            "incapacite": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "custom-nuee-fees-dents",
+      "nom": "NUÉE DE FÉES DES DENTS",
+      "metatype": "Fée des dents",
+      "categorie": "Paranimal",
+      "attributs": {
+        "FOR": {
+          "base": 3
+        },
+        "AGI": {
+          "base": 5
+        },
+        "VOL": {
+          "base": 3
+        },
+        "LOG": {
+          "base": 1
+        },
+        "CHA": {
+          "base": 2
+        }
+      },
+      "competences": [
+        {
+          "nom": "Athlétisme",
+          "indice": 4,
+          "attribut": "FOR",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Vol",
+              "indice": 6,
+              "attribut": "AGI",
+              "rr": 1
+            },
+            {
+              "nom": "Défense à distance",
+              "indice": 6,
+              "attribut": "FOR",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Perception",
+          "indice": 5,
+          "attribut": "LOG",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Physique",
+              "indice": 7,
+              "attribut": "LOG",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Furtivité",
+          "indice": 5,
+          "attribut": "AGI",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Discrétion physique",
+              "indice": 7,
+              "attribut": "AGI",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Combat rapproché",
+          "indice": 6,
+          "attribut": "AGI",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Morsure en nuée",
+              "indice": 8,
+              "attribut": "AGI",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Influence",
+          "indice": 3,
+          "attribut": "CHA",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Intimidation",
+              "indice": 5,
+              "attribut": "CHA",
+              "rr": 0
+            }
+          ]
+        }
+      ],
+      "atouts": [
+        {
+          "nom": "Nuée",
+          "effet": "Les attaques à distance et de Combat rapproché subissent un désavantage. \nLes attaques de zone (grenades, sorts de zone) ne sont pas désavantage. Immunité aux prises, à l’immobilisation."
+        },
+        {
+          "nom": "Dévoration",
+          "effet": "Combat rapproché (morsure) : VD +1. Si la cible subit des blessure légère, la Fée gagne 1 points Anarchy de combat."
+        },
+        {
+          "nom": "Vol en essaim",
+          "effet": "Peut voler et ignorer les obstacles au sol. RR 1 aux tests d’Athlétisme (vol)."
+        },
+        {
+          "nom": "Sens des dents",
+          "effet": "Perception (physique) : détecte automatiquement les créatures avec des dents ou des os apparents."
+        }
+      ],
+      "armes": [
+        {
+          "nom": "Nuée de morsures",
+          "vd": 7,
+          "rr": [
+            "OK",
+            "OK",
+            "Dés",
+            "–"
+          ]
+        },
+        {
+          "nom": "Morsure isolée",
+          "vd": 4,
+          "rr": [
+            "OK",
+            "-",
+            "-",
+            "-"
+          ]
+        }
+      ],
+      "equipement": [],
+      "description": "**NUÉE DE FÉES DES DENTS** — Essaim de 20 à 50 individus, bourdonnement aigu semblable à une scie électrique. Le nuage noir tourbillonne autour de sa proie comme une tornade de dents et de griffes.\n\n**Comportement** : Hyper-agressive dès qu’une proie saigne. Déchiquette la chair en quelques secondes pour en dévorer le squelette. Attaque aux dents et aux cornes en priorité.\n\n**Habitat** : La Forêts Noirs, caves, égouts, laboratoire oubliés, sous les ponts de banlieue.\n\n**Tactique** : Enveloppe la cible, la aveugle et la débite par dizaines de morsures simultanées. Fuie uniquement si plus de la moitié de l’essaim est détruit.\n\n**Faiblesse** : Lumière vive et feu. Subit un désavantage à la Perception et perd  l’Initiative sous la lumière du jour ou les projecteurs. Le froid l'endors (désavantage à l’AGI sous 0°C).\n\n**Légende** : Les anciens druides de la Forêt Noire les appelaient « les dentellières ». Les corpos les utilisent parfois comme bio-armes de déniabilité plausible. Un seul essaim a déjà vidé une mégaplexe entière en une nuit de blackout.\n\n\nLes enfants Berlinois mettent leurs dents de lait sous l’oreiller… mais dans la Forêt Noire, ce ne sont pas les parents qui viennent les chercher. Les corps retrouvés présentent une cavité buccale vide et des marques de griffes autour des lèvres. Dans les galeries du métro, on retrouve rarement seuls des amas de chair sans un seul os pour identifier la victime.\nÉtrangement, à Spandau, une ville voisine de Berlin et contrôlée par Aztechnologie, les amas de chair se font de plus en plus nombreux. Un ancien article racontait même que ces monstres ont été utilisés par une corpo comme bio-armes ; un seul essaim a déjà vidé une mégaplexe entière en une nuit de blackout.",
+      "blessures": {
+        "combativite": "extrême",
+        "combativiteAlt": "",
+        "armurePrincipale": 1,
+        "armureSecondaire": 0,
+        "protectionMentale": 0,
+        "physiques": {
+          "cases": {
+            "legeres": 3,
+            "graves": 2,
+            "incapacite": 1
+          }
+        },
+        "mentales": {
+          "cases": {
+            "legeres": 3,
+            "graves": 2,
+            "incapacite": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "custom-1787316270594",
+      "nom": "chupacabra",
+      "metatype": "INFECTER",
+      "categorie": "Paranimal",
+      "attributs": {
+        "FOR": {
+          "base": 3
+        },
+        "AGI": {
+          "base": 4
+        },
+        "VOL": {
+          "base": 3
+        },
+        "LOG": {
+          "base": 3
+        },
+        "CHA": {
+          "base": 1
+        }
+      },
+      "competences": [
+        {
+          "nom": "Athlétisme",
+          "indice": 4,
+          "attribut": "FOR",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Course",
+              "indice": 6,
+              "attribut": "FOR",
+              "rr": 0
+            },
+            {
+              "nom": "Saut",
+              "indice": 6,
+              "attribut": "FOR",
+              "rr": 0
+            },
+            {
+              "nom": "Défense à distance",
+              "indice": 6,
+              "attribut": "FOR",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Perception",
+          "indice": 4,
+          "attribut": "LOG",
+          "rr": 1,
+          "specialisations": [
+            {
+              "nom": "Physique",
+              "indice": 6,
+              "attribut": "LOG",
+              "rr": 1
+            }
+          ]
+        },
+        {
+          "nom": "Furtivité",
+          "indice": 5,
+          "attribut": "AGI",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Embuscade",
+              "indice": 7,
+              "attribut": "AGI",
+              "rr": 0
+            },
+            {
+              "nom": "Discrétion physique",
+              "indice": 7,
+              "attribut": "AGI",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Combat rapproché",
+          "indice": 5,
+          "attribut": "AGI",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Morsure",
+              "indice": 7,
+              "attribut": "AGI",
+              "rr": 0
+            },
+            {
+              "nom": "Griffe",
+              "indice": 7,
+              "attribut": "AGI",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Survie",
+          "indice": 3,
+          "attribut": "LOG",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Milieu rural",
+              "indice": 5,
+              "attribut": "LOG",
+              "rr": 0
+            }
+          ]
+        },
+        {
+          "nom": "Influence",
+          "indice": 3,
+          "attribut": "CHA",
+          "rr": 0,
+          "specialisations": [
+            {
+              "nom": "Intimidation",
+              "indice": 5,
+              "attribut": "CHA",
+              "rr": 2
+            }
+          ]
+        }
+      ],
+      "atouts": [
+        {
+          "nom": "Sangsue",
+          "effet": "Combat rapproché (morsure) : Peut drainer le sang d’une cible moyenne inconsciente pour récupérer toutes ses blessures en 1 minute."
+        },
+        {
+          "nom": "Vision nocturne",
+          "effet": "RR 1 dans l’obscurité."
+        },
+        {
+          "nom": "Peau épaisse",
+          "effet": "Armure +2 naturelle."
+        },
+        {
+          "nom": "Peur",
+          "effet": "RR 2 aux tests d’Influence (intimidation)"
+        },
+        {
+          "nom": "Griffes rétractiles",
+          "effet": "griffes : VD +1, peut escalader les surfaces verticales sans test d’Athlétisme."
+        },
+        {
+          "nom": "Exigence alimentaire",
+          "effet": "se nourrit exclusivement de sang."
+        }
+      ],
+      "armes": [
+        {
+          "nom": "Morsure",
+          "vd": 5,
+          "rr": [
+            "OK",
+            "-",
+            "-",
+            "-"
+          ]
+        },
+        {
+          "nom": "Griffe",
+          "vd": 6,
+          "rr": [
+            "OK",
+            "-",
+            "-",
+            "-"
+          ]
+        }
+      ],
+      "equipement": [],
+      "description": "**CHUPACABRA** \nCréature paranormale nocturne de petite taille (1 m au garrot), couverte de poils gris-vert et de piquants dorsaux. Ses yeux rouges brillent dans le noir.\n\n**Comportement** : Chasse en embuscade, préfère le bétail et les animaux domestiques, mais n’hésite pas à attaquer les humanoïdes isolés. Extrêmement rapide et silencieux.\n\n**Habitat** : Zones rurales, banlieues périphériques, égouts, terrains vagues.\n\n**Tactique** : Attaque par surprise depuis les hauteurs ou les buissons. Cible les proies isolées, les immobilise avec ses griffes, puis les saigne avec sa morsure. Fuie si confronté par un groupe ou une créature plus grande.\n\n**Faiblesse** : Lumière vive (projecteurs, flashs) : subit un désavantage à la Perception et perd l’Initiative.\n\n**Légende** : Les fermiers des barrens rapportent des troupeaux entiers vidés de leur sang en une nuit. Les corps présentent deux perforations nettes au cou. Les autorités attribuent ces attaques à des gangs sanguinaires… mais les ombres savent mieux.\nLe Virus Vampirique Humain/Métahumain **VVHMH**, a muté ou a été modifié. Son origine est assez floue, car le complexe où le premier individu a été trouvé a été détruit lors d'une run. Mais ce que les ombres ont rapporté, c'est que le virus s'est adapté pour infecter les chien **VVC** Virus Vampirique Canin.",
+      "blessures": {
+        "combativite": "faible",
+        "combativiteAlt": "",
+        "armurePrincipale": 2,
+        "armureSecondaire": 0,
+        "protectionMentale": 0,
+        "physiques": {
+          "cases": {
+            "legeres": 3,
+            "graves": 2,
+            "incapacite": 1
+          }
+        },
+        "mentales": {
+          "cases": {
+            "legeres": 3,
+            "graves": 2,
+            "incapacite": 1
+          }
+        }
+      }
+    }
+  ]
+}
