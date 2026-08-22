@@ -10,11 +10,14 @@ Ces outils sont conçus pour les joueurs et maîtres de jeu (MJ) francophones so
 
 | Outil | Description | Fichier |
 |-------|-------------|---------|
-| **Fiche de Personnage** | Fiche interactive pour gérer son runner (attributs, compétences, équipement, état) | [`index.html`](./index.html) |
+| **Fiche de Personnage** | Fiche interactive pour gérer son runner | [`index.html`](./index.html) |
 | **Créateur de Personnage** | Assistant étape par étape pour créer un nouveau personnage selon les règles Anarchy V2 | [`creation2.0.html`](./creation2.0.html) |
-| **Carte du Cybermonde** | Carte interactive de l'univers de Shadowrun (villes, zones, corporations) | [`carte_interactive_cybermonde.html`](./carte_interactive_cybermonde.html) |
+| **Carte du Cybermonde** | Carte interactive de l'univers de Shadowrun | [`carte_interactive_cybermonde.html`](./carte_interactive_cybermonde.html) |
 | **Black Market** | Catalogue d'équipements, armes, cyberware et prix du marché noir | [`black-market.html`](./black-market.html) |
 | **Bestiaire** | Référentiel des créatures, PNJ et menaces du 6ème Monde | [`bestiaire.html`](./bestiaire.html) |
+| **My run** | Générateur de scénarios pour vos futures parties | [`Run_Generator.html`](./Run_Generator.html) |
+| **SIN** | Générateur de SIN, SINess et SIN corpo | [`sin_generator.html`](./sin_generator.html) |
+
 
 ---
 
