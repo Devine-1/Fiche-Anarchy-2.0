@@ -144,7 +144,7 @@ const SHADOWRUN_DATA = {
         "Description": "Pas de pouvoirs magiques."
       },
       {
-        "Type": "Émerge",
+        "Type": "Émergé",
         //"Cout_Atout": "2",
         "Description": "Seuls les personnages Émergés peuvent accéder à la Matrice par la seule force de leur esprit, y tisser des formes complexes et compiler des sprites."
       },
