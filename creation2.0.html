@@ -1556,11 +1556,11 @@ const ARMURES_DATA = [
 const CONTACT_LEVELS = [
   { niveau: 0, nom: "Contact gratuit", coutAtout: 0, coutNuyen: 0, description: "Une personne importante pour le personnage et qui fait partie intégrante de son Réseau. Peut être utilisé pour enrichir la narration où orienter la façon d’interpréter le résultat d'un test de Réseau.", rr: "", domaine: "" },
   { niveau: 1, nom: "Contact fiable", coutAtout: 2, coutNuyen: 10000, description: "Une personne importante pour le personnage et qui – par son influence, sa fiabilité et/ou sa volonté – permet d'aider à réduire les risques de complication lorsqu'on cherche à acquérir du matos ou des infos sensibles.", rr: "RR 1 Réseau", domaine: "domaine au choix" },
-  { niveau: 2, nom: "Contact influent (multi-domaines)", coutAtout: 4, coutNuyen: 20000, description: "Idem, mais en plus, le contact opère dans plusieurs domaines.", rr: "RR 1 Réseau (domaine) — RR 1 Réseau (autre domaine)", domaine: "2 domaines au choix" },
+  { niveau: 2, nom: "Contact influent (multi-domaines)", coutAtout: 4, coutNuyen: 20000, description: "Idem, mais en plus, le contact opère dans plusieurs domaines.", rr: "RR 1 Réseau (domaine) - RR 1 Réseau (autre domaine)", domaine: "2 domaines au choix" },
   { niveau: 3, nom: "Contact influent et risqué", coutAtout: 4, coutNuyen: 20000, description: "Ce contact est probablement à la fois très influent et fiable et/ou il accepte en plus de prendre certains risques à la place du PJ.", rr: "RR 2 Réseau (domaine au choix)", domaine: "domaine au choix" },
   { niveau: 4, nom: "Contact très influent", coutAtout: 6, coutNuyen: 30000, description: "Ce contact-là est extrêmement influent et fiable dans son domaine et en plus il doit vraiment apprécier le PJ…", rr: "RR 3 Réseau (domaine au choix)", domaine: "domaine au choix" },
   { niveau: 5, nom: "Contact réseauté (Fixer)", coutAtout: 5, coutNuyen: 25000, description: "Un contact qui connait beaucoup de monde dans tous les milieux. Probablement un Fixer, une Star disposant d'un vaste réseau ou quelqu'un de haut placé. Il est par contre peut-être très occupé et pas toujours disponible.", rr: "RR 1 Réseau", domaine: "tous les milieux" },
-  { niveau: 6, nom: "Contact réseauté et fiable", coutAtout: 7, coutNuyen: 35000, description: "Ce contact connait du monde partout et encore plus dans un domaine en particulier et il est prêt à utiliser ce réseau pour le PJ lorsqu'il en a besoin.", rr: "RR 1 Réseau — RR 1 Réseau (domaine au choix)", domaine: "tous les milieux + 1 domaine" }
+  { niveau: 6, nom: "Contact réseauté et fiable", coutAtout: 7, coutNuyen: 35000, description: "Ce contact connait du monde partout et encore plus dans un domaine en particulier et il est prêt à utiliser ce réseau pour le PJ lorsqu'il en a besoin.", rr: "RR 1 Réseau - RR 1 Réseau (domaine au choix)", domaine: "tous les milieux + 1 domaine" }
 ];
 
 
@@ -2915,6 +2915,7 @@ function updateAttr(attr, value, usableMax, metaMax, maxAttrAtMax) {
 
   let attrsAtMaxCount = 0;
   attrs.forEach(a => {
+    if (a === 'Anarchy') return; // Anarchy est fixe, ne compte pas dans la limite
     const max = parseInt(maxMap[a]);
     if (character.attributs[a] >= max) attrsAtMaxCount++;
   });
@@ -2976,9 +2977,10 @@ function renderStep4(container) {
 
   const remaining = totalPoints - usedPoints;
 
-  // Compter combien d'attributs sont au MAXIMUM DU MÉTATYPE (pas au max autorisé par le niveau)
+  // Compter combien d'attributs sont au MAXIMUM DU MÉTATYPE (Anarchy exclue — fixe par métatype)
   let attrsAtMaxCount = 0;
   attrs.forEach(attr => {
+    if (attr === 'Anarchy') return; // Anarchy est fixe, ne compte pas dans la limite
     const max = parseInt(maxMap[attr]);
     if (character.attributs[attr] >= max) attrsAtMaxCount++;
   });
@@ -3216,8 +3218,17 @@ function renderStep5(container) {
       let restricted = false;
       let restrictionText = '';
 
+      // === RESTRICTION DIRECTE : Non éveillé et Émergé n'ont pas accès à Conjuration et Sorcellerie ===
+      const compNameNormDirect = normalizeString(skill.nom);
+      const isNonEveilleDirect = conceptTypeNorm.includes('non') && conceptTypeNorm.includes('eveille');
+      const isEmergeDirect = conceptTypeNorm.includes('emerge');
+      if ((isNonEveilleDirect || isEmergeDirect) && (compNameNormDirect === 'conjuration' || compNameNormDirect === 'sorcellerie')) {
+        restricted = true;
+        restrictionText = 'Non autorisé (' + (character.concept ? character.concept.Type : '') + ')';
+      }
+
       // === RESTRICTION SELON LE CONCEPT (types éveillés avec compétences limitées) ===
-      if (hasConceptRestriction) {
+      if (hasConceptRestriction && !restricted) {
         const compNameNorm = normalizeString(skill.nom);
         // Compétences magiques = catégorie magique OU nom contenant "astral" / "astrale"
         const isMagical = skill.categorie_principale === 'Compétences magiques' ||
@@ -4354,21 +4365,40 @@ function addContactAchete(levelIdx) {
     <div class="input-group" style="margin-bottom:10px;">
       <label style="font-size:11px;">Occupation / Fonction</label>
       <input type="text" id="contactOccupation" placeholder="Ex: Fixer, médecin de rue, ganger..." style="width:100%;padding:8px 12px;border:2px solid var(--gray-mid);border-radius:6px;font-size:13px;">
-    </div>
+    </div>`;
 
-    <div class="input-group" style="margin-bottom:10px;">
-      <label style="font-size:11px;">Domaine</label>
-      <select id="contactDomaine" style="width:100%;padding:8px 12px;border:2px solid var(--gray-mid);border-radius:6px;font-size:13px;background:white;">
-        <option value="">-- Choisir un domaine --</option>`;
+    if (level.niveau === 2) {
+      html += `<div class="input-group" style="margin-bottom:10px;">
+        <label style="font-size:11px;">Domaine 1</label>
+        <select id="contactDomaine1" style="width:100%;padding:8px 12px;border:2px solid var(--gray-mid);border-radius:6px;font-size:13px;background:white;">
+          <option value="">-- Choisir un domaine --</option>`;
+      DOMAINE_CONTACTS.forEach(d => {
+        html += `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`;
+      });
+      html += `</select>
+      </div>`;
+      html += `<div class="input-group" style="margin-bottom:10px;">
+        <label style="font-size:11px;">Domaine 2</label>
+        <select id="contactDomaine2" style="width:100%;padding:8px 12px;border:2px solid var(--gray-mid);border-radius:6px;font-size:13px;background:white;">
+          <option value="">-- Choisir un domaine --</option>`;
+      DOMAINE_CONTACTS.forEach(d => {
+        html += `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`;
+      });
+      html += `</select>
+      </div>`;
+    } else {
+      html += `<div class="input-group" style="margin-bottom:10px;">
+        <label style="font-size:11px;">Domaine</label>
+        <select id="contactDomaine" style="width:100%;padding:8px 12px;border:2px solid var(--gray-mid);border-radius:6px;font-size:13px;background:white;">
+          <option value="">-- Choisir un domaine --</option>`;
+      DOMAINE_CONTACTS.forEach(d => {
+        html += `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`;
+      });
+      html += `</select>
+      </div>`;
+    }
 
-  DOMAINE_CONTACTS.forEach(d => {
-    html += `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`;
-  });
-
-  html += `</select>
-    </div>
-
-    <div class="input-group" style="margin-bottom:14px;">
+    html += `<div class="input-group" style="margin-bottom:14px;">
       <label style="font-size:11px;">Particularite (optionnel)</label>
       <input type="text" id="contactParticularite" placeholder="Ex: Dette de sang, Ancien partenaire..." style="width:100%;padding:8px 12px;border:2px solid var(--gray-mid);border-radius:6px;font-size:13px;">
     </div>
@@ -4388,7 +4418,15 @@ function saveContactAchete(levelIdx) {
 
   const nom = document.getElementById('contactNom')?.value.trim() || 'Contact sans nom';
   const occupation = document.getElementById('contactOccupation')?.value.trim() || '';
-  const domaine = document.getElementById('contactDomaine')?.value.trim() || level.domaine || '';
+  let domaine = '';
+  if (level.niveau === 2) {
+    const d1 = document.getElementById('contactDomaine1')?.value.trim() || '';
+    const d2 = document.getElementById('contactDomaine2')?.value.trim() || '';
+    const parts = [d1, d2].filter(Boolean);
+    domaine = parts.length > 0 ? parts.join(' + ') : (level.domaine || '');
+  } else {
+    domaine = document.getElementById('contactDomaine')?.value.trim() || level.domaine || '';
+  }
   const particularite = document.getElementById('contactParticularite')?.value.trim() || '';
 
   if (!character.contactsAchetes) character.contactsAchetes = [];
@@ -5676,7 +5714,6 @@ function finishCharacter() {
 
   html += `<div class="result-actions">
     <button class="btn" style="background:#1565C0;color:#fff;border-color:#1565C0;" onclick="downloadFicheJSON()">📄 Télécharger JSON pour Fiche Anarchy</button>
-    <button class="btn" style="background:var(--green);color:#fff;border-color:var(--green);" onclick="exportJSON()">💾 Télécharger JSON brut</button>
     <button class="btn secondary" onclick="location.reload()">🔄 Nouveau personnage</button>
   </div>`;
 
