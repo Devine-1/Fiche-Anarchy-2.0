@@ -736,13 +736,13 @@
             nom: "Combinaison de camouflage",
             prix: "17 500¥",
             score: "3",
-            desc: "RR 2 Furtivité (discrétion physique)",
+            desc: "RR 1 Furtivité (discrétion physique)",
           },
           {
             nom: "Combinaison caméléon",
             prix: "27 500¥",
             score: "3",
-            desc: "RR 1 Furtivité (discrétion physique)",
+            desc: "RR 2 Furtivité (discrétion physique)",
           },
           {
             nom: "SecureTech Invisi-shield",
@@ -900,7 +900,7 @@
         function parseYen(yenStr) {
           if (!yenStr) return null;
           var s = String(yenStr);
-          var sign = s.indexOf('-') !== -1 ? -1 : 1;
+          var sign = s.indexOf("-") !== -1 ? -1 : 1;
           var n = parseInt(s.replace(/[^0-9]/g, ""), 10);
           return isNaN(n) ? null : n * sign;
         }
@@ -1104,7 +1104,8 @@
           if (!item || !isPimpEligible(item)) return;
 
           var upgrades = getPimpUpgrades();
-          var appliedCounts = item && item.upgradeCounts ? item.upgradeCounts : {};
+          var appliedCounts =
+            item && item.upgradeCounts ? item.upgradeCounts : {};
           var currentCost = calculateVehicleUpgradeCost(itemId);
           var totalCount = 0;
           for (var k in appliedCounts) {
@@ -1149,9 +1150,15 @@
             var nuyenVal = parseYen(upg.COUT_Yen) || 0;
             var totalVal = nuyenVal * count;
             var costDisplay = "";
-            if (totalVal > 0) costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
-            else if (totalVal < 0) costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
-            else costDisplay = (nuyenVal >= 0 ? "+" : "") + nuyenVal.toLocaleString("fr-FR") + " ¥";
+            if (totalVal > 0)
+              costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
+            else if (totalVal < 0)
+              costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
+            else
+              costDisplay =
+                (nuyenVal >= 0 ? "+" : "") +
+                nuyenVal.toLocaleString("fr-FR") +
+                " ¥";
             var negativeClass = nuyenVal < 0 ? "pimp-upgrade-negative" : "";
 
             modalHtml +=
@@ -1163,7 +1170,11 @@
               idx +
               ')">' +
               '<div class="pimp-checkbox">' +
-              (count > 1 ? '<span style="color:white;font-size:10px;font-weight:700;">' + count + "</span>" : "") +
+              (count > 1
+                ? '<span style="color:white;font-size:10px;font-weight:700;">' +
+                  count +
+                  "</span>"
+                : "") +
               "</div>" +
               '<div class="pimp-upgrade-content">' +
               '<div class="pimp-upgrade-name">' +
@@ -1178,7 +1189,13 @@
               esc(upg.EFFETS || "Pas de description") +
               "</div>" +
               "</div>" +
-              (isSelected ? '<button class="pimp-btn" style="padding:2px 8px;font-size:10px;margin-left:8px;flex-shrink:0;align-self:center;" onclick="event.stopPropagation(); decrementPimpUpgrade(' + itemId + ', ' + idx + ');">−</button>' : "") +
+              (isSelected
+                ? '<button class="pimp-btn" style="padding:2px 8px;font-size:10px;margin-left:8px;flex-shrink:0;align-self:center;" onclick="event.stopPropagation(); decrementPimpUpgrade(' +
+                  itemId +
+                  ", " +
+                  idx +
+                  ');">−</button>'
+                : "") +
               "</div>";
           });
 
@@ -1225,7 +1242,8 @@
           }
           if (!item) return;
           if (!item.upgradeCounts) item.upgradeCounts = {};
-          item.upgradeCounts[upgradeIdx] = (item.upgradeCounts[upgradeIdx] || 0) + 1;
+          item.upgradeCounts[upgradeIdx] =
+            (item.upgradeCounts[upgradeIdx] || 0) + 1;
           openPimpModal(itemId);
         }
 
@@ -1258,7 +1276,8 @@
           var count = 0;
           if (item && item.upgradeCounts) {
             for (var k in item.upgradeCounts) {
-              if (item.upgradeCounts.hasOwnProperty(k)) count += item.upgradeCounts[k];
+              if (item.upgradeCounts.hasOwnProperty(k))
+                count += item.upgradeCounts[k];
             }
           }
           return (
@@ -1299,10 +1318,17 @@
             var nuyenVal = parseYen(upg.COUT_Yen) || 0;
             var totalVal = nuyenVal * count;
             var costDisplay = "";
-            if (totalVal > 0) costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
-            else if (totalVal < 0) costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
+            if (totalVal > 0)
+              costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
+            else if (totalVal < 0)
+              costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
 
-            var countLabel = count > 1 ? ' <span style="color:#7b1fa2;font-weight:700;">×' + count + "</span>" : "";
+            var countLabel =
+              count > 1
+                ? ' <span style="color:#7b1fa2;font-weight:700;">×' +
+                  count +
+                  "</span>"
+                : "";
 
             html +=
               '<div class="pimp-applied-item">' +
@@ -1399,7 +1425,8 @@
           if (!item || !isArmeAmeliorable(item)) return;
 
           var upgrades = getArmeUpgrades();
-          var appliedCounts = item && item.ameliorationCounts ? item.ameliorationCounts : {};
+          var appliedCounts =
+            item && item.ameliorationCounts ? item.ameliorationCounts : {};
           var currentCost = calculateArmeUpgradeCost(itemId);
           var totalCount = 0;
           for (var k in appliedCounts) {
@@ -1444,9 +1471,15 @@
             var nuyenVal = parseYen(upg.COUT_Yen) || 0;
             var totalVal = nuyenVal * count;
             var costDisplay = "";
-            if (totalVal > 0) costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
-            else if (totalVal < 0) costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
-            else costDisplay = (nuyenVal >= 0 ? "+" : "") + nuyenVal.toLocaleString("fr-FR") + " ¥";
+            if (totalVal > 0)
+              costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
+            else if (totalVal < 0)
+              costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
+            else
+              costDisplay =
+                (nuyenVal >= 0 ? "+" : "") +
+                nuyenVal.toLocaleString("fr-FR") +
+                " ¥";
             var negativeClass = nuyenVal < 0 ? "pimp-upgrade-negative" : "";
 
             modalHtml +=
@@ -1458,7 +1491,11 @@
               idx +
               ')">' +
               '<div class="pimp-checkbox">' +
-              (count > 1 ? '<span style="color:white;font-size:10px;font-weight:700;">' + count + "</span>" : "") +
+              (count > 1
+                ? '<span style="color:white;font-size:10px;font-weight:700;">' +
+                  count +
+                  "</span>"
+                : "") +
               "</div>" +
               '<div class="pimp-upgrade-content">' +
               '<div class="pimp-upgrade-name">' +
@@ -1473,7 +1510,13 @@
               esc(upg.EFFETS || "Pas de description") +
               "</div>" +
               "</div>" +
-              (isSelected ? '<button class="pimp-btn" style="padding:2px 8px;font-size:10px;margin-left:8px;flex-shrink:0;align-self:center;" onclick="event.stopPropagation(); decrementArmeUpgrade(' + itemId + ', ' + idx + ');">−</button>' : "") +
+              (isSelected
+                ? '<button class="pimp-btn" style="padding:2px 8px;font-size:10px;margin-left:8px;flex-shrink:0;align-self:center;" onclick="event.stopPropagation(); decrementArmeUpgrade(' +
+                  itemId +
+                  ", " +
+                  idx +
+                  ');">−</button>'
+                : "") +
               "</div>";
           });
 
@@ -1522,7 +1565,8 @@
           }
           if (!item) return;
           if (!item.ameliorationCounts) item.ameliorationCounts = {};
-          item.ameliorationCounts[upgradeIdx] = (item.ameliorationCounts[upgradeIdx] || 0) + 1;
+          item.ameliorationCounts[upgradeIdx] =
+            (item.ameliorationCounts[upgradeIdx] || 0) + 1;
           openArmeUpgradeModal(itemId);
         }
 
@@ -1555,7 +1599,8 @@
           var count = 0;
           if (item && item.ameliorationCounts) {
             for (var k in item.ameliorationCounts) {
-              if (item.ameliorationCounts.hasOwnProperty(k)) count += item.ameliorationCounts[k];
+              if (item.ameliorationCounts.hasOwnProperty(k))
+                count += item.ameliorationCounts[k];
             }
           }
           return (
@@ -1596,10 +1641,17 @@
             var nuyenVal = parseYen(upg.COUT_Yen) || 0;
             var totalVal = nuyenVal * count;
             var costDisplay = "";
-            if (totalVal > 0) costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
-            else if (totalVal < 0) costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
+            if (totalVal > 0)
+              costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
+            else if (totalVal < 0)
+              costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
 
-            var countLabel = count > 1 ? ' <span style="color:#B71C1C;font-weight:700;">×' + count + "</span>" : "";
+            var countLabel =
+              count > 1
+                ? ' <span style="color:#B71C1C;font-weight:700;">×' +
+                  count +
+                  "</span>"
+                : "";
 
             html +=
               '<div class="pimp-applied-item" style="background: #FFEBEE; border-color: #EF9A9A;">' +
