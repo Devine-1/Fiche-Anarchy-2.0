@@ -420,10 +420,12 @@ body {
 }
 #sin-card.corpo-style .sin-photo-box { border-color: #ffd700; }
 #sin-card.fake-style .sin-photo-box { border-color: #ff5252; }
-.sin-photo-box img {
+#card-photo {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   display: none;
 }
 .sin-photo-placeholder {
@@ -971,7 +973,7 @@ input[type="file"]::file-selector-button:hover {
     <div class="sin-body">
       <div class="sin-col-left">
         <div class="sin-photo-box" id="photo-container">
-          <img id="card-photo" src="" alt="" crossorigin="anonymous">
+          <div id="card-photo"></div>
           <div class="sin-photo-placeholder" id="photo-placeholder">?</div>
         </div>
         <div class="sin-barcode-wrap">
@@ -1312,10 +1314,11 @@ async function generateSIN() {
   }
 
   if (srcToUse) {
-    cardPhoto.src = srcToUse;
+    cardPhoto.style.backgroundImage = "url('" + srcToUse.replace(/'/g, "\'") + "')";
     cardPhoto.style.display = 'block';
     placeholder.style.display = 'none';
   } else {
+    cardPhoto.style.backgroundImage = '';
     cardPhoto.style.display = 'none';
     placeholder.style.display = 'flex';
     placeholder.textContent = type === 'fake' ? 'X' : (type === 'corpo' ? 'C' : '?');
