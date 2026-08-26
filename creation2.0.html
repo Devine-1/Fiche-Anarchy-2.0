@@ -1421,7 +1421,7 @@ body.nuyen-active {
   <div class="nuyen-progress">
     <div class="nuyen-progress-fill safe" id="nuyenProgress" style="width:0%"></div>
   </div>
-  <span style="font-size:11px;color:var(--gray-mid);margin-left:12px;">Mode Libre — répartissez librement</span>
+  <span style="font-size:11px;color:var(--gray-mid);margin-left:12px;">Mode Libre - répartissez librement</span>
 </div>
 <div class="nuyen-alert" id="nuyenAlert">⚠️ Budget dépassé !</div>
 
@@ -2420,7 +2420,7 @@ function renderStep1(container) {
 
   if (character.niveauJeu) {
     html += `<div class="alert info" style="margin-bottom:20px;">
-      <strong>Niveau de jeu sélectionné :</strong> ${character.niveauJeu.Niveau} — ${character.niveauJeu.Option}<br>
+      <strong>Niveau de jeu sélectionné :</strong> ${character.niveauJeu.Niveau} - ${character.niveauJeu.Option}<br>
     </div>`;
   }
 
@@ -2477,7 +2477,7 @@ function renderStep1(container) {
         const attrMap = { 'Charisme': 'CHA', 'Volonté': 'VOL', 'Logique': 'LOG' };
         const attrCode = attrMap[character.tradition.ATTRIBUT_DE_CONJURATION] || character.tradition.ATTRIBUT_DE_CONJURATION;
         html += `<div class="alert success" style="margin-top:12px;">`;
-        html += `Tradition : <strong>${character.tradition.TRADITION}</strong> — Conjuration en ${character.tradition.ATTRIBUT_DE_CONJURATION}<br>`;
+        html += `Tradition : <strong>${character.tradition.TRADITION}</strong> -Conjuration en ${character.tradition.ATTRIBUT_DE_CONJURATION}<br>`;
         html += `Mot-clé 2 : <strong>${escapeHtml(character.tradition.TRADITION)} (${attrCode})</strong>`;
         html += `</div>`;
       }
@@ -2977,7 +2977,7 @@ function renderStep4(container) {
 
   const remaining = totalPoints - usedPoints;
 
-  // Compter combien d'attributs sont au MAXIMUM DU MÉTATYPE (Anarchy exclue — fixe par métatype)
+  // Compter combien d'attributs sont au MAXIMUM DU MÉTATYPE (Anarchy exclue -fixe par métatype)
   let attrsAtMaxCount = 0;
   attrs.forEach(attr => {
     if (attr === 'Anarchy') return; // Anarchy est fixe, ne compte pas dans la limite
@@ -3024,7 +3024,7 @@ function renderStep4(container) {
       html += `<div class="attr-box" style="background:#FFF8E1; border-color:var(--yellow-dark);">
         <div class="attr-name">${attr}</div>
         <div class="attr-max">Max métatype: ${max}</div>
-        <div class="attr-bonus">Fixe — gratuit</div>
+        <div class="attr-bonus">Fixe -gratuit</div>
         <input type="number" value="${fixedVal}" readonly 
           style="width:60px; height:40px; border:2px solid var(--yellow-dark); border-radius:8px; text-align:center; font-family:'Roboto Mono', monospace; font-size:18px; font-weight:700; background:#FFF8E1; cursor:not-allowed; color:var(--gray-dark);">
         <div style="font-size:10px;color:var(--gray-mid);margin-top:4px;">Défini par le métatype</div>
@@ -3147,7 +3147,7 @@ function renderStep5(container) {
     <div class="step-subtitle" style="font-size:11px; color:#9E9E9E;">Spécialisation : coûte 1 pt (mode précalculé) ou 2 500 ¥ (mode libre), requiert indice ≥ 2. Donne +2 dés.</div>`;
 
   if (armorBonus !== 0) {
-    html += `<div class="alert info">Armure sélectionnée : <strong>${character.armure.Armure}</strong> — ${armorBonus > 0 ? '+' : ''}${armorBonus} point${Math.abs(armorBonus) > 1 ? 's' : ''} de compétence.</div>`;
+    html += `<div class="alert info">Armure sélectionnée : <strong>${character.armure.Armure}</strong> -${armorBonus > 0 ? '+' : ''}${armorBonus} point${Math.abs(armorBonus) > 1 ? 's' : ''} de compétence.</div>`;
   }
 
   if (creationMode === 'libre') {
@@ -3161,7 +3161,7 @@ function renderStep5(container) {
       <span style="font-family:'Roboto Condensed',sans-serif;font-size:12px;color:#1565C0;margin-left:12px;">Connaissance: ${character.hasKnowledge ? '✓' : '—'}</span>
     </div>`;
     html += `<div class="alert info" style="background:#E3F2FD; color:#1565C0; border-color:#90CAF9; font-size:12px;">
-      <strong>Mode Libre — Coûts :</strong> 2 500¥/pt (rang 1-5) • 5 000¥/pt (rang 6-8) • Spécialisation : 2 500¥ • Connaissance : 2 500¥
+      <strong>Mode Libre - Coûts :</strong> 2 500¥/pt (rang 1-5) • 5 000¥/pt (rang 6-8) • Spécialisation : 2 500¥ • Connaissance : 2 500¥
     </div>`;
   } else {
     html += `<div class="skill-points-bar">
@@ -3176,7 +3176,7 @@ function renderStep5(container) {
     }
   }
 
-  // (Ancienne limite Compétences_au_max retirée — seul le rang max compte)
+  // (Ancienne limite Compétences_au_max retirée -seul le rang max compte)
 
   // Grouper par Catégorie principale
   const mainCatOrder = [
@@ -3206,7 +3206,7 @@ function renderStep5(container) {
     mainCatSkills.forEach((skill) => {
       const globalIdx = character.competences.indexOf(skill);
 
-      // Vérifier la restriction — comparaison normalisée (sans accents, minuscule)
+      // Vérifier la restriction -comparaison normalisée (sans accents, minuscule)
       const conceptTypeNorm = normalizeString(character.concept ? character.concept.Type : '');
       const isEveille = conceptTypeNorm.includes('magicien') || 
                         conceptTypeNorm.includes('adepte') || 
@@ -3296,13 +3296,13 @@ function renderStep5(container) {
           <strong>Réserve de dés :</strong> ${attrCode}(${attrVal}) + ${skill.rang || 0} = <strong>${poolBase}</strong>
         </div>
         <div style="font-size:10px;color:var(--gray-mid);padding:0 4px 4px;">
-          <span style="font-weight:700;">${attrCode}</span> — ${attrDisplay}${nuyenCost}
+          <span style="font-weight:700;">${attrCode}</span> -${attrDisplay}${nuyenCost}
         </div>`;
 
       // Spécialisations
       if (skill.specialisations && skill.specialisations.length > 0) {
         html += `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--gray-mid);" onclick="event.stopPropagation();">
-          <div style="font-size:11px;font-weight:700;color:var(--gray-dark);margin-bottom:6px;">Spécialisations (+2 dés) — requiert indice ≥ 2</div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray-dark);margin-bottom:6px;">Spécialisations (+2 dés) - requiert indice ≥ 2</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;">`;
 
         skill.specialisations.forEach((spec, specIdx) => {
@@ -3417,7 +3417,7 @@ function updateSkillRank(idx, value, max) {
   const val = parseInt(value) || 0;
   const maxRank = parseInt(character.niveauJeu.Compétence_max) || 5;
 
-  // Seul le rang max compte — pas de limite sur le nombre de compétences au rang max
+  // Seul le rang max compte -pas de limite sur le nombre de compétences au rang max
   character.competences[idx].rang = Math.max(0, Math.min(val, max));
   if (character.competences[idx].rang === 0) {
     character.competences[idx].selected = false;
@@ -3610,7 +3610,7 @@ function renderStep6(container) {
     html += `<div class="atout-points-bar" style="background:#E3F2FD; border-color:#90CAF9;">
       <span class="points-label" style="color:#1565C0;">💡 Points d'atouts (conseillé)</span>
       <span class="points-value" style="color:#1565C0;">${remaining}</span>
-      <span style="font-size:11px;color:#1565C0;margin-left:8px;">(pas de limite stricte${pimpCostsStep6.atout !== 0 ? ' — pimp: ' + pimpCostsStep6.atout + ' pt' : ''})</span>
+      <span style="font-size:11px;color:#1565C0;margin-left:8px;">(pas de limite stricte${pimpCostsStep6.atout !== 0 ? ' -pimp: ' + pimpCostsStep6.atout + ' pt' : ''})</span>
     </div>`;
     // Compteur de sorts en mode libre (conseil)
     if (sortsMax > 0) {
@@ -3918,7 +3918,7 @@ function renderStep7(container) {
     return;
   }
 
-  // Barre de progression — Équipement général uniquement (PAS de barre d'atouts ici)
+  // Barre de progression -Équipement général uniquement (PAS de barre d'atouts ici)
   if (creationMode === 'libre') {
     html += `<div class="attr-points-bar" style="margin-bottom:20px; background:#E3F2FD; border-color:#90CAF9;">
       <span class="points-label" style="color:#1565C0;">💡 Équipement général (conseillé)</span>
@@ -4049,7 +4049,7 @@ function renderStep8(container) {
   const armorAtoutCost = getArmorAtoutCost();
   const atoutPointsRemaining = totalAtoutPoints - conceptCost - atoutsUsedStep6 - contactsPointsUsed - atoutsUsedRigger - pimpCostsStep8.atout - armorAtoutCost;
 
-  // Barre de progression — Points d'atout UNIQUEMENT (pas de barre "matos rigger sélectionné")
+  // Barre de progression -Points d'atout UNIQUEMENT (pas de barre "matos rigger sélectionné")
   if (creationMode === 'libre') {
     html += `<div class="atout-points-bar" style="margin-bottom:20px; background:#E3F2FD; border-color:#90CAF9;">
       <span class="points-label" style="color:#1565C0;">💡 Points d'atouts (conseillé)</span>
@@ -4280,7 +4280,7 @@ function renderStep9(container) {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
           <div>
             <span style="font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;">${escapeHtml(c.nomContact || 'Contact sans nom')}</span>
-            <span style="font-size:11px;color:var(--gray-dark);margin-left:8px;">— ${c.niveauContact.nom}</span>
+            <span style="font-size:11px;color:var(--gray-dark);margin-left:8px;">-${c.niveauContact.nom}</span>
           </div>
           <button class="btn secondary" style="padding:4px 12px;font-size:11px;" onclick="removeContactAchete(${idx})">✕ Retirer</button>
         </div>
@@ -4556,10 +4556,10 @@ function renderStep12(container) {
 
   if (creationMode === 'libre') {
   html += `<div class="step-subtitle">Coût : 1 pt ou 2 500 ¥ par point d'armure. Les armures ne cumulent pas, sauf pour les boucliers et protetions cumulables.</div>`;
-    html += `<div class="alert info">💡 Mode Libre — Armure conseillée : <strong>Protections légères (3 pts, 7 500 ¥)</strong>. Le choix est libre et la description est personnalisable.</div>`;
+    html += `<div class="alert info">💡 Mode Libre - Armure conseillée : <strong>Protections légères (3 pts, 7 500 ¥)</strong>. Le choix est libre et la description est personnalisable.</div>`;
   } else {
     html += `<div class="step-subtitle">Armure imposée par le niveau de jeu.</div>`;
-    html += `<div class="alert info">🔒 Mode Précalculé — <strong>Protections légères (3 pts)</strong> imposées. Vous pouvez personnaliser la description et ajouter des protections cumulables.</div>`;
+    html += `<div class="alert info">🔒 Mode Précalculé - <strong>Protections légères (3 pts)</strong> imposées. Vous pouvez personnaliser la description et ajouter des protections cumulables.</div>`;
   }
 
   const armorAtoutCost = getArmorAtoutCost();
@@ -4584,7 +4584,7 @@ function renderStep12(container) {
     html += `<div class="atout-points-bar" style="margin-bottom:12px;">
       <span class="points-label">Points d'atouts restants (armure incluse)</span>
       <span class="points-value ${remaining < 0 ? 'error' : ''}">${remaining}</span>
-      <span style="font-size:11px;color:var(--gray-dark);margin-left:8px;">Armure : ${armorAtoutCost} pt${armorAtoutCost > 1 ? 's' : ''} — Protection : ${totalProtection}</span>
+      <span style="font-size:11px;color:var(--gray-dark);margin-left:8px;">Armure : ${armorAtoutCost} pt${armorAtoutCost > 1 ? 's' : ''} -Protection : ${totalProtection}</span>
     </div>`;
     if (remaining < 0) {
       html += `<div class="alert error">Vous avez dépensé trop de points d'atout ! Réduisez les protections cumulables ou d'autres choix.</div>`;
@@ -4614,7 +4614,7 @@ function renderStep12(container) {
 
       html += `<div class="equip-item ${cls}" onclick="selectArmorBase(${globalIdx})">
         <div class="equip-name">${escapeHtml(armure.Armure)}</div>
-        <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--yellow-dark);font-weight:700;margin-bottom:4px;">Protection ${armure.Protection} — ${coutDisplay}</div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--yellow-dark);font-weight:700;margin-bottom:4px;">Protection ${armure.Protection} -${coutDisplay}</div>
         <div class="equip-desc">${escapeHtml(armure.description)}</div>
       </div>`;
     });
@@ -4630,7 +4630,7 @@ function renderStep12(container) {
     if (forcedArmor) {
       html += `<div class="equip-item selected" style="cursor:default;">
         <div class="equip-name">${escapeHtml(forcedArmor.Armure)}</div>
-        <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--yellow-dark);font-weight:700;margin-bottom:4px;">Protection ${forcedArmor.Protection} — ${forcedArmor.coutAtout} pt${forcedArmor.coutAtout > 1 ? 's' : ''}</div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--yellow-dark);font-weight:700;margin-bottom:4px;">Protection ${forcedArmor.Protection} -${forcedArmor.coutAtout} pt${forcedArmor.coutAtout > 1 ? 's' : ''}</div>
         <div class="equip-desc">${escapeHtml(forcedArmor.description)}</div>
       </div>`;
     }
@@ -4658,7 +4658,7 @@ function renderStep12(container) {
 
     html += `<div class="equip-item ${cls}" onclick="toggleArmorExtra(${globalIdx})">
       <div class="equip-name">${escapeHtml(armure.Armure)}</div>
-      <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--yellow-dark);font-weight:700;margin-bottom:4px;">+${armure.Protection} protection — ${coutDisplay}</div>
+      <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--yellow-dark);font-weight:700;margin-bottom:4px;">+${armure.Protection} protection -${coutDisplay}</div>
       <div class="equip-desc">${escapeHtml(armure.description)}</div>
       ${warning}
     </div>`;
@@ -4746,13 +4746,13 @@ function openArmeUpgradeModal(armeId) {
   let modalHtml = `<div class="pimp-modal-overlay" id="armeUpgradeModalOverlay" onclick="if(event.target===this)closeArmeUpgradeModal()">
     <div class="pimp-modal">
       <div class="pimp-modal-header" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);">
-        <h3>Améliorations — ${escapeHtml(arme.nom)}</h3>
+        <h3>Améliorations -${escapeHtml(arme.nom)}</h3>
         <button class="pimp-close" onclick="closeArmeUpgradeModal()">×</button>
       </div>
       <div class="pimp-modal-body">
         <div class="pimp-vehicle-info" style="background: #FFEBEE; border-color: #EF9A9A;">
           <div class="pimp-vehicle-name" style="color: #B71C1C;">${escapeHtml(arme.nom)}</div>
-          <div class="pimp-vehicle-type">${escapeHtml(arme.categorie || 'Arme')} — ${escapeHtml(arme.effets || '')}</div>
+          <div class="pimp-vehicle-type">${escapeHtml(arme.categorie || 'Arme')} -${escapeHtml(arme.effets || '')}</div>
         </div>`;
 
   const costLabel = creationMode === 'libre'
@@ -4978,14 +4978,14 @@ function renderStep10(container) {
 
   const armesData = useNewSystem ? SHADOWRUN_GEAR['33_arme'].donnees : dataArmes;
 
-  // === STANDBY — aucune donnée ===
+  // === STANDBY -aucune donnée ===
   if (!armesData || armesData.length === 0) {
     const limitText = creationMode === 'libre' 
       ? `Conseillé : ${maxArmes} arme(s)` 
       : `Maximum ${maxArmes} arme(s) autorisée(s)`;
 
     container.innerHTML = `<div class="step-title">11. Armes</div>
-      <div class="step-subtitle" style="color:var(--gray-mid);">🚧 Section temporairement indisponible — Données en cours de mise à jour</div>
+      <div class="step-subtitle" style="color:var(--gray-mid);">🚧 Section temporairement indisponible - Données en cours de mise à jour</div>
       <div class="alert info" style="margin-top:20px;">
         <strong>Mode standby</strong><br>
         Les données des armes ne sont pas encore chargées.<br>
@@ -5016,14 +5016,14 @@ function renderStep10(container) {
   let html = `<div class="step-title">11. Armes</div>`;
 
   if (creationMode === 'libre') {
-    html += `<div class="step-subtitle">Mode Libre — ${maxArmes} arme(s) conseillée(s) (${character.armes.length} sélectionnée(s))${maxExpertise > 0 ? ' + ' + maxExpertise + ' expertise(s) d\'arme' : ''}</div>`;
+    html += `<div class="step-subtitle">Mode Libre - ${maxArmes} arme(s) conseillée(s) (${character.armes.length} sélectionnée(s))${maxExpertise > 0 ? ' + ' + maxExpertise + ' expertise(s) d\'arme' : ''}</div>`;
     html += `<div class="attr-points-bar" style="background:#E3F2FD; border-color:#90CAF9; margin-bottom:20px;">
       <span class="points-label" style="color:#1565C0;">💡 Conseil armes</span>
       <span class="points-value" style="color:#1565C0;">${character.armes.length} / ${maxArmes}</span>
       <span style="font-size:11px;color:#1565C0;margin-left:8px;">(pas de limite stricte en mode libre)</span>
     </div>`;
   } else {
-    html += `<div class="step-subtitle">Mode Précalculé — Maximum ${maxArmes} arme(s) (${getUsedArmeSlots()}/${maxArmes} atout(s) consommé(s))${maxExpertise > 0 ? ' + ' + maxExpertise + ' expertise(s) d\'arme' : ''}</div>`;
+    html += `<div class="step-subtitle">Mode Précalculé -Maximum ${maxArmes} arme(s) (${getUsedArmeSlots()}/${maxArmes} atout(s) consommé(s))${maxExpertise > 0 ? ' + ' + maxExpertise + ' expertise(s) d\'arme' : ''}</div>`;
     html += `<div class="attr-points-bar" style="margin-bottom:20px;">
       <span class="points-label">Armes sélectionnées</span>
       <span class="points-value ${isOverLimit ? 'error' : ''}">${getUsedArmeSlots()} / ${maxArmes}</span>
@@ -5070,7 +5070,7 @@ function renderStep10(container) {
         const coutAtout = arme.COUT_Atout || '—';
         const coutYen = arme.COUT_Yen || '—';
         const amelio = (arme.amélioraion || 'NON').toUpperCase() === 'OUI' ? '✅' : '❌';
-        const costLabel = tooExpensive ? ` <span style="font-size:9px;color:var(--red);background:#FFEBEE;padding:1px 6px;border-radius:3px;margin-left:6px;font-weight:700;">${armeCost} atouts — trop chère</span>` : '';
+        const costLabel = tooExpensive ? ` <span style="font-size:9px;color:var(--red);background:#FFEBEE;padding:1px 6px;border-radius:3px;margin-left:6px;font-weight:700;">${armeCost} atouts -trop chère</span>` : '';
 
         html += `<tr class="${cls}" onclick="${onclick}" style="cursor:${cursor};${opacity}">
           <td><strong>${escapeHtml(nom)}</strong>${costLabel}</td>
@@ -5244,7 +5244,7 @@ function renderStep11(container) {
   container.innerHTML = html;
 }
 // ============================================
-// RÉDUCTION DE RISQUE (RedR) — COMPÉTENCES
+// RÉDUCTION DE RISQUE (RedR) -COMPÉTENCES
 // ============================================
 
 function toggleRedR(compIdx, idx) {
@@ -5332,7 +5332,7 @@ function finishCharacter() {
   }
 
   let html = `<div class="step-title">Personnage créé !</div>
-    <div class="step-subtitle">Récapitulatif complet — Cliquez sur ✏️ pour modifier un champ</div>`;
+    <div class="step-subtitle">Récapitulatif complet - Cliquez sur ✏️ pour modifier un champ</div>`;
 
   if (creationMode === 'libre') {
     const pct = nuyenMax > 0 ? (nuyenSpent / nuyenMax) * 100 : 0;
@@ -5381,7 +5381,7 @@ function finishCharacter() {
   if (character.tradition) {
     html += `<div class="recap-edit-row">
       <span class="recap-label">Tradition :</span>
-      <span class="recap-value">${escapeHtml(character.tradition.TRADITION)} — Conjuration en ${escapeHtml(character.tradition.ATTRIBUT_DE_CONJURATION)}</span>
+      <span class="recap-value">${escapeHtml(character.tradition.TRADITION)} -Conjuration en ${escapeHtml(character.tradition.ATTRIBUT_DE_CONJURATION)}</span>
     </div>`;
   }
   if (character.metatype && character.metatype._bonus) {
@@ -5497,7 +5497,7 @@ function finishCharacter() {
       const gradeLabel = a.grade && a.grade !== 'standard' ? ` [${(IMPLANT_GRADES[a.grade.toUpperCase()] || {}).label || a.grade}]` : '';
       const gradeColor = a.grade === 'omega' ? 'var(--red)' : (a.grade === 'delta' || a.grade === 'cultive' ? 'var(--green)' : '');
       const gradeStyle = gradeColor ? `color:${gradeColor};font-weight:700;` : '';
-      const essenceDisplay = a.essence && String(a.essence).trim() !== '' ? ` — Essence ${a.essence}` : '';
+      const essenceDisplay = a.essence && String(a.essence).trim() !== '' ? ` -Essence ${a.essence}` : '';
       const costDisplay = creationMode === 'libre' && a.coutNuyenSupp > 0
         ? `${(a.cout * 5000 + a.coutNuyenSupp).toLocaleString('fr-FR')} ¥`
         : `${a.cout} pt${a.cout > 1 ? 's' : ''}`;
@@ -5523,7 +5523,7 @@ function finishCharacter() {
         const cost = creationMode === 'libre' ? `${t.coutNuyen.toLocaleString('fr-FR')} ¥` : `${t.coutAtout} pt${t.coutAtout > 1 ? 's' : ''}`;
         html += `<div class="recap-edit-row" style="background:#F3E5F5;padding:8px 12px;border-radius:6px;margin-bottom:6px;">
           <span class="recap-value" style="flex:1;">
-            <strong>${escapeHtml(t.nom)}</strong> — Tatouage implanté (sans coût essence)
+            <strong>${escapeHtml(t.nom)}</strong> Tatouage implanté (sans coût essence)
           </span>
           <span style="font-family:'Roboto Mono',monospace;font-size:12px;color:#7B1FA2;font-weight:700;">${cost}</span>
         </div>`;
@@ -5556,7 +5556,7 @@ function finishCharacter() {
       const cost = creationMode === 'libre' ? `${c.coutNuyen.toLocaleString('fr-FR')} ¥` : `${c.coutAtout} pt${c.coutAtout > 1 ? 's' : ''}`;
       html += `<div class="recap-edit-row" style="background:#FFF8E1;padding:8px 12px;border-radius:6px;margin-bottom:6px;">
         <span class="recap-value" style="flex:1;">
-          <strong>${escapeHtml(c.nomContact)}</strong> — ${escapeHtml(c.niveauContact.nom)}<br>
+          <strong>${escapeHtml(c.nomContact)}</strong> -${escapeHtml(c.niveauContact.nom)}<br>
           <span style="font-size:11px;color:var(--gray-dark);">${escapeHtml(c.occupation || '')} | Domaine: ${escapeHtml(c.domaine)}</span><br>
           <span style="font-size:10px;color:var(--green);">${c.niveauContact.rr}</span>
         </span>
@@ -5582,7 +5582,7 @@ function finishCharacter() {
       : `${character.armure.coutAtout || 0} pt${(character.armure.coutAtout || 0) > 1 ? 's' : ''}`;
     html += `<div class="recap-edit-row">
       <span class="recap-label">Base :</span>
-      <span class="recap-value">${escapeHtml(character.armure.Armure)} (${character.armure.Protection}) — ${baseCost}</span>
+      <span class="recap-value">${escapeHtml(character.armure.Armure)} (${character.armure.Protection}) -${baseCost}</span>
     </div>`;
     if (character.armure._description) {
       html += `<div class="recap-edit-row">
@@ -5598,7 +5598,7 @@ function finishCharacter() {
         : `${e.coutAtout || 0} pt${(e.coutAtout || 0) > 1 ? 's' : ''}`;
       html += `<div class="recap-edit-row">
         <span class="recap-label">Cumul :</span>
-        <span class="recap-value">${escapeHtml(e.Armure)} (+${e.Protection}) — ${extraCost}</span>
+        <span class="recap-value">${escapeHtml(e.Armure)} (+${e.Protection}) -${extraCost}</span>
       </div>`;
     });
   }
@@ -5624,7 +5624,7 @@ function finishCharacter() {
         : '';
       html += `<div class="recap-edit-row">
         <span class="recap-value" style="flex:1;">
-          <strong>${nom}</strong> — ${effets}${amelios}
+          <strong>${nom}</strong> -${effets}${amelios}
         </span>
       </div>`;
     });
@@ -5648,7 +5648,7 @@ function finishCharacter() {
   html += `<div class="recap-edit-row"><span class="recap-value">Commlink</span></div>`;
   html += `<div class="recap-edit-row"><span class="recap-value">Faux SIN</span></div>`;
   if (character.armure) {
-    html += `<div class="recap-edit-row"><span class="recap-value"><strong>${escapeHtml(character.armure.Armure)}</strong> (Protection +${character.armure.Protection})${character.armure._description ? ' — ' + escapeHtml(character.armure._description) : ''}</span></div>`;
+    html += `<div class="recap-edit-row"><span class="recap-value"><strong>${escapeHtml(character.armure.Armure)}</strong> (Protection +${character.armure.Protection})${character.armure._description ? ' -' + escapeHtml(character.armure._description) : ''}</span></div>`;
   }
   if (character.armureExtras && character.armureExtras.length > 0) {
     character.armureExtras.forEach(e => {
@@ -5662,7 +5662,7 @@ function finishCharacter() {
   if (generalEquip.length > 0) {
     html += `<div style="font-family:'Roboto Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--gray-dark);margin-bottom:8px;">Équipement général</div>`;
     generalEquip.forEach(e => {
-      html += `<div class="recap-edit-row"><span class="recap-value">${escapeHtml(e.nom)}${e.effets ? ' — ' + escapeHtml(e.effets) : ''}</span></div>`;
+      html += `<div class="recap-edit-row"><span class="recap-value">${escapeHtml(e.nom)}${e.effets ? ' -' + escapeHtml(e.effets) : ''}</span></div>`;
     });
   }
   if (riggerEquip.length > 0) {
@@ -5678,7 +5678,7 @@ function finishCharacter() {
         : '';
       html += `<div class="recap-edit-row">
         <span class="recap-value" style="flex:1;">
-          <strong>${escapeHtml(e.nom)}</strong>${e.effets ? ' — ' + escapeHtml(e.effets) : ''}${upgText}
+          <strong>${escapeHtml(e.nom)}</strong>${e.effets ? ' -' + escapeHtml(e.effets) : ''}${upgText}
         </span>
       </div>`;
     });
@@ -5836,7 +5836,7 @@ function toggleEditAtout(idx) {
     const gradeLabel = atout.grade && atout.grade !== 'standard' ? ` [${(IMPLANT_GRADES[atout.grade.toUpperCase()] || {}).label || atout.grade}]` : '';
     const gradeColor = atout.grade === 'omega' ? 'var(--red)' : (atout.grade === 'delta' || atout.grade === 'cultive' ? 'var(--green)' : '');
     const gradeStyle = gradeColor ? `color:${gradeColor};font-weight:700;` : '';
-    const essenceDisplay = atout.essence && String(atout.essence).trim() !== '' ? ` — Essence ${atout.essence}` : '';
+    const essenceDisplay = atout.essence && String(atout.essence).trim() !== '' ? ` -Essence ${atout.essence}` : '';
     const costDisplay = creationMode === 'libre' && atout.coutNuyenSupp > 0
       ? `${(atout.cout * 5000 + atout.coutNuyenSupp).toLocaleString('fr-FR')} ¥`
       : `${atout.cout} pt${atout.cout > 1 ? 's' : ''}`;
@@ -6008,7 +6008,7 @@ function exportJSON() {
       { nom: "Commlink", effets: "Équipement de base", coutAtout: "", coutYen: "0 ¥" },
       { nom: "Faux SIN", effets: "Équipement de base", coutAtout: "", coutYen: "0 ¥" },
       ...(character.armure ? [{
-        nom: character.armure.Armure + (character.armure._description ? " — " + character.armure._description : ""),
+        nom: character.armure.Armure + (character.armure._description ? " - " + character.armure._description : ""),
         effets: "Protection +" + character.armure.Protection,
         coutAtout: String(character.armure.coutAtout || ""),
         coutYen: character.armure.coutNuyen ? character.armure.coutNuyen.toLocaleString("fr-FR") + " ¥" : ""
@@ -6238,7 +6238,7 @@ function generateFicheJSON() {
   if (character.contactsAchetes) {
     character.contactsAchetes.forEach(c => {
       let txt = c.nomContact || 'Contact sans nom';
-      if (c.niveauContact && c.niveauContact.nom) txt += ' — ' + c.niveauContact.nom;
+      if (c.niveauContact && c.niveauContact.nom) txt += ' -' + c.niveauContact.nom;
       if (c.occupation) txt += ' (' + c.occupation + ')';
       if (c.domaine) txt += ' [' + c.domaine + ']';
       if (c.particularite) txt += ' | ' + c.particularite;
@@ -6285,7 +6285,7 @@ function generateFicheJSON() {
   textarea("equip-" + (++equipIdx), "Commlink");
   textarea("equip-" + (++equipIdx), "Faux SIN");
   if (character.armure) {
-    const armureLabel = character.armure.Armure + (character.armure._description ? " — " + character.armure._description : "") + " (+" + character.armure.Protection + ")";
+    const armureLabel = character.armure.Armure + (character.armure._description ? " - " + character.armure._description : "") + " (+" + character.armure.Protection + ")";
     textarea("equip-" + (++equipIdx), armureLabel);
   }
   if (character.armureExtras) {
@@ -6566,13 +6566,13 @@ function openPimpModal(itemId) {
   let modalHtml = `<div class="pimp-modal-overlay" id="pimpModalOverlay" onclick="if(event.target===this)closePimpModal()">
     <div class="pimp-modal">
       <div class="pimp-modal-header">
-        <h3>🔧 Pimp My Ride — ${escapeHtml(item.nom)}</h3>
+        <h3>Pimp My Ride - ${escapeHtml(item.nom)}</h3>
         <button class="pimp-close" onclick="closePimpModal()">×</button>
       </div>
       <div class="pimp-modal-body">
         <div class="pimp-vehicle-info">
           <div class="pimp-vehicle-name">${escapeHtml(item.nom)}</div>
-          <div class="pimp-vehicle-type">${getVehicleCategoryLabel(item._catKey)} — ${getVehicleCategoryIcon(item._catKey)}</div>
+          <div class="pimp-vehicle-type">${getVehicleCategoryLabel(item._catKey)} -${getVehicleCategoryIcon(item._catKey)}</div>
         </div>`;
 
   // Barre de cout
@@ -7209,7 +7209,7 @@ function toggleArmeAmelioration(armeId, amelioIdx) {
     Ce projet est un outil de fan <strong>non officiel</strong>, sans affiliation.
   </p>
   <p style="margin: 0.5rem 0 0 0; font-size: 0.65rem; opacity: 0.6;">
-    © 2026 — Projet communautaire francophone Shadowrun Anarchy
+    © 2026 -Projet communautaire francophone Shadowrun Anarchy
   </p>
 </footer>
 </html>

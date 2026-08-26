@@ -41929,7 +41929,7 @@
           '" readonly>' +
           '<span class="fiche-type">' +
           escapeHtml(creature.categorie || "PNJ") +
-          (creature.metatype ? " — " + escapeHtml(creature.metatype) : "") +
+          (creature.metatype ? " - " + escapeHtml(creature.metatype) : "") +
           (isCustom ? " [CUSTOM]" : "") +
           "</span>" +
           "</div>";
@@ -42689,7 +42689,7 @@
             "</div>" +
             '<div class="creature-meta">' +
             (c.categorie ? escapeHtml(c.categorie) : "PNJ") +
-            (c.metatype ? " — " + escapeHtml(c.metatype) : "") +
+            (c.metatype ? " - " + escapeHtml(c.metatype) : "") +
             "</div>";
           item.addEventListener("click", function () {
             if (
@@ -43095,7 +43095,7 @@
             'Pool : ' + data.attrName + ' ' + data.attrVal + ' + ' + escapeHtml(data.skill) + ' ' + data.indice +
             (mod ? (mod > 0 ? ' + ' + mod + ' mod' : ' ' + mod + ' mod') : '') +
             ' = ' + pool + ' dés (' + normalDice + ' normal' + (normalDice > 1 ? 'x' : '') + (actualRisk ? ' + ' + actualRisk + ' risque' : '') + ')' +
-            (data.rr ? ' — RR ' + data.rr : '') +
+            (data.rr ? ' - RR ' + data.rr : '') +
           '</div>' +
           '<div class="chatdice-dice-box">' + diceHtml + '</div>' +
           '<div class="chatdice-summary ' + summaryClass + '">' + summaryText + '</div>' +
@@ -43361,7 +43361,7 @@
     Ce projet est un outil de fan <strong>non officiel</strong>, sans affiliation.
   </p>
   <p style="margin: 0.5rem 0 0 0; font-size: 0.65rem; opacity: 0.6;">
-    © 2026 — Projet communautaire francophone Shadowrun Anarchy
+    © 2026 - Projet communautaire francophone Shadowrun Anarchy
   </p>
 </footer>
 </html>

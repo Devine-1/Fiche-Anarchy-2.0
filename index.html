@@ -2470,7 +2470,7 @@ window.rollDiceFromModal = function() {
   if (actualRisk > 0) {
     var riskNote = actualRisk + ' dé' + (actualRisk > 1 ? 's' : '') + ' de risque';
     if (rr > 0) riskNote += ', RR ' + rr;
-    noteText = (noteText ? noteText + ' — ' : '') + riskNote;
+    noteText = (noteText ? noteText + ' -' : '') + riskNote;
   }
 
   var now = new Date();
@@ -2480,7 +2480,7 @@ window.rollDiceFromModal = function() {
   msg.className = 'chatdice-msg';
   msg.innerHTML =
     '<div class="chatdice-msg-header">' +
-      '<span>' + escapeHtml(data.creature) + ' — ' + escapeHtml(data.skill) + '</span>' +
+      '<span>' + escapeHtml(data.creature) + ' -' + escapeHtml(data.skill) + '</span>' +
       '<span class="chatdice-msg-time">' + timeStr + '</span>' +
     '</div>' +
     '<div class="chatdice-dice-box">' + diceHtml + '</div>' +
