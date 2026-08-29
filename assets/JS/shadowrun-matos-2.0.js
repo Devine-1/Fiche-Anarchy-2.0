@@ -1,5 +1,5 @@
 // shadowrun-gear.js
-// Données Shadowrun Anarchy — ÉQUIPEMENT, CYBERWARE, BIOWARE, VÉHICULES, DRONES, SORTS, ETC.
+// Données Shadowrun Anarchy -ÉQUIPEMENT, CYBERWARE, BIOWARE, VÉHICULES, DRONES, SORTS, ETC.
 // Généré automatiquement depuis Atout.csv
 // Sections: Traits, Cyberware, Bioware, Cephaloware, Somatoware, Cyberdecks,
 //            Programmes, Constructs, Formes Complexes, Matériel Magique,

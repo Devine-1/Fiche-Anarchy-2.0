@@ -1780,7 +1780,7 @@ body {
   background: var(--white);
   color: var(--black);
 }
-/* Dés de risque — bordure pointillée + fond légèrement teinté */
+/* Dés de risque -bordure pointillée + fond légèrement teinté */
 .die.risk {
   border-style: dashed;
   border-width: 2px;
