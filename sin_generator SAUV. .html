@@ -423,8 +423,10 @@ body {
 #card-photo {
   width: 100%;
   height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   display: none;
-  border-radius: 3px;
 }
 .sin-photo-placeholder {
   width: 100%;
@@ -971,7 +973,7 @@ input[type="file"]::file-selector-button:hover {
     <div class="sin-body">
       <div class="sin-col-left">
         <div class="sin-photo-box" id="photo-container">
-          <canvas id="card-photo" width="100" height="120"></canvas>
+          <div id="card-photo"></div>
           <div class="sin-photo-placeholder" id="photo-placeholder">?</div>
         </div>
         <div class="sin-barcode-wrap">
@@ -1233,31 +1235,6 @@ async function fetchImageAsBase64(url) {
 }
 
 /* ============================================================
-   DRAW IMAGE COVER (canvas)
-   ============================================================ */
-function drawImageCover(canvas, img) {
-  var ctx = canvas.getContext('2d');
-  var w = canvas.width;
-  var h = canvas.height;
-  ctx.clearRect(0, 0, w, h);
-  var imgRatio = img.width / img.height;
-  var boxRatio = w / h;
-  var drawW, drawH, drawX, drawY;
-  if (imgRatio > boxRatio) {
-    drawH = h;
-    drawW = h * imgRatio;
-    drawX = (w - drawW) / 2;
-    drawY = 0;
-  } else {
-    drawW = w;
-    drawH = w / imgRatio;
-    drawX = 0;
-    drawY = (h - drawH) / 2;
-  }
-  ctx.drawImage(img, drawX, drawY, drawW, drawH);
-}
-
-/* ============================================================
    GENERATION
    ============================================================ */
 async function generateSIN() {
@@ -1337,21 +1314,11 @@ async function generateSIN() {
   }
 
   if (srcToUse) {
-    var img = new Image();
-    img.onload = function() {
-      drawImageCover(cardPhoto, img);
-    };
-    img.onerror = function() {
-      cardPhoto.style.display = 'none';
-      placeholder.style.display = 'flex';
-      placeholder.textContent = type === 'fake' ? 'X' : (type === 'corpo' ? 'C' : '?');
-    };
-    img.src = srcToUse;
+    cardPhoto.style.backgroundImage = "url('" + srcToUse.replace(/'/g, "\'") + "')";
     cardPhoto.style.display = 'block';
     placeholder.style.display = 'none';
   } else {
-    var ctx = cardPhoto.getContext('2d');
-    ctx.clearRect(0, 0, cardPhoto.width, cardPhoto.height);
+    cardPhoto.style.backgroundImage = '';
     cardPhoto.style.display = 'none';
     placeholder.style.display = 'flex';
     placeholder.textContent = type === 'fake' ? 'X' : (type === 'corpo' ? 'C' : '?');
@@ -1578,7 +1545,9 @@ function exportPNG() {
   var card = document.getElementById('sin-card');
   if (!card) return;
 
-  setTimeout(function() {
+  // Attendre que l'image soit chargee avant de capturer
+  var cardPhoto = document.getElementById('card-photo');
+  function doCapture() {
     html2canvas(card, {
       backgroundColor: '#0a1f1f',
       scale: 3,
@@ -1595,7 +1564,19 @@ function exportPNG() {
       console.error('Erreur export PNG:', err);
       alert('Erreur lors de l\'export PNG. Verifiez la console.');
     });
-  }, 400);
+  }
+
+  if (cardPhoto && cardPhoto.style.display !== 'none' && cardPhoto.src) {
+    if (cardPhoto.complete && cardPhoto.naturalHeight !== 0) {
+      doCapture();
+    } else {
+      cardPhoto.onload = doCapture;
+      cardPhoto.onerror = doCapture;
+      setTimeout(doCapture, 1500); // fallback
+    }
+  } else {
+    doCapture();
+  }
 }
 
 </script>
