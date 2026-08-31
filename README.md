@@ -1,4 +1,4 @@
-# Shadowrun Anarchy V2 — Outils de Jeu
+# Shadowrun Anarchy V2 - Outils de Jeu
 
 > **Un ensemble d'outils web interactifs pour faciliter les parties de Shadowrun Anarchy V2.**
 
@@ -40,10 +40,10 @@ Aucun ! Ces outils sont des pages web statiques (HTML/CSS/JavaScript). Il suffit
 
 ## Technologies
 
-- **HTML5** — Structure sémantique
-- **CSS3** — Mise en page responsive (mobile & desktop)
-- **JavaScript (Vanilla)** — Logique interactive, pas de framework externe
-- **Aucune base de données** — Toutes les données sont stockées en mémoire (session)
+- **HTML5** - Structure sémantique
+- **CSS3** - Mise en page responsive (mobile & desktop)
+- **JavaScript (Vanilla)** - Logique interactive, pas de framework externe
+- **Aucune base de données** - Toutes les données sont stockées en mémoire (session)
 
 ---
 
