@@ -1233,26 +1233,30 @@ async function fetchImageAsBase64(url) {
 }
 
 /* ============================================================
-   DRAW IMAGE COVER (canvas)
+   DRAW IMAGE COVER (canvas haute résolution)
    ============================================================ */
 function drawImageCover(canvas, img) {
+  // Résolution interne élevée pour éviter la pixelisation à l'export
+  var cssW = 100;
+  var cssH = 120;
+  var scaleFactor = 6;
+  canvas.width = cssW * scaleFactor;
+  canvas.height = cssH * scaleFactor;
   var ctx = canvas.getContext('2d');
-  var w = canvas.width;
-  var h = canvas.height;
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   var imgRatio = img.width / img.height;
-  var boxRatio = w / h;
+  var boxRatio = cssW / cssH;
   var drawW, drawH, drawX, drawY;
   if (imgRatio > boxRatio) {
-    drawH = h;
-    drawW = h * imgRatio;
-    drawX = (w - drawW) / 2;
+    drawH = canvas.height;
+    drawW = canvas.height * imgRatio;
+    drawX = (canvas.width - drawW) / 2;
     drawY = 0;
   } else {
-    drawW = w;
-    drawH = w / imgRatio;
+    drawW = canvas.width;
+    drawH = canvas.width / imgRatio;
     drawX = 0;
-    drawY = (h - drawH) / 2;
+    drawY = (canvas.height - drawH) / 2;
   }
   ctx.drawImage(img, drawX, drawY, drawW, drawH);
 }
