@@ -242,6 +242,11 @@ body {
   border-color: #c7a000;
   color: var(--black);
 }
+.type-btn.active-criminel {
+  background: #ff9800;
+  border-color: #e65100;
+  color: #fff;
+}
 
 /* Licences */
 .license-grid {
@@ -360,6 +365,10 @@ body {
   border-color: #ff5252;
   box-shadow: 0 0 30px rgba(255,82,82,0.15), inset 0 0 40px rgba(0,0,0,0.5);
 }
+#sin-card.criminel-style {
+  border-color: #ff9800;
+  box-shadow: 0 0 30px rgba(255,152,0,0.15), inset 0 0 40px rgba(0,0,0,0.5);
+}
 #fake-overlay {
   display: none;
   position: absolute;
@@ -384,6 +393,10 @@ body {
   background: linear-gradient(90deg, rgba(255,82,82,0.15), rgba(255,82,82,0.05));
   border-bottom-color: rgba(255,82,82,0.3);
 }
+#sin-card.criminel-style .sin-header {
+  background: linear-gradient(90deg, rgba(255,152,0,0.15), rgba(255,152,0,0.05));
+  border-bottom-color: rgba(255,152,0,0.3);
+}
 .sin-header-title {
   color: #00e5ff;
   font-size: 9px;
@@ -392,6 +405,7 @@ body {
 }
 #sin-card.corpo-style .sin-header-title { color: #ffd700; }
 #sin-card.fake-style .sin-header-title { color: #ff8a80; }
+#sin-card.criminel-style .sin-header-title { color: #ff9800; }
 .sin-badge {
   padding: 3px 10px;
   border-radius: 3px;
@@ -420,6 +434,7 @@ body {
 }
 #sin-card.corpo-style .sin-photo-box { border-color: #ffd700; }
 #sin-card.fake-style .sin-photo-box { border-color: #ff5252; }
+#sin-card.criminel-style .sin-photo-box { border-color: #ff9800; }
 #card-photo {
   width: 100%;
   height: 100%;
@@ -555,6 +570,7 @@ body {
 }
 .sin-license-tag.expired { border-color: #ff5252; color: #ff8a80; }
 .sin-license-tag.corpo { border-color: #ffd700; color: #ffe082; }
+.sin-license-tag.criminel { border-color: #ff9800; color: #ffcc80; }
 
 /* Biometrics */
 .sin-biometrics { padding: 0 14px 10px; }
@@ -651,6 +667,10 @@ body {
   background: rgba(255,82,82,0.05);
   border-top-color: rgba(255,82,82,0.2);
 }
+#sin-card.criminel-style .sin-footer {
+  background: rgba(255,152,0,0.05);
+  border-top-color: rgba(255,152,0,0.2);
+}
 .sin-footer-version { color: #006064; font-size: 7px; letter-spacing: 1px; }
 .sin-footer-validity { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
 
@@ -696,6 +716,9 @@ body {
   #sin-card.fake-style {
     box-shadow: 0 0 30px rgba(255,82,82,0.15), inset 0 0 40px rgba(0,0,0,0.5) !important;
   }
+  #sin-card.criminel-style {
+    box-shadow: 0 0 30px rgba(255,152,0,0.15), inset 0 0 40px rgba(0,0,0,0.5) !important;
+  }
   .sin-body { padding: 10px; gap: 10px; }
   .sin-biometrics { padding: 0 10px 8px; }
   .sin-fingerprints { gap: 4px; }
@@ -710,6 +733,9 @@ body {
   #sin-card.fake-style .sin-header {
     background: linear-gradient(90deg, rgba(255,82,82,0.15), rgba(255,82,82,0.05)) !important;
   }
+  #sin-card.criminel-style .sin-header {
+    background: linear-gradient(90deg, rgba(255,152,0,0.15), rgba(255,152,0,0.05)) !important;
+  }
   .sin-footer {
     background: rgba(0,188,212,0.05) !important;
   }
@@ -718,6 +744,9 @@ body {
   }
   #sin-card.fake-style .sin-footer {
     background: rgba(255,82,82,0.05) !important;
+  }
+  #sin-card.criminel-style .sin-footer {
+    background: rgba(255,152,0,0.05) !important;
   }
   .sin-photo-box {
     background: #0a1a1a !important;
@@ -814,6 +843,7 @@ input[type="file"]::file-selector-button:hover {
           <button id="btn-real" class="type-btn active-real" onclick="setSinType('real')">Vrai SIN</button>
           <button id="btn-fake" class="type-btn" onclick="setSinType('fake')">Faux SIN</button>
           <button id="btn-corpo" class="type-btn" onclick="setSinType('corpo')">Corpo SIN</button>
+          <button id="btn-criminel" class="type-btn" onclick="setSinType('criminel')">Criminel</button>
         </div>
         <input type="hidden" id="sin-type" value="real">
       </div>
@@ -937,6 +967,61 @@ input[type="file"]::file-selector-button:hover {
         </div>
       </div>
 
+      <div class="form-group full-width" id="form-crimes-group" style="display:none;">
+        <label>Antecedents criminels</label>
+        <div class="license-grid" id="crime-selector">
+          <label class="license-item">
+            <input type="checkbox" value="Vol" class="crime-check"> Vol
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Fraude" class="crime-check"> Fraude
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Aggression" class="crime-check"> Aggression
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Cambriolage" class="crime-check"> Cambriolage
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Trafic de drogue" class="crime-check"> Trafic de drogue
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Piratage informatique" class="crime-check"> Piratage informatique
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Meurtre" class="crime-check"> Meurtre
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Kidnapping" class="crime-check"> Kidnapping
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Extorsion" class="crime-check"> Extorsion
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Contrefacon" class="crime-check"> Contrefacon
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Infraction routiere" class="crime-check"> Infraction routiere
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Resistance a l'arrestation" class="crime-check"> Resistance a l'arrestation
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Evasion" class="crime-check"> Evasion
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Terrorisme" class="crime-check"> Terrorisme
+          </label>
+          <label class="license-item">
+            <input type="checkbox" value="Trahison d'etat" class="crime-check"> Trahison d'etat
+          </label>
+        </div>
+        <div class="license-custom-row">
+          <input type="text" id="custom-crime" placeholder="Ajouter un crime personnalise...">
+          <button class="btn-add" onclick="addCustomCrime()">+</button>
+        </div>
+      </div>
+
     </div>
 
     <div class="generate-row">
@@ -1035,6 +1120,10 @@ input[type="file"]::file-selector-button:hover {
         <div>
           <div class="sin-licenses-title">Permis &amp; Licences</div>
           <div class="sin-licenses-list" id="licenses-list"></div>
+        </div>
+        <div id="crimes-section" style="display:none; margin-top:8px;">
+          <div class="sin-licenses-title">Antecedents Criminels</div>
+          <div class="sin-licenses-list" id="crimes-list"></div>
         </div>
       </div>
     </div>
@@ -1151,6 +1240,36 @@ document.getElementById('custom-license').addEventListener('keypress', function(
 });
 
 /* ============================================================
+   CRIME PERSONNALISE
+   ============================================================ */
+function addCustomCrime() {
+  var input = document.getElementById('custom-crime');
+  var val = input.value.trim();
+  if (!val) return;
+  var container = document.getElementById('crime-selector');
+  var label = document.createElement('label');
+  label.className = 'license-item checked';
+  label.innerHTML = '<input type="checkbox" value="' + val.replace(/"/g, '&quot;') + '" class="crime-check" checked> ' + val;
+  container.appendChild(label);
+  label.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'INPUT') return;
+    label.classList.toggle('checked', e.target.checked);
+  });
+  input.value = '';
+}
+
+document.querySelectorAll('#crime-selector .license-item').forEach(function(item) {
+  item.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'INPUT') return;
+    item.classList.toggle('checked', e.target.checked);
+  });
+});
+
+document.getElementById('custom-crime').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') addCustomCrime();
+});
+
+/* ============================================================
    TYPE DE SIN
    ============================================================ */
 function setSinType(type) {
@@ -1159,14 +1278,17 @@ function setSinType(type) {
   var btns = {
     real: document.getElementById('btn-real'),
     fake: document.getElementById('btn-fake'),
-    corpo: document.getElementById('btn-corpo')
+    corpo: document.getElementById('btn-corpo'),
+    criminel: document.getElementById('btn-criminel')
   };
   btns.real.className = 'type-btn';
   btns.fake.className = 'type-btn';
   btns.corpo.className = 'type-btn';
+  btns.criminel.className = 'type-btn';
   if (type === 'real') btns.real.className = 'type-btn active-real';
   else if (type === 'fake') btns.fake.className = 'type-btn active-fake';
-  else btns.corpo.className = 'type-btn active-corpo';
+  else if (type === 'corpo') btns.corpo.className = 'type-btn active-corpo';
+  else btns.criminel.className = 'type-btn active-criminel';
 
   var label = document.getElementById('label-country');
   var input = document.getElementById('country');
@@ -1176,6 +1298,12 @@ function setSinType(type) {
   } else {
     label.textContent = 'Pays';
     input.placeholder = 'Tapez ou choisissez...';
+  }
+
+  // Afficher/masquer la section antecedents criminels
+  var crimesGroup = document.getElementById('form-crimes-group');
+  if (crimesGroup) {
+    crimesGroup.style.display = (type === 'criminel') ? 'block' : 'none';
   }
 }
 
@@ -1311,9 +1439,10 @@ async function generateSIN() {
   card.className = '';
   if (type === 'corpo') card.classList.add('corpo-style');
   else if (type === 'fake') card.classList.add('fake-style');
+  else if (type === 'criminel') card.classList.add('criminel-style');
 
   document.getElementById('card-fullname').textContent = lastName.toUpperCase() + ' ' + firstName;
-  document.getElementById('card-country').textContent = country || 'Non specifie';
+  document.getElementById('card-country').textContent = (country || 'Non specifie') + (type === 'criminel' ? ' (Criminel)' : '');
   document.getElementById('card-metatype').textContent = metatype || 'Non specifie';
   document.getElementById('card-sex').textContent = sex || 'Non specifie';
   document.getElementById('card-birth').textContent = birthYear + '-' + String(birthMonth).padStart(2,'0') + '-' + String(birthDay).padStart(2,'0');
@@ -1348,7 +1477,7 @@ async function generateSIN() {
     img.onerror = function() {
       cardPhoto.style.display = 'none';
       placeholder.style.display = 'flex';
-      placeholder.textContent = type === 'fake' ? 'X' : (type === 'corpo' ? 'C' : '?');
+      placeholder.textContent = type === 'fake' ? 'X' : (type === 'corpo' ? 'C' : (type === 'criminel' ? '!' : '?'));
     };
     img.src = srcToUse;
     cardPhoto.style.display = 'block';
@@ -1358,7 +1487,7 @@ async function generateSIN() {
     ctx.clearRect(0, 0, cardPhoto.width, cardPhoto.height);
     cardPhoto.style.display = 'none';
     placeholder.style.display = 'flex';
-    placeholder.textContent = type === 'fake' ? 'X' : (type === 'corpo' ? 'C' : '?');
+    placeholder.textContent = type === 'fake' ? 'X' : (type === 'corpo' ? 'C' : (type === 'criminel' ? '!' : '?'));
   }
 
   var badge = document.getElementById('sin-badge');
@@ -1380,6 +1509,13 @@ async function generateSIN() {
     overlay.style.display = 'none';
     validity.textContent = 'ACCES NIVEAU CORPO';
     validity.style.color = '#ffd700';
+  } else if (type === 'criminel') {
+    badge.textContent = 'CRIMINEL';
+    badge.style.background = '#ff9800';
+    badge.style.color = '#000';
+    overlay.style.display = 'none';
+    validity.textContent = 'VALIDITE : RESTREINTE';
+    validity.style.color = '#ff9800';
   } else {
     badge.textContent = 'VERIFIE';
     badge.style.background = '#00bcd4';
@@ -1397,7 +1533,7 @@ async function generateSIN() {
   document.getElementById('card-residence').textContent = country || 'Non specifie';
 
   var labelResidence = document.getElementById('label-residence');
-  labelResidence.textContent = type === 'corpo' ? 'Employeur' : 'Residence';
+  labelResidence.textContent = type === 'corpo' ? 'Employeur' : (type === 'criminel' ? 'Domicile surveille' : 'Residence');
 
   var licensesContainer = document.getElementById('licenses-list');
   licensesContainer.innerHTML = '';
@@ -1414,9 +1550,37 @@ async function generateSIN() {
       div.className = 'sin-license-tag';
       if (isExpired) div.classList.add('expired');
       if (type === 'corpo') div.classList.add('corpo');
+      if (type === 'criminel') div.classList.add('criminel');
       div.textContent = isExpired ? lic + ' [EXPIRE]' : lic;
       licensesContainer.appendChild(div);
     });
+  }
+
+  // Antecedents criminels
+  var crimesContainer = document.getElementById('crimes-list');
+  var crimesSection = document.getElementById('crimes-section');
+  crimesContainer.innerHTML = '';
+  if (type === 'criminel') {
+    crimesSection.style.display = 'block';
+    var checkedCrimes = [];
+    document.querySelectorAll('.crime-check:checked').forEach(function(cb) {
+      checkedCrimes.push(cb.value);
+    });
+    if (checkedCrimes.length === 0) {
+      var div = document.createElement('div');
+      div.style.cssText = 'color:#006064; font-size:9px; font-style:italic;';
+      div.textContent = 'Aucun antecedent declare';
+      crimesContainer.appendChild(div);
+    } else {
+      checkedCrimes.forEach(function(crime) {
+        var div = document.createElement('div');
+        div.className = 'sin-license-tag criminel';
+        div.textContent = crime;
+        crimesContainer.appendChild(div);
+      });
+    }
+  } else {
+    crimesSection.style.display = 'none';
   }
 
   document.getElementById('card-height').textContent = height + ' cm';
@@ -1433,6 +1597,9 @@ async function generateSIN() {
   } else if (type === 'corpo') {
     dnaStatus.textContent = 'BIOMETRIE CORPO ENREGISTREE';
     dnaStatus.style.color = '#ffd700';
+  } else if (type === 'criminel') {
+    dnaStatus.textContent = 'BIOMETRIE ENREGISTREE [CRIMINEL]';
+    dnaStatus.style.color = '#ff9800';
   } else {
     dnaStatus.textContent = 'MATCH BIOMETRIQUE CONFIRME';
     dnaStatus.style.color = '#00e5ff';
@@ -1456,7 +1623,7 @@ function drawBarcode(text, type) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   var x = 8;
   var seed = type === 'fake' ? 0.4 : 0.5;
-  var color = type === 'corpo' ? '#ffd700' : '#00e5ff';
+  var color = type === 'corpo' ? '#ffd700' : (type === 'criminel' ? '#ff9800' : '#00e5ff');
   for (var i = 0; i < text.length * 6; i++) {
     var w = Math.random() > seed ? 3 : 1;
     if (Math.random() > 0.3) {
@@ -1503,6 +1670,8 @@ function drawDNA(type) {
         var baseColor;
         if (type === 'corpo') {
           baseColor = 'rgba(255,' + (180 + Math.floor(Math.random()*75)) + ',0,' + intensity + ')';
+        } else if (type === 'criminel') {
+          baseColor = 'rgba(255,' + (100 + Math.floor(Math.random()*80)) + ',0,' + intensity + ')';
         } else {
           baseColor = 'rgba(0,' + (180 + Math.floor(Math.random()*75)) + ',' + (220 + Math.floor(Math.random()*35)) + ',' + intensity + ')';
         }
@@ -1526,7 +1695,7 @@ function drawDNA(type) {
     ctx.lineTo(lane * laneWidth, H);
     ctx.stroke();
   }
-  var suffix = type === 'fake' ? ' [ANOMALIES]' : (type === 'corpo' ? ' [CORPO]' : ' [STABLE]');
+  var suffix = type === 'fake' ? ' [ANOMALIES]' : (type === 'corpo' ? ' [CORPO]' : (type === 'criminel' ? ' [CRIMINEL]' : ' [STABLE]'));
   document.getElementById('dna-sequence').textContent = 'SEQ: ' + sequence.join('') + suffix;
 }
 
@@ -1546,7 +1715,7 @@ function drawFingerprints(type) {
     var ctx = canvas.getContext('2d');
     var cx = 18;
     var cy = 22;
-    var lineColor = type === 'fake' && Math.random() > 0.75 ? 'rgba(255,100,100,0.5)' : (type === 'corpo' ? 'rgba(255,200,0,0.4)' : 'rgba(0,200,255,0.4)');
+    var lineColor = type === 'fake' && Math.random() > 0.75 ? 'rgba(255,100,100,0.5)' : (type === 'corpo' ? 'rgba(255,200,0,0.4)' : (type === 'criminel' ? 'rgba(255,150,0,0.4)' : 'rgba(0,200,255,0.4)'));
     ctx.strokeStyle = lineColor;
     ctx.lineWidth = 0.6;
     for (var r = 5; r < 16; r += 2 + Math.random() * 2) {
@@ -1564,7 +1733,7 @@ function drawFingerprints(type) {
     for (var i = 0; i < 4; i++) {
       var mx = cx + (Math.random() - 0.5) * 20;
       var my = cy + (Math.random() - 0.5) * 28;
-      ctx.fillStyle = type === 'fake' && Math.random() > 0.7 ? '#ff5252' : (type === 'corpo' ? '#ffd700' : '#00bcd4');
+      ctx.fillStyle = type === 'fake' && Math.random() > 0.7 ? '#ff5252' : (type === 'corpo' ? '#ffd700' : (type === 'criminel' ? '#ff9800' : '#00bcd4'));
       ctx.beginPath();
       ctx.arc(mx, my, 0.8, 0, Math.PI * 2);
       ctx.fill();
