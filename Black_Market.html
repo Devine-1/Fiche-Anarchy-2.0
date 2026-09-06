@@ -908,89 +908,88 @@
             '<div class="bm-empty">Erreur : shadowrun-matos-2.0.js non chargé</div>';
         } else {
           var nextId = 0;
-
           for (var mainCat in CATEGORY_MAP) {
-            if (!CATEGORY_MAP.hasOwnProperty(mainCat)) continue;
-            var cfg = CATEGORY_MAP[mainCat];
-            dynamicSubcats[mainCat] = new Set();
+          if (!CATEGORY_MAP.hasOwnProperty(mainCat)) continue;
+          var cfg = CATEGORY_MAP[mainCat];
+          dynamicSubcats[mainCat] = new Set();
 
-            // Données hardcodées (armures)
-            if (cfg.hardcoded) {
-              cfg.hardcoded.forEach(function (raw) {
-                allItems.push({
-                  id: nextId++,
-                  mainCat: mainCat,
-                  subCat: "Armures",
-                  nom: raw.nom,
-                  prix: raw.prix,
-                  prixNum: parseYen(raw.prix),
-                  desc: raw.desc,
-                  prerequis: "",
-                  essence: "",
-                  type: "",
-                  seuil: "",
-                  score: raw.score,
-                });
-                dynamicSubcats[mainCat].add("Armures");
+          // Données hardcodées (armures)
+          if (cfg.hardcoded) {
+            cfg.hardcoded.forEach(function (raw) {
+              allItems.push({
+                id: nextId++,
+                mainCat: mainCat,
+                subCat: "Armures",
+                nom: raw.nom,
+                prix: raw.prix,
+                prixNum: parseYen(raw.prix),
+                desc: raw.desc,
+                prerequis: "",
+                essence: "",
+                type: "",
+                seuil: "",
+                score: raw.score,
               });
-              continue;
-            }
+              dynamicSubcats[mainCat].add("Armures");
+            });
+            continue;
+          }
 
-            // Données du fichier JS
-            (cfg.sections || []).forEach(function (secKey) {
-              var sec = SHADOWRUN_GEAR[secKey];
-              if (!sec || !sec.donnees) return;
+          // Données du fichier JS
+          cfg.sections.forEach(function (secKey) {
+            var sec = SHADOWRUN_GEAR[secKey];
+            if (!sec || !sec.donnees) return;
 
-              sec.donnees.forEach(function (raw) {
-                var yenStr = raw.COUT_Yen || raw["COUT_Yen"] || "";
-                if (!yenStr.toString().trim()) return;
+            sec.donnees.forEach(function (raw) {
+              var yenStr = raw.COUT_Yen || raw["COUT_Yen"] || "";
+              if (!yenStr.toString().trim()) return;
 
-                var subCat = null;
-                if (cfg.dynamicSubcatField && raw[cfg.dynamicSubcatField]) {
-                  subCat = raw[cfg.dynamicSubcatField];
-                } else if (cfg.filterByField && raw[cfg.filterByField]) {
-                  subCat = raw[cfg.filterByField];
-                } else if (cfg.subcats) {
-                  for (var sc in cfg.subcats) {
-                    if (cfg.subcats[sc].indexOf(secKey) !== -1) {
-                      subCat = sc;
-                      break;
-                    }
+              var subCat = null;
+              if (cfg.dynamicSubcatField && raw[cfg.dynamicSubcatField]) {
+                subCat = raw[cfg.dynamicSubcatField];
+              } else if (cfg.filterByField && raw[cfg.filterByField]) {
+                subCat = raw[cfg.filterByField];
+              } else if (cfg.subcats) {
+                for (var sc in cfg.subcats) {
+                  if (cfg.subcats[sc].indexOf(secKey) !== -1) {
+                    subCat = sc;
+                    break;
                   }
                 }
+              }
 
-                if (!subCat) subCat = sec.nom || secKey;
+              if (!subCat) subCat = sec.nom || secKey;
 
-                var subCatNorm = norm(subCat);
-                if (
-                  subCatNorm === "munitions" ||
-                  subCatNorm === "accessoires" ||
-                  subCatNorm === "munition" ||
-                  subCatNorm === "accessoire"
-                )
-                  return;
+              var subCatNorm = norm(subCat);
+              if (
+                subCatNorm === "munitions" ||
+                subCatNorm === "accessoires" ||
+                subCatNorm === "munition" ||
+                subCatNorm === "accessoire"
+              )
+                return;
 
-                dynamicSubcats[mainCat].add(subCat);
+              dynamicSubcats[mainCat].add(subCat);
 
-                var item = {
-                  id: nextId++,
-                  mainCat: mainCat,
-                  subCat: subCat,
-                  sectionKey: secKey,
-                  nom: raw.Atout || raw.Nom || "Sans nom",
-                  prix: yenStr.toString().trim(),
-                  prixNum: parseYen(yenStr),
-                  desc: raw.EFFETS || raw.Description || "",
-                  prerequis: raw.Pré_requis || raw["Pré-requis"] || "",
-                  essence: raw.Perte_essence || "",
-                  type: raw.Type || "",
-                  seuil: raw.Seuil || "",
-                };
+              var item = {
+                id: nextId++,
+                mainCat: mainCat,
+                subCat: subCat,
+                sectionKey: secKey,
+                nom: raw.Atout || raw.Nom || "Sans nom",
+                prix: yenStr.toString().trim(),
+                prixNum: parseYen(yenStr),
+                desc: raw.EFFETS || raw.Description || "",
+                prerequis: raw.Pré_requis || raw["Pré-requis"] || "",
+                essence: raw.Perte_essence || "",
+                type: raw.Type || "",
+                seuil: raw.Seuil || "",
+              };
 
-                allItems.push(item);
-              });
+              allItems.push(item);
             });
-          }
+          });
+        }
 
           // Trier par prix décroissant
           allItems.sort(function (a, b) {
