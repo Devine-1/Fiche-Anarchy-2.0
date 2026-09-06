@@ -759,1153 +759,799 @@
           
         ];
 
-        // ===== MAPPING DES BOUTIQUES =====
-        var CATEGORY_MAP = {
-          "Faire un tour chez le charcudoc": {
-            sections: [
-              "2_cephaloware",
-              "3_cyberyeux",
-              "4_cyberoreilles",
-              "5_somatoware",
-              "6_bioware",
-            ],
-            subcats: {
-              Cyberware: [
-                "2_cephaloware",
-                "3_cyberyeux",
-                "4_cyberoreilles",
-                "5_somatoware",
-              ],
-              "Bioware": ["6_bioware"],
-            },
-          },
-          "Matos de decker": {
-            sections: ["7_cyberdek", "10_programmes_illegaux", "31_ccr"],
-            subcats: {
-              "Cyberdecks": ["7_cyberdek"],
-              "Programmes": ["10_programmes_illegaux"],
-              "CCR": ["31_ccr"],
-            },
-          },
-          Matos: {
-            sections: ["8_equipement"],
-            filterByField: "Catégorie",
-          },
-          Cracheur: {
-            sections: ["33_arme", "34_améliorationarme"],
-            subcats: {}, // dynamique selon le champ Catégorie
-            dynamicSubcatField: "Catégorie",
-          },
-          "Les fringues": {
-            hardcoded: ARMURE_DATA,
-            subcats: { Armures: true },
-          },
-          Véhicules: {
-            sections: ["22_deux_roues", "23_voitures", "24_vehicules_divers"],
-            subcats: {
-              "Deux roues": ["22_deux_roues"],
-              "Voitures": ["23_voitures"],
-              "Véhicules divers": ["24_vehicules_divers"],
-            },
-          },
-          Drones: {
-            sections: [
-              "25_microdrones",
-              "26_minidrones",
-              "27_petits_drones",
-              "28_drones_moyens",
-              "29_grands_drones",
-              "30_drones_anthropomorphes",
-            ],
-            subcats: {
-              "Microdrones": ["25_microdrones"],
-              "Minidrones": ["26_minidrones"],
-              "Petits drones": ["27_petits_drones"],
-              "Drones moyens": ["28_drones_moyens"],
-              "Grands drones": ["29_grands_drones"],
-              "Drones anthropomorphes": ["30_drones_anthropomorphes"],
-            },
-          },
-          Formation: {
-            sections: ["1_traits"],
-            subcats: { Traits: ["1_traits"] },
-          },
-          Technomancien: {
-            sections: ["11_constructs", "12_formes_complexes"],
-            subcats: {
-              Constructs: ["11_constructs"],
-              "Formes complexes": ["12_formes_complexes"],
-            },
-          },
-          "Loge des arcanes": {
-            sections: [
-              "16_idoles",
-              "17_sorts_combat",
-              "18_sorts_detection",
-              "19_sorts_sante",
-              "20_sorts_illusion",
-              "21_sorts_manipulation",
-              "14_pouvoirs_adepte",
-              "15_voies_adepte",
-              "13_materiel_magique",
-            ],
-            subcats: {
-              "Idoles": ["16_idoles"],
-              "Sorts de combat": ["17_sorts_combat"],
-              "Sorts de détection": ["18_sorts_detection"],
-              "Sorts de santé": ["19_sorts_sante"],
-              "Sorts d'illusion": ["20_sorts_illusion"],
-              "Sorts de manipulation": ["21_sorts_manipulation"],
-              "Pouvoirs d'adepte": ["14_pouvoirs_adepte"],
-              "Voies d'adepte": ["15_voies_adepte"],
-              "Matériel magique": ["13_materiel_magique"],
-            },
-          },
-        };
-        // Affichage des Nuyen transmis depuis la fiche
-        var urlParams = new URLSearchParams(window.location.search);
-        var nuyenParam = urlParams.get("nuyen");
-        if (nuyenParam) {
-          var nuyenDisplay = document.getElementById("bm-nuyen-display");
-          if (nuyenDisplay) {
-            var formatted =
-              parseInt(nuyenParam, 10).toLocaleString("fr-FR") + " ¥";
-            nuyenDisplay.textContent = formatted;
-            nuyenDisplay.style.display = "inline";
-          }
-        }
-        // ===== HELPERS =====
-        function norm(str) {
-          if (!str) return "";
-          return str
-            .toString()
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u030f]/g, "");
-        }
-        function esc(text) {
-          if (!text) return "";
-          var d = document.createElement("div");
-          d.textContent = text;
-          return d.innerHTML;
-        }
-        function parseYen(yenStr) {
-          if (!yenStr) return null;
-          var s = String(yenStr);
-          var sign = s.indexOf("-") !== -1 ? -1 : 1;
-          var n = parseInt(s.replace(/[^0-9]/g, ""), 10);
-          return isNaN(n) ? null : n * sign;
-        }
-
-        // ===== EXTRACTION =====
-        var allItems = [];
-        var dynamicSubcats = {}; // mainCat -> Set de sous-catégories découvertes
-
-        if (typeof SHADOWRUN_GEAR === "undefined") {
-          document.getElementById("bm-content").innerHTML =
-            '<div class="bm-empty">Erreur : shadowrun-matos-2.0.js non chargé</div>';
-          return;
-        
-
-        var nextId = 0;
-
-        for (var mainCat in CATEGORY_MAP) {
-        if (!CATEGORY_MAP.hasOwnProperty(mainCat)) continue;
-        var cfg = CATEGORY_MAP[mainCat];
-        dynamicSubcats[mainCat] = new Set();
-
-        // Données hardcodées (armures)
-        if (cfg.hardcoded) {
-          cfg.hardcoded.forEach(function (raw) {
-            allItems.push({
-              id: nextId++,
-              mainCat: mainCat,
-              subCat: "Armures",
-              nom: raw.nom,
-              prix: raw.prix,
-              prixNum: parseYen(raw.prix),
-              desc: raw.desc,
-              prerequis: "",
-              essence: "",
-              type: "",
-              seuil: "",
-              score: raw.score,
-            });
-            dynamicSubcats[mainCat].add("Armures");
-          });
-          continue;
-        }
-
-        // Données du fichier JS
-        cfg.sections.forEach(function (secKey) {
-          var sec = SHADOWRUN_GEAR[secKey];
-          if (!sec || !sec.donnees) return;
-
-          sec.donnees.forEach(function (raw) {
-            var yenStr = raw.COUT_Yen || raw["COUT_Yen"] || "";
-            if (!yenStr.toString().trim()) return;
-
-            var subCat = null;
-            if (cfg.dynamicSubcatField && raw[cfg.dynamicSubcatField]) {
-              subCat = raw[cfg.dynamicSubcatField];
-            } else if (cfg.filterByField && raw[cfg.filterByField]) {
-              subCat = raw[cfg.filterByField];
-            } else if (cfg.subcats) {
-              for (var sc in cfg.subcats) {
-                if (cfg.subcats[sc].indexOf(secKey) !== -1) {
-                  subCat = sc;
-                  break;
-                }
-              }
-            }
-
-            if (!subCat) subCat = sec.nom || secKey;
-
-            var subCatNorm = norm(subCat);
-            if (
-              subCatNorm === "munitions" ||
-              subCatNorm === "accessoires" ||
-              subCatNorm === "munition" ||
-              subCatNorm === "accessoire"
-            )
-              return;
-
-            dynamicSubcats[mainCat].add(subCat);
-
-            var item = {
-              id: nextId++,
-              mainCat: mainCat,
-              subCat: subCat,
-              sectionKey: secKey,
-              nom: raw.Atout || raw.Nom || "Sans nom",
-              prix: yenStr.toString().trim(),
-              prixNum: parseYen(yenStr),
-              desc: raw.EFFETS || raw.Description || "",
-              prerequis: raw.Pré_requis || raw["Pré-requis"] || "",
-              essence: raw.Perte_essence || "",
-              type: raw.Type || "",
-              seuil: raw.Seuil || "",
-            };
-
-            allItems.push(item);
-          });
-        });
-      }
-
-
-        // Trier par prix décroissant
-        allItems.sort(function (a, b) {
-          return (b.prixNum || 0) - (a.prixNum || 0);
-        });
-
-        // ===== UI =====
-        var searchInput = document.getElementById("bm-search");
-        var mainSelect = document.getElementById("bm-maincat");
-        var subcatsDiv = document.getElementById("bm-subcats");
-        var contentDiv = document.getElementById("bm-content");
-        var countLabel = document.getElementById("bm-count");
-        var activeSubcat = "";
-
-        Object.keys(CATEGORY_MAP).forEach(function (cat) {
-          var opt = document.createElement("option");
-          opt.value = cat;
-          opt.textContent = cat;
-          mainSelect.appendChild(opt);
-        });
-
-        // ===== PIMP MY RIDE =====
-        var PIMP_ELIGIBLE_SECTIONS = [
-          "22_deux_roues",
-          "23_voitures",
-          "24_vehicules_divers",
+    // ===== MAPPING DES BOUTIQUES =====
+    var CATEGORY_MAP = {
+      "Faire un tour chez le charcudoc": {
+        sections: [
+          "2_cephaloware",
+          "3_cyberyeux",
+          "4_cyberoreilles",
+          "5_somatoware",
+          "6_bioware",
+        ],
+        subcats: {
+          Cyberware: [
+            "2_cephaloware",
+            "3_cyberyeux",
+            "4_cyberoreilles",
+            "5_somatoware",
+          ],
+          Bioware: ["6_bioware"],
+        },
+      },
+      "Matos de decker": {
+        sections: ["7_cyberdek", "10_programmes_illegaux", "31_ccr"],
+        subcats: {
+          Cyberdecks: ["7_cyberdek"],
+          Programmes: ["10_programmes_illegaux"],
+          CCR: ["31_ccr"],
+        },
+      },
+      Matos: {
+        sections: ["8_equipement"],
+        filterByField: "Catégorie",
+      },
+      Cracheur: {
+        sections: ["33_arme", "34_améliorationarme"],
+        subcats: {},
+        dynamicSubcatField: "Catégorie",
+      },
+      "Les fringues": {
+        hardcoded: ARMURE_DATA,
+        subcats: { Armures: true },
+      },
+      Véhicules: {
+        sections: ["22_deux_roues", "23_voitures", "24_vehicules_divers"],
+        subcats: {
+          "Deux roues": ["22_deux_roues"],
+          Voitures: ["23_voitures"],
+          "Véhicules divers": ["24_vehicules_divers"],
+        },
+      },
+      Drones: {
+        sections: [
           "25_microdrones",
           "26_minidrones",
           "27_petits_drones",
           "28_drones_moyens",
           "29_grands_drones",
           "30_drones_anthropomorphes",
-        ];
+        ],
+        subcats: {
+          Microdrones: ["25_microdrones"],
+          Minidrones: ["26_minidrones"],
+          "Petits drones": ["27_petits_drones"],
+          "Drones moyens": ["28_drones_moyens"],
+          "Grands drones": ["29_grands_drones"],
+          "Drones anthropomorphes": ["30_drones_anthropomorphes"],
+        },
+      },
+      Formation: {
+        sections: ["1_traits"],
+        subcats: { Traits: ["1_traits"] },
+      },
+      Technomancien: {
+        sections: ["11_constructs", "12_formes_complexes"],
+        subcats: {
+          Constructs: ["11_constructs"],
+          "Formes complexes": ["12_formes_complexes"],
+        },
+      },
+      "Loge des arcanes": {
+        sections: [
+          "16_idoles",
+          "17_sorts_combat",
+          "18_sorts_detection",
+          "19_sorts_sante",
+          "20_sorts_illusion",
+          "21_sorts_manipulation",
+          "14_pouvoirs_adepte",
+          "15_voies_adepte",
+          "13_materiel_magique",
+        ],
+        subcats: {
+          Idoles: ["16_idoles"],
+          "Sorts de combat": ["17_sorts_combat"],
+          "Sorts de détection": ["18_sorts_detection"],
+          "Sorts de santé": ["19_sorts_sante"],
+          "Sorts d'illusion": ["20_sorts_illusion"],
+          "Sorts de manipulation": ["21_sorts_manipulation"],
+          "Pouvoirs d'adepte": ["14_pouvoirs_adepte"],
+          "Voies d'adepte": ["15_voies_adepte"],
+          "Matériel magique": ["13_materiel_magique"],
+        },
+      },
+    };
 
-        function isPimpEligible(item) {
-          return (
-            item.sectionKey &&
-            PIMP_ELIGIBLE_SECTIONS.indexOf(item.sectionKey) !== -1
-          );
-        }
+    // Affichage des Nuyen transmis depuis la fiche
+    var urlParams = new URLSearchParams(window.location.search);
+    var nuyenParam = urlParams.get("nuyen");
+    if (nuyenParam) {
+      var nuyenDisplay = document.getElementById("bm-nuyen-display");
+      if (nuyenDisplay) {
+        var formatted =
+          parseInt(nuyenParam, 10).toLocaleString("fr-FR") + " ¥";
+        nuyenDisplay.textContent = formatted;
+        nuyenDisplay.style.display = "inline";
+      }
+    }
 
-        function getPimpUpgrades() {
+    // ===== HELPERS =====
+    function norm(str) {
+      if (!str) return "";
+      return str
+        .toString()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u030f]/g, "");
+    }
+    function esc(text) {
+      if (!text) return "";
+      var d = document.createElement("div");
+      d.textContent = text;
+      return d.innerHTML;
+    }
+    function parseYen(yenStr) {
+      if (!yenStr) return null;
+      var s = String(yenStr);
+      var sign = s.indexOf("-") !== -1 ? -1 : 1;
+      var n = parseInt(s.replace(/[^0-9]/g, ""), 10);
+      return isNaN(n) ? null : n * sign;
+    }
+
+    // ===== EXTRACTION =====
+    var allItems = [];
+    var dynamicSubcats = {};
+
+    if (typeof SHADOWRUN_GEAR === "undefined") {
+      document.getElementById("bm-content").innerHTML =
+        '<div class="bm-empty">Erreur : shadowrun-matos-2.0.js non chargé</div>';
+      return;
+    }
+
+    var nextId = 0;
+
+    for (var mainCat in CATEGORY_MAP) {
+      if (!CATEGORY_MAP.hasOwnProperty(mainCat)) continue;
+      var cfg = CATEGORY_MAP[mainCat];
+      dynamicSubcats[mainCat] = new Set();
+
+      // Armures hardcodées
+      if (cfg.hardcoded) {
+        cfg.hardcoded.forEach(function (raw) {
+          allItems.push({
+            id: nextId++,
+            mainCat: mainCat,
+            subCat: "Armures",
+            nom: raw.nom,
+            prix: raw.prix,
+            prixNum: parseYen(raw.prix),
+            desc: raw.desc,
+            prerequis: "",
+            essence: "",
+            type: "",
+            seuil: "",
+            score: raw.score,
+          });
+          dynamicSubcats[mainCat].add("Armures");
+        });
+        continue;
+      }
+
+      // Données du fichier JS
+      (cfg.sections || []).forEach(function (secKey) {
+        var sec = SHADOWRUN_GEAR[secKey];
+        if (!sec || !sec.donnees) return;
+
+        sec.donnees.forEach(function (raw) {
+          var yenStr = raw.COUT_Yen || raw["COUT_Yen"] || "";
+          if (!yenStr.toString().trim()) return;
+
+          var subCat = null;
+          if (cfg.dynamicSubcatField && raw[cfg.dynamicSubcatField]) {
+            subCat = raw[cfg.dynamicSubcatField];
+          } else if (cfg.filterByField && raw[cfg.filterByField]) {
+            subCat = raw[cfg.filterByField];
+          } else if (cfg.subcats) {
+            for (var sc in cfg.subcats) {
+              if (Array.isArray(cfg.subcats[sc]) &&
+                  cfg.subcats[sc].indexOf(secKey) !== -1) {
+                subCat = sc;
+                break;
+              }
+            }
+          }
+
+          if (!subCat) subCat = sec.nom || secKey;
+
+          var subCatNorm = norm(subCat);
           if (
-            typeof SHADOWRUN_GEAR === "undefined" ||
-            !SHADOWRUN_GEAR["32_pimpmyride"]
+            subCatNorm === "munitions" ||
+            subCatNorm === "accessoires" ||
+            subCatNorm === "munition" ||
+            subCatNorm === "accessoire"
           )
-            return [];
-          return SHADOWRUN_GEAR["32_pimpmyride"].donnees || [];
-        }
-
-        function getVehicleUpgradeCounts(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          return item && item.upgradeCounts ? item.upgradeCounts : {};
-        }
-
-        function calculateVehicleUpgradeCost(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !item.upgradeCounts) return 0;
-          var allUpgrades = getPimpUpgrades();
-          var total = 0;
-          for (var idx in item.upgradeCounts) {
-            if (!item.upgradeCounts.hasOwnProperty(idx)) continue;
-            var upg = allUpgrades[parseInt(idx)];
-            if (!upg) continue;
-            var val = parseYen(upg.COUT_Yen) || 0;
-            total += val * item.upgradeCounts[idx];
-          }
-          return total;
-        }
-
-        function openPimpModal(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !isPimpEligible(item)) return;
-
-          var upgrades = getPimpUpgrades();
-          var appliedCounts =
-            item && item.upgradeCounts ? item.upgradeCounts : {};
-          var currentCost = calculateVehicleUpgradeCost(itemId);
-          var totalCount = 0;
-          for (var k in appliedCounts) {
-            if (appliedCounts.hasOwnProperty(k)) totalCount += appliedCounts[k];
-          }
-
-          var modalHtml =
-            '<div class="pimp-modal-overlay" id="pimpModalOverlay" onclick="if(event.target===this)closePimpModal()">' +
-            '<div class="pimp-modal">' +
-            '<div class="pimp-modal-header">' +
-            "<h3>Pimp My Ride -" +
-            esc(item.nom) +
-            "</h3>" +
-            '<button class="pimp-close" onclick="closePimpModal()">×</button>' +
-            "</div>" +
-            '<div class="pimp-modal-body">' +
-            '<div class="pimp-vehicle-info">' +
-            '<div class="pimp-vehicle-name">' +
-            esc(item.nom) +
-            "</div>" +
-            '<div class="pimp-vehicle-type">' +
-            esc(item.subCat) +
-            " -" +
-            esc(item.mainCat) +
-            "</div>" +
-            "</div>" +
-            '<div class="pimp-cost-bar">' +
-            '<span class="pimp-cost-label">Coût upgrades: ' +
-            currentCost.toLocaleString("fr-FR") +
-            " ¥</span>" +
-            '<span class="pimp-cost-value">' +
-            totalCount +
-            " upgrade" +
-            (totalCount !== 1 ? "s" : "") +
-            "</span>" +
-            "</div>" +
-            '<div class="pimp-upgrade-list">';
-
-          upgrades.forEach(function (upg, idx) {
-            var count = appliedCounts[idx] || 0;
-            var isSelected = count > 0;
-            var nuyenVal = parseYen(upg.COUT_Yen) || 0;
-            var totalVal = nuyenVal * count;
-            var costDisplay = "";
-            if (totalVal > 0)
-              costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
-            else if (totalVal < 0)
-              costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
-            else
-              costDisplay =
-                (nuyenVal >= 0 ? "+" : "") +
-                nuyenVal.toLocaleString("fr-FR") +
-                " ¥";
-            var negativeClass = nuyenVal < 0 ? "pimp-upgrade-negative" : "";
-
-            modalHtml +=
-              '<div class="pimp-upgrade-item ' +
-              (isSelected ? "selected" : "") +
-              '" onclick="togglePimpUpgrade(' +
-              itemId +
-              ", " +
-              idx +
-              ')">' +
-              '<div class="pimp-checkbox">' +
-              (count > 1
-                ? '<span style="color:white;font-size:10px;font-weight:700;">' +
-                  count +
-                  "</span>"
-                : "") +
-              "</div>" +
-              '<div class="pimp-upgrade-content">' +
-              '<div class="pimp-upgrade-name">' +
-              esc(upg.Atout || upg.Nom || "Upgrade") +
-              "</div>" +
-              '<div class="pimp-upgrade-cost ' +
-              negativeClass +
-              '">' +
-              costDisplay +
-              "</div>" +
-              '<div class="pimp-upgrade-desc">' +
-              esc(upg.EFFETS || "Pas de description") +
-              "</div>" +
-              "</div>" +
-              (isSelected
-                ? '<button class="pimp-btn" style="padding:2px 8px;font-size:10px;margin-left:8px;flex-shrink:0;align-self:center;" onclick="event.stopPropagation(); decrementPimpUpgrade(' +
-                  itemId +
-                  ", " +
-                  idx +
-                  ');">−</button>'
-                : "") +
-              "</div>";
-          });
-
-          modalHtml +=
-            "</div></div>" +
-            '<div class="pimp-modal-footer">' +
-            '<span style="font-size:12px;color:#424242;">' +
-            upgrades.length +
-            " modification" +
-            (upgrades.length !== 1 ? "s" : "") +
-            " disponible" +
-            (upgrades.length !== 1 ? "s" : "") +
-            "</span>" +
-            '<button class="pimp-btn" style="background:#7B1FA2;color:white;border-color:#4A148C;" onclick="closePimpModal()">Fermer</button>' +
-            "</div>" +
-            "</div>" +
-            "</div>";
-
-          var existingModal = document.getElementById("pimpModalOverlay");
-          if (existingModal) existingModal.remove();
-
-          var modalDiv = document.createElement("div");
-          modalDiv.innerHTML = modalHtml;
-          document.body.appendChild(modalDiv.firstElementChild);
-          document.body.style.overflow = "hidden";
-        }
-
-        function closePimpModal() {
-          var modal = document.getElementById("pimpModalOverlay");
-          if (modal) {
-            modal.remove();
-            document.body.style.overflow = "";
-          }
-          render();
-        }
-
-        function togglePimpUpgrade(itemId, upgradeIdx) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item) return;
-          if (!item.upgradeCounts) item.upgradeCounts = {};
-          item.upgradeCounts[upgradeIdx] =
-            (item.upgradeCounts[upgradeIdx] || 0) + 1;
-          openPimpModal(itemId);
-        }
-
-        function decrementPimpUpgrade(itemId, upgradeIdx) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !item.upgradeCounts) return;
-          var current = item.upgradeCounts[upgradeIdx] || 0;
-          if (current > 1) {
-            item.upgradeCounts[upgradeIdx] = current - 1;
-          } else {
-            delete item.upgradeCounts[upgradeIdx];
-          }
-          openPimpModal(itemId);
-        }
-
-        function renderPimpButton(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          var count = 0;
-          if (item && item.upgradeCounts) {
-            for (var k in item.upgradeCounts) {
-              if (item.upgradeCounts.hasOwnProperty(k))
-                count += item.upgradeCounts[k];
-            }
-          }
-          return (
-            '<button class="pimp-btn" onclick="event.stopPropagation(); openPimpModal(' +
-            itemId +
-            ');">' +
-            '<span class="pimp-icon">⚙️</span>' +
-            "<span>Pimp My Ride" +
-            (count > 0 ? " (" + count + ")" : "") +
-            "</span>" +
-            "</button>"
-          );
-        }
-
-        function renderAppliedUpgrades(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !item.upgradeCounts) return "";
-          var keys = Object.keys(item.upgradeCounts);
-          if (keys.length === 0) return "";
-
-          var allUpgrades = getPimpUpgrades();
-
-          var html =
-            '<div class="pimp-applied">' +
-            '<div class="pimp-applied-label">⚙️ Modifications appliquées</div>' +
-            '<div class="pimp-applied-list">';
-
-          keys.forEach(function (idxStr) {
-            var upg = allUpgrades[parseInt(idxStr)];
-            if (!upg) return;
-            var count = item.upgradeCounts[idxStr];
-            var nuyenVal = parseYen(upg.COUT_Yen) || 0;
-            var totalVal = nuyenVal * count;
-            var costDisplay = "";
-            if (totalVal > 0)
-              costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
-            else if (totalVal < 0)
-              costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
-
-            var countLabel =
-              count > 1
-                ? ' <span style="color:#7b1fa2;font-weight:700;">×' +
-                  count +
-                  "</span>"
-                : "";
-
-            html +=
-              '<div class="pimp-applied-item">' +
-              '<div class="pimp-applied-item-name">' +
-              esc(upg.Atout || upg.Nom || "Upgrade") +
-              countLabel +
-              (costDisplay
-                ? ' <span class="pimp-applied-item-cost">' +
-                  costDisplay +
-                  "</span>"
-                : "") +
-              ' <span class="pimp-remove" onclick="event.stopPropagation(); window.removePimpUpgrade(' +
-              itemId +
-              ", " +
-              idxStr +
-              ')" title="Retirer tout">×</span></div>' +
-              '<div class="pimp-applied-item-desc">' +
-              esc(upg.EFFETS || upg.Description || "Pas de description") +
-              "</div>" +
-              "</div>";
-          });
-
-          html += "</div></div>";
-          return html;
-        }
-
-        function removePimpUpgrade(itemId, upgradeIdx) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !item.upgradeCounts) return;
-          delete item.upgradeCounts[upgradeIdx];
-          render();
-        }
-
-        // ===== AMÉLIORATIONS D'ARMES (cat 34) =====
-        function isArmeAmeliorable(item) {
-          return item.sectionKey === "33_arme" && item.ameliorable === true;
-        }
-
-        function getArmeUpgrades() {
-          if (
-            typeof SHADOWRUN_GEAR === "undefined" ||
-            !SHADOWRUN_GEAR["34_améliorationarme"]
-          )
-            return [];
-          return SHADOWRUN_GEAR["34_améliorationarme"].donnees || [];
-        }
-
-        function getArmeUpgradeCounts(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          return item && item.ameliorationCounts ? item.ameliorationCounts : {};
-        }
-
-        function calculateArmeUpgradeCost(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !item.ameliorationCounts) return 0;
-          var allUpgrades = getArmeUpgrades();
-          var total = 0;
-          for (var idx in item.ameliorationCounts) {
-            if (!item.ameliorationCounts.hasOwnProperty(idx)) continue;
-            var upg = allUpgrades[parseInt(idx)];
-            if (!upg) continue;
-            var val = parseYen(upg.COUT_Yen) || 0;
-            total += val * item.ameliorationCounts[idx];
-          }
-          return total;
-        }
-
-        function openArmeUpgradeModal(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !isArmeAmeliorable(item)) return;
-
-          var upgrades = getArmeUpgrades();
-          var appliedCounts =
-            item && item.ameliorationCounts ? item.ameliorationCounts : {};
-          var currentCost = calculateArmeUpgradeCost(itemId);
-          var totalCount = 0;
-          for (var k in appliedCounts) {
-            if (appliedCounts.hasOwnProperty(k)) totalCount += appliedCounts[k];
-          }
-
-          var modalHtml =
-            '<div class="pimp-modal-overlay" id="armeUpgradeModalOverlay" onclick="if(event.target===this)closeArmeUpgradeModal()">' +
-            '<div class="pimp-modal">' +
-            '<div class="pimp-modal-header" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);">' +
-            "<h3>Améliorations - " +
-            esc(item.nom) +
-            "</h3>" +
-            '<button class="pimp-close" onclick="closeArmeUpgradeModal()">×</button>' +
-            "</div>" +
-            '<div class="pimp-modal-body">' +
-            '<div class="pimp-vehicle-info" style="background: #FFEBEE; border-color: #EF9A9A;">' +
-            '<div class="pimp-vehicle-name" style="color: #B71C1C;">' +
-            esc(item.nom) +
-            "</div>" +
-            '<div class="pimp-vehicle-type">' +
-            esc(item.subCat) +
-            " - " +
-            esc(item.desc) +
-            "</div>" +
-            "</div>" +
-            '<div class="pimp-cost-bar" style="border-color: #EF9A9A;">' +
-            '<span class="pimp-cost-label" style="color: #B71C1C;">Coût améliorations: ' +
-            currentCost.toLocaleString("fr-FR") +
-            " ¥</span>" +
-            '<span class="pimp-cost-value" style="color: #B71C1C;">' +
-            totalCount +
-            " amélioration" +
-            (totalCount !== 1 ? "s" : "") +
-            "</span>" +
-            "</div>" +
-            '<div class="pimp-upgrade-list">';
-
-          upgrades.forEach(function (upg, idx) {
-            var count = appliedCounts[idx] || 0;
-            var isSelected = count > 0;
-            var nuyenVal = parseYen(upg.COUT_Yen) || 0;
-            var totalVal = nuyenVal * count;
-            var costDisplay = "";
-            if (totalVal > 0)
-              costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
-            else if (totalVal < 0)
-              costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
-            else
-              costDisplay =
-                (nuyenVal >= 0 ? "+" : "") +
-                nuyenVal.toLocaleString("fr-FR") +
-                " ¥";
-            var negativeClass = nuyenVal < 0 ? "pimp-upgrade-negative" : "";
-
-            modalHtml +=
-              '<div class="pimp-upgrade-item ' +
-              (isSelected ? "selected" : "") +
-              '" onclick="toggleArmeUpgrade(' +
-              itemId +
-              ", " +
-              idx +
-              ')">' +
-              '<div class="pimp-checkbox">' +
-              (count > 1
-                ? '<span style="color:white;font-size:10px;font-weight:700;">' +
-                  count +
-                  "</span>"
-                : "") +
-              "</div>" +
-              '<div class="pimp-upgrade-content">' +
-              '<div class="pimp-upgrade-name">' +
-              esc(upg.Atout || upg.Nom || "Amélioration") +
-              "</div>" +
-              '<div class="pimp-upgrade-cost ' +
-              negativeClass +
-              '">' +
-              costDisplay +
-              "</div>" +
-              '<div class="pimp-upgrade-desc">' +
-              esc(upg.EFFETS || "Pas de description") +
-              "</div>" +
-              "</div>" +
-              (isSelected
-                ? '<button class="pimp-btn" style="padding:2px 8px;font-size:10px;margin-left:8px;flex-shrink:0;align-self:center;" onclick="event.stopPropagation(); decrementArmeUpgrade(' +
-                  itemId +
-                  ", " +
-                  idx +
-                  ');">−</button>'
-                : "") +
-              "</div>";
-          });
-
-          modalHtml +=
-            "</div></div>" +
-            '<div class="pimp-modal-footer">' +
-            '<span style="font-size:12px;color:#424242;">' +
-            upgrades.length +
-            " amélioration" +
-            (upgrades.length !== 1 ? "s" : "") +
-            " disponible" +
-            (upgrades.length !== 1 ? "s" : "") +
-            "</span>" +
-            '<button class="pimp-btn" style="background:#D32F2F;color:white;border-color:#B71C1C;" onclick="closeArmeUpgradeModal()">Fermer</button>' +
-            "</div>" +
-            "</div>" +
-            "</div>";
-
-          var existingModal = document.getElementById(
-            "armeUpgradeModalOverlay",
-          );
-          if (existingModal) existingModal.remove();
-
-          var modalDiv = document.createElement("div");
-          modalDiv.innerHTML = modalHtml;
-          document.body.appendChild(modalDiv.firstElementChild);
-          document.body.style.overflow = "hidden";
-        }
-
-        function closeArmeUpgradeModal() {
-          var modal = document.getElementById("armeUpgradeModalOverlay");
-          if (modal) {
-            modal.remove();
-            document.body.style.overflow = "";
-          }
-          render();
-        }
-
-        function toggleArmeUpgrade(itemId, upgradeIdx) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item) return;
-          if (!item.ameliorationCounts) item.ameliorationCounts = {};
-          item.ameliorationCounts[upgradeIdx] =
-            (item.ameliorationCounts[upgradeIdx] || 0) + 1;
-          openArmeUpgradeModal(itemId);
-        }
-
-        function decrementArmeUpgrade(itemId, upgradeIdx) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !item.ameliorationCounts) return;
-          var current = item.ameliorationCounts[upgradeIdx] || 0;
-          if (current > 1) {
-            item.ameliorationCounts[upgradeIdx] = current - 1;
-          } else {
-            delete item.ameliorationCounts[upgradeIdx];
-          }
-          openArmeUpgradeModal(itemId);
-        }
-
-        function renderArmeUpgradeButton(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          var count = 0;
-          if (item && item.ameliorationCounts) {
-            for (var k in item.ameliorationCounts) {
-              if (item.ameliorationCounts.hasOwnProperty(k))
-                count += item.ameliorationCounts[k];
-            }
-          }
-          return (
-            '<button class="pimp-btn" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%); border-color: #B71C1C;" onclick="event.stopPropagation(); window.openArmeUpgradeModal(' +
-            itemId +
-            ');">' +
-            "<span>⚙️</span>" +
-            "<span>Améliorer" +
-            (count > 0 ? " (" + count + ")" : "") +
-            "</span>" +
-            "</button>"
-          );
-        }
-
-        function renderAppliedArmeUpgrades(itemId) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !item.ameliorationCounts) return "";
-          var keys = Object.keys(item.ameliorationCounts);
-          if (keys.length === 0) return "";
-
-          var allUpgrades = getArmeUpgrades();
-
-          var html =
-            '<div class="pimp-applied">' +
-            '<div class="pimp-applied-label" style="color: #B71C1C;">⚙️ Améliorations appliquées</div>' +
-            '<div class="pimp-applied-list">';
-
-          keys.forEach(function (idxStr) {
-            var upg = allUpgrades[parseInt(idxStr)];
-            if (!upg) return;
-            var count = item.ameliorationCounts[idxStr];
-            var nuyenVal = parseYen(upg.COUT_Yen) || 0;
-            var totalVal = nuyenVal * count;
-            var costDisplay = "";
-            if (totalVal > 0)
-              costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
-            else if (totalVal < 0)
-              costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
-
-            var countLabel =
-              count > 1
-                ? ' <span style="color:#B71C1C;font-weight:700;">×' +
-                  count +
-                  "</span>"
-                : "";
-
-            html +=
-              '<div class="pimp-applied-item" style="background: #FFEBEE; border-color: #EF9A9A;">' +
-              '<div class="pimp-applied-item-name" style="color: #B71C1C;">' +
-              esc(upg.Atout || upg.Nom || "Amélioration") +
-              countLabel +
-              (costDisplay
-                ? ' <span class="pimp-applied-item-cost">' +
-                  costDisplay +
-                  "</span>"
-                : "") +
-              ' <span class="pimp-remove" onclick="event.stopPropagation(); window.removeArmeUpgrade(' +
-              itemId +
-              ", " +
-              idxStr +
-              ')" title="Retirer tout">×</span></div>' +
-              '<div class="pimp-applied-item-desc">' +
-              esc(upg.EFFETS || "Pas de description") +
-              "</div>" +
-              "</div>";
-          });
-
-          html += "</div></div>";
-          return html;
-        }
-
-        function removeArmeUpgrade(itemId, upgradeIdx) {
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === itemId) {
-              item = allItems[i];
-              break;
-            }
-          }
-          if (!item || !item.ameliorationCounts) return;
-          delete item.ameliorationCounts[upgradeIdx];
-          render();
-        }
-
-        function renderSubcats(mainCat) {
-          subcatsDiv.innerHTML = "";
-          activeSubcat = "";
-
-          if (!mainCat) return;
-
-          // Bouton "Tout"
-          var allBtn = document.createElement("button");
-          allBtn.className = "bm-subcat-btn active";
-          allBtn.textContent = "Tout";
-          allBtn.onclick = function () {
-            activeSubcat = "";
-            updateActiveSubcat();
-            render();
-          };
-          subcatsDiv.appendChild(allBtn);
-
-          // Sous-catégories dynamiques uniquement
-          Array.from(dynamicSubcats[mainCat])
-            .sort()
-            .forEach(function (sc) {
-              var btn = document.createElement("button");
-              btn.className = "bm-subcat-btn";
-              btn.textContent = sc;
-              btn.onclick = function () {
-                activeSubcat = sc;
-                updateActiveSubcat();
-                render();
-              };
-              subcatsDiv.appendChild(btn);
-            });
-        }
-
-        function updateActiveSubcat() {
-          var btns = subcatsDiv.querySelectorAll(".bm-subcat-btn");
-          btns.forEach(function (b) {
-            b.classList.toggle(
-              "active",
-              (activeSubcat === "" && b.textContent === "Tout") ||
-                b.textContent === activeSubcat,
-            );
-          });
-        }
-
-        function buildCard(item) {
-          var meta = "";
-          if (item.essence)
-            meta +=
-              '<span class="bm-tag essence">Essence ' +
-              esc(item.essence) +
-              "</span>";
-          if (item.prerequis)
-            meta +=
-              '<span class="bm-tag prereq">' + esc(item.prerequis) + "</span>";
-          if (item.type)
-            meta +=
-              '<span class="bm-tag type">' +
-              esc(item.type) +
-              (item.seuil ? " | Seuil " + esc(item.seuil) : "") +
-              "</span>";
-          if (item.score)
-            meta +=
-              '<span class="bm-tag score">Armure ' +
-              esc(item.score) +
-              "</span>";
-
-          var tatouageBtn = "";
-          if (item.isFocus) {
-            var isActive = item.tatouageActive;
-            var btnClass = isActive
-              ? "bm-tatouage-btn active"
-              : "bm-tatouage-btn";
-            var btnLabel = isActive
-              ? "Tatouage ✓ (+15 000¥)"
-              : "Tatouage +15 000¥";
-            tatouageBtn =
-              '<button class="' +
-              btnClass +
-              '" data-id="' +
-              item.id +
-              '">' +
-              btnLabel +
-              "</button>";
-          }
-
-          var pimpBtn = "";
-          var appliedUpgrades = "";
-          if (isPimpEligible(item)) {
-            pimpBtn = renderPimpButton(item.id);
-            appliedUpgrades = renderAppliedUpgrades(item.id);
-          }
-
-          var armeBtn = "";
-          var armeUpgrades = "";
-          if (isArmeAmeliorable(item)) {
-            armeBtn = renderArmeUpgradeButton(item.id);
-            armeUpgrades = renderAppliedArmeUpgrades(item.id);
-          }
-
-          // Prix avec upgrades (Pimp My Ride + Améliorations d'armes)
-          var prixTotal = item.prixNum || 0;
-          if (isPimpEligible(item)) {
-            prixTotal += calculateVehicleUpgradeCost(item.id);
-          }
-          if (isArmeAmeliorable(item)) {
-            prixTotal += calculateArmeUpgradeCost(item.id);
-          }
-          var prixDisplay =
-            prixTotal > 0 ? prixTotal.toLocaleString("fr-FR") + "¥" : item.prix;
-
-          return (
-            '<div class="bm-card">' +
-            '<div class="bm-card-header"><div class="bm-card-title">' +
-            esc(item.nom) +
-            '</div><div class="bm-card-price">' +
-            esc(prixDisplay) +
-            "</div></div>" +
-            '<div class="bm-card-cat">' +
-            esc(item.subCat) +
-            "</div>" +
-            '<div class="bm-card-desc">' +
-            esc(item.desc) +
-            "</div>" +
-            (meta ? '<div class="bm-card-meta">' + meta + "</div>" : "") +
-            tatouageBtn +
-            pimpBtn +
-            appliedUpgrades +
-            armeBtn +
-            armeUpgrades +
-            "</div>"
-          );
-        }
-
-        function render() {
-          var q = norm(searchInput.value);
-          var mainCat = mainSelect.value;
-
-          var filtered = allItems.filter(function (it) {
-            if (mainCat && it.mainCat !== mainCat) return false;
-            if (activeSubcat && it.subCat !== activeSubcat) return false;
-            if (q) {
-              var txt = norm(
-                it.nom +
-                  " " +
-                  it.desc +
-                  " " +
-                  it.subCat +
-                  " " +
-                  it.mainCat +
-                  " " +
-                  it.prerequis,
-              );
-              return txt.indexOf(q) !== -1;
-            }
-            return true;
-          });
-
-          countLabel.textContent =
-            filtered.length + " article" + (filtered.length > 1 ? "s" : "");
-
-          if (filtered.length === 0) {
-            contentDiv.innerHTML = '<div class="bm-empty">Aucun résultat</div>';
             return;
+
+          dynamicSubcats[mainCat].add(subCat);
+
+          var item = {
+            id: nextId++,
+            mainCat: mainCat,
+            subCat: subCat,
+            sectionKey: secKey,
+            nom: raw.Atout || raw.Nom || "Sans nom",
+            prix: yenStr.toString().trim(),
+            prixNum: parseYen(yenStr),
+            desc: raw.EFFETS || raw.Description || "",
+            prerequis: raw.Pré_requis || raw["Pré-requis"] || "",
+            essence: raw.Perte_essence || "",
+            type: raw.Type || "",
+            seuil: raw.Seuil || "",
+          };
+
+          if (secKey === "33_arme") {
+            item.ameliorable =
+              String(raw.amélioraion || "").toUpperCase() === "OUI";
           }
 
-          var groups = {};
-          filtered.forEach(function (it) {
-            if (!groups[it.subCat]) groups[it.subCat] = [];
-            groups[it.subCat].push(it);
-          });
-
-          var html = "";
-          Object.keys(groups)
-            .sort()
-            .forEach(function (sub) {
-              html +=
-                '<div class="bm-section-title">' +
-                esc(sub) +
-                " <span style=\"font-size:11px;color:var(--gray-mid);font-family:'Roboto Mono',monospace;\">(" +
-                groups[sub].length +
-                ")</span></div>";
-              html += '<div class="bm-grid">';
-              groups[sub].forEach(function (it) {
-                html += buildCard(it);
-              });
-              html += "</div>";
-            });
-          contentDiv.innerHTML = html;
-        }
-
-        contentDiv.addEventListener("click", function (e) {
-          var btn = e.target.closest(".bm-tatouage-btn");
-          if (!btn) return;
-          e.stopPropagation();
-          var id = parseInt(btn.getAttribute("data-id"), 10);
-          var item = null;
-          for (var i = 0; i < allItems.length; i++) {
-            if (allItems[i].id === id) {
-              item = allItems[i];
-              break;
+          if (secKey === "13_materiel_magique") {
+            var focusName = raw.Atout || raw.Nom || "";
+            if (typeof FOCUS_TATOUABLES !== "undefined" &&
+                FOCUS_TATOUABLES.indexOf(focusName) !== -1) {
+              item.isFocus = true;
+              item.basePrixNum = item.prixNum;
             }
           }
-          if (!item || !item.isFocus) return;
-          item.tatouageActive = !item.tatouageActive;
-          if (item.tatouageActive) {
-            item.prixNum = item.basePrixNum + 15000;
-          } else {
-            item.prixNum = item.basePrixNum;
-          }
-          item.prix = item.prixNum.toLocaleString("fr-FR") + "¥";
+
+          allItems.push(item);
+        });
+      });
+    }
+
+    // Tri par prix décroissant
+    allItems.sort(function (a, b) {
+      return (b.prixNum || 0) - (a.prixNum || 0);
+    });
+
+    // ===== UI =====
+    var searchInput = document.getElementById("bm-search");
+    var mainSelect = document.getElementById("bm-maincat");
+    var subcatsDiv = document.getElementById("bm-subcats");
+    var contentDiv = document.getElementById("bm-content");
+    var countLabel = document.getElementById("bm-count");
+    var activeSubcat = "";
+
+    Object.keys(CATEGORY_MAP).forEach(function (cat) {
+      var opt = document.createElement("option");
+      opt.value = cat;
+      opt.textContent = cat;
+      mainSelect.appendChild(opt);
+    });
+
+    function renderSubcats(mainCat) {
+      subcatsDiv.innerHTML = "";
+      var set = dynamicSubcats[mainCat];
+      if (!set || set.size === 0) return;
+      set.forEach(function (sc) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className =
+          "bm-subcat-btn" + (activeSubcat === sc ? " bm-subcat-active" : "");
+        btn.textContent = sc;
+        btn.addEventListener("click", function () {
+          activeSubcat = sc;
           render();
         });
+        subcatsDiv.appendChild(btn);
+      });
+    }
 
-        searchInput.addEventListener("input", render);
-        mainSelect.addEventListener("change", function () {
-          renderSubcats(mainSelect.value);
-          render();
-        });
+    // ===== PIMP MY RIDE =====
+    var PIMP_ELIGIBLE_SECTIONS = [
+      "22_deux_roues",
+      "23_voitures",
+      "24_vehicules_divers",
+      "25_microdrones",
+      "26_minidrones",
+      "27_petits_drones",
+      "28_drones_moyens",
+      "29_grands_drones",
+      "30_drones_anthropomorphes",
+    ];
 
-        renderSubcats("");
-        render();
+    function isPimpEligible(item) {
+      return (
+        item.sectionKey &&
+        PIMP_ELIGIBLE_SECTIONS.indexOf(item.sectionKey) !== -1
+      );
+    }
 
-        // Exposer les fonctions Pimp My Ride au scope global pour les onclick inline
-        window.openPimpModal = openPimpModal;
-        window.closePimpModal = closePimpModal;
-        window.togglePimpUpgrade = togglePimpUpgrade;
-        window.decrementPimpUpgrade = decrementPimpUpgrade;
-        window.removePimpUpgrade = removePimpUpgrade;
-        window.openArmeUpgradeModal = openArmeUpgradeModal;
-        window.closeArmeUpgradeModal = closeArmeUpgradeModal;
-        window.toggleArmeUpgrade = toggleArmeUpgrade;
-        window.decrementArmeUpgrade = decrementArmeUpgrade;
-        window.removeArmeUpgrade = removeArmeUpgrade;
-      })();
+    function getPimpUpgrades() {
+      if (
+        typeof SHADOWRUN_GEAR === "undefined" ||
+        !SHADOWRUN_GEAR["32_pimpmyride"]
+      )
+        return [];
+      return SHADOWRUN_GEAR["32_pimpmyride"].donnees || [];
+    }
+
+    function calculateVehicleUpgradeCost(itemId) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      if (!item || !item.upgradeCounts) return 0;
+      var allUpgrades = getPimpUpgrades();
+      var total = 0;
+      for (var idx in item.upgradeCounts) {
+        if (!item.upgradeCounts.hasOwnProperty(idx)) continue;
+        var upg = allUpgrades[parseInt(idx)];
+        if (!upg) continue;
+        var val = parseYen(upg.COUT_Yen) || 0;
+        total += val * item.upgradeCounts[idx];
+      }
+      return total;
+    }
+
+    function openPimpModal(itemId) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      if (!item || !isPimpEligible(item)) return;
+
+      var upgrades = getPimpUpgrades();
+      var appliedCounts = item.upgradeCounts || {};
+      var currentCost = calculateVehicleUpgradeCost(itemId);
+      var totalCount = 0;
+      for (var k in appliedCounts) {
+        if (appliedCounts.hasOwnProperty(k)) totalCount += appliedCounts[k];
+      }
+
+      var modalHtml =
+        '<div class="pimp-modal-overlay" id="pimpModalOverlay" onclick="if(event.target===this)closePimpModal()">' +
+        '<div class="pimp-modal">' +
+        '<div class="pimp-modal-header">' +
+        "<h3>Pimp My Ride -" +
+        esc(item.nom) +
+        "</h3>" +
+        '<button class="pimp-close" onclick="closePimpModal()">×</button>' +
+        "</div>" +
+        '<div class="pimp-modal-body">' +
+        '<div class="pimp-vehicle-info">' +
+        '<div class="pimp-vehicle-name">' +
+        esc(item.nom) +
+        "</div>" +
+        '<div class="pimp-vehicle-type">' +
+        esc(item.subCat) +
+        " -" +
+        esc(item.mainCat) +
+        "</div>" +
+        "</div>" +
+        '<div class="pimp-cost-bar">' +
+        '<span class="pimp-cost-label">Coût upgrades: ' +
+        currentCost.toLocaleString("fr-FR") +
+        " ¥</span>" +
+        '<span class="pimp-cost-value">' +
+        totalCount +
+        " upgrade" +
+        (totalCount !== 1 ? "s" : "") +
+        "</span>" +
+        "</div>" +
+        '<div class="pimp-upgrade-list">';
+
+      upgrades.forEach(function (upg, idx) {
+        var count = appliedCounts[idx] || 0;
+        var isSelected = count > 0;
+        var nuyenVal = parseYen(upg.COUT_Yen) || 0;
+        var totalVal = nuyenVal * count;
+        var costDisplay = "";
+        if (totalVal > 0)
+          costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
+        else if (totalVal < 0)
+          costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
+        else
+          costDisplay =
+            (nuyenVal >= 0 ? "+" : "") +
+            nuyenVal.toLocaleString("fr-FR") +
+            " ¥";
+        var negativeClass = nuyenVal < 0 ? "pimp-upgrade-negative" : "";
+
+        modalHtml +=
+          '<div class="pimp-upgrade-item ' +
+          (isSelected ? "selected" : "") +
+          '" onclick="togglePimpUpgrade(' +
+          itemId +
+          ", " +
+          idx +
+          ')">' +
+          '<div class="pimp-checkbox">' +
+          (count > 1
+            ? '<span style="color:white;font-size:10px;font-weight:700;">' +
+              count +
+              "</span>"
+            : "") +
+          "</div>" +
+          '<div class="pimp-upgrade-content">' +
+          '<div class="pimp-upgrade-name">' +
+          esc(upg.Atout || upg.Nom || "Upgrade") +
+          "</div>" +
+          '<div class="pimp-upgrade-cost ' +
+          negativeClass +
+          '">' +
+          costDisplay +
+          "</div>" +
+          '<div class="pimp-upgrade-desc">' +
+          esc(upg.EFFETS || "Pas de description") +
+          "</div>" +
+          "</div>" +
+          (isSelected
+            ? '<button class="pimp-btn" style="padding:2px 8px;font-size:10px;margin-left:8px;flex-shrink:0;align-self:center;" onclick="event.stopPropagation(); decrementPimpUpgrade(' +
+              itemId +
+              ", " +
+              idx +
+              ');">−</button>'
+            : "") +
+          "</div>";
+      });
+
+      modalHtml +=
+        "</div></div>" +
+        '<div class="pimp-modal-footer">' +
+        '<span style="font-size:12px;color:#424242;">' +
+        upgrades.length +
+        " modification" +
+        (upgrades.length !== 1 ? "s" : "") +
+        " disponible" +
+        (upgrades.length !== 1 ? "s" : "") +
+        "</span>" +
+        '<button class="pimp-btn" style="background:#7B1FA2;color:white;border-color:#4A148C;" onclick="closePimpModal()">Fermer</button>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+
+      var existingModal = document.getElementById("pimpModalOverlay");
+      if (existingModal) existingModal.remove();
+
+      var modalDiv = document.createElement("div");
+      modalDiv.innerHTML = modalHtml;
+      document.body.appendChild(modalDiv.firstElementChild);
+      document.body.style.overflow = "hidden";
+    }
+
+    function closePimpModal() {
+      var modal = document.getElementById("pimpModalOverlay");
+      if (modal) {
+        modal.remove();
+        document.body.style.overflow = "";
+      }
+      render();
+    }
+
+    function togglePimpUpgrade(itemId, upgradeIdx) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      if (!item) return;
+      if (!item.upgradeCounts) item.upgradeCounts = {};
+      item.upgradeCounts[upgradeIdx] =
+        (item.upgradeCounts[upgradeIdx] || 0) + 1;
+      openPimpModal(itemId);
+    }
+
+    function decrementPimpUpgrade(itemId, upgradeIdx) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      if (!item || !item.upgradeCounts) return;
+      var current = item.upgradeCounts[upgradeIdx] || 0;
+      if (current > 1) {
+        item.upgradeCounts[upgradeIdx] = current - 1;
+      } else {
+        delete item.upgradeCounts[upgradeIdx];
+      }
+      openPimpModal(itemId);
+    }
+
+    function renderPimpButton(itemId) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      var count = 0;
+      if (item && item.upgradeCounts) {
+        for (var k in item.upgradeCounts) {
+          if (item.upgradeCounts.hasOwnProperty(k))
+            count += item.upgradeCounts[k];
+        }
+      }
+      return (
+        '<button class="pimp-btn" onclick="event.stopPropagation(); openPimpModal(' +
+        itemId +
+        ');">' +
+        '<span class="pimp-icon">⚙️</span>' +
+        "<span>Pimp My Ride" +
+        (count > 0 ? " (" + count + ")" : "") +
+        "</span>" +
+        "</button>"
+      );
+    }
+
+    // ===== AMÉLIORATIONS D'ARMES =====
+    function isArmeAmeliorable(item) {
+      return item.sectionKey === "33_arme" && item.ameliorable === true;
+    }
+
+    function getArmeUpgrades() {
+      if (
+        typeof SHADOWRUN_GEAR === "undefined" ||
+        !SHADOWRUN_GEAR["34_améliorationarme"]
+      )
+        return [];
+      return SHADOWRUN_GEAR["34_améliorationarme"].donnees || [];
+    }
+
+    function calculateArmeUpgradeCost(itemId) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      if (!item || !item.ameliorationCounts) return 0;
+      var allUpgrades = getArmeUpgrades();
+      var total = 0;
+      for (var idx in item.ameliorationCounts) {
+        if (!item.ameliorationCounts.hasOwnProperty(idx)) continue;
+        var upg = allUpgrades[parseInt(idx)];
+        if (!upg) continue;
+        var val = parseYen(upg.COUT_Yen) || 0;
+        total += val * item.ameliorationCounts[idx];
+      }
+      return total;
+    }
+
+    function openArmeUpgradeModal(itemId) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      if (!item || !isArmeAmeliorable(item)) return;
+
+      var upgrades = getArmeUpgrades();
+      var appliedCounts = item.ameliorationCounts || {};
+      var currentCost = calculateArmeUpgradeCost(itemId);
+      var totalCount = 0;
+      for (var k in appliedCounts) {
+        if (appliedCounts.hasOwnProperty(k)) totalCount += appliedCounts[k];
+      }
+
+      var modalHtml =
+        '<div class="pimp-modal-overlay" id="armeUpgradeModalOverlay" onclick="if(event.target===this)closeArmeUpgradeModal()">' +
+        '<div class="pimp-modal">' +
+        '<div class="pimp-modal-header" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);">' +
+        "<h3>Améliorations - " +
+        esc(item.nom) +
+        "</h3>" +
+        '<button class="pimp-close" onclick="closeArmeUpgradeModal()">×</button>' +
+        "</div>" +
+        '<div class="pimp-modal-body">' +
+        '<div class="pimp-vehicle-info" style="background: #FFEBEE; border-color: #EF9A9A;">' +
+        '<div class="pimp-vehicle-name" style="color: #B71C1C;">' +
+        esc(item.nom) +
+        "</div>" +
+        '<div class="pimp-vehicle-type">' +
+        esc(item.subCat) +
+        " - " +
+        esc(item.desc) +
+        "</div>" +
+        "</div>" +
+        '<div class="pimp-cost-bar" style="border-color: #EF9A9A;">' +
+        '<span class="pimp-cost-label" style="color: #B71C1C;">Coût améliorations: ' +
+        currentCost.toLocaleString("fr-FR") +
+        " ¥</span>" +
+        '<span class="pimp-cost-value" style="color: #B71C1C;">' +
+        totalCount +
+        " amélioration" +
+        (totalCount !== 1 ? "s" : "") +
+        "</span>" +
+        "</div>" +
+        '<div class="pimp-upgrade-list">';
+
+      upgrades.forEach(function (upg, idx) {
+        var count = appliedCounts[idx] || 0;
+        var isSelected = count > 0;
+        var nuyenVal = parseYen(upg.COUT_Yen) || 0;
+        var totalVal = nuyenVal * count;
+        var costDisplay = "";
+        if (totalVal > 0)
+          costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
+        else if (totalVal < 0)
+          costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
+        else
+          costDisplay =
+            (nuyenVal >= 0 ? "+" : "") +
+            nuyenVal.toLocaleString("fr-FR") +
+            " ¥";
+        var negativeClass = nuyenVal < 0 ? "pimp-upgrade-negative" : "";
+
+        modalHtml +=
+          '<div class="pimp-upgrade-item ' +
+          (isSelected ? "selected" : "") +
+          '" onclick="toggleArmeUpgrade(' +
+          itemId +
+          ", " +
+          idx +
+          ')">' +
+          '<div class="pimp-checkbox">' +
+          (count > 1
+            ? '<span style="color:white;font-size:10px;font-weight:700;">' +
+              count +
+              "</span>"
+            : "") +
+          "</div>" +
+          '<div class="pimp-upgrade-content">' +
+          '<div class="pimp-upgrade-name">' +
+          esc(upg.Atout || upg.Nom || "Amélioration") +
+          "</div>" +
+          '<div class="pimp-upgrade-cost ' +
+          negativeClass +
+          '">' +
+          costDisplay +
+          "</div>" +
+          '<div class="pimp-upgrade-desc">' +
+          esc(upg.EFFETS || "Pas de description") +
+          "</div>" +
+          "</div>" +
+          (isSelected
+            ? '<button class="pimp-btn" style="padding:2px 8px;font-size:10px;margin-left:8px;flex-shrink:0;align-self:center;" onclick="event.stopPropagation(); decrementArmeUpgrade(' +
+              itemId +
+              ", " +
+              idx +
+              ');">−</button>'
+            : "") +
+          "</div>";
+      });
+
+      modalHtml +=
+        "</div></div>" +
+        '<div class="pimp-modal-footer">' +
+        '<span style="font-size:12px;color:#424242;">' +
+        upgrades.length +
+        " amélioration" +
+        (upgrades.length !== 1 ? "s" : "") +
+        " disponible" +
+        (upgrades.length !== 1 ? "s" : "") +
+        "</span>" +
+        '<button class="pimp-btn" style="background:#D32F2F;color:white;border-color:#B71C1C;" onclick="closeArmeUpgradeModal()">Fermer</button>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+
+      var existingModal = document.getElementById("armeUpgradeModalOverlay");
+      if (existingModal) existingModal.remove();
+
+      var modalDiv = document.createElement("div");
+      modalDiv.innerHTML = modalHtml;
+      document.body.appendChild(modalDiv.firstElementChild);
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeArmeUpgradeModal() {
+      var modal = document.getElementById("armeUpgradeModalOverlay");
+      if (modal) {
+        modal.remove();
+        document.body.style.overflow = "";
+      }
+      render();
+    }
+
+    function toggleArmeUpgrade(itemId, upgradeIdx) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      if (!item) return;
+      if (!item.ameliorationCounts) item.ameliorationCounts = {};
+      item.ameliorationCounts[upgradeIdx] =
+        (item.ameliorationCounts[upgradeIdx] || 0) + 1;
+      openArmeUpgradeModal(itemId);
+    }
+
+    function decrementArmeUpgrade(itemId, upgradeIdx) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      if (!item || !item.ameliorationCounts) return;
+      var current = item.ameliorationCounts[upgradeIdx] || 0;
+      if (current > 1) {
+        item.ameliorationCounts[upgradeIdx] = current - 1;
+      } else {
+        delete item.ameliorationCounts[upgradeIdx];
+      }
+      openArmeUpgradeModal(itemId);
+    }
+
+    function renderArmeUpgradeButton(itemId) {
+      var item = allItems.find(function (it) { return it.id === itemId; });
+      var count = 0;
+      if (item && item.ameliorationCounts) {
+        for (var k in item.ameliorationCounts) {
+          if (item.ameliorationCounts.hasOwnProperty(k))
+            count += item.ameliorationCounts[k];
+        }
+      }
+      return (
+        '<button class="pimp-btn" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%); border-color: #B71C1C;" onclick="event.stopPropagation(); openArmeUpgradeModal(' +
+        itemId +
+        ');">' +
+        "<span>Améliorations d'arme" +
+        (count > 0 ? " (" + count + ")" : "") +
+        "</span>" +
+        "</button>"
+      );
+    }
+
+    // ===== RENDER =====
+    function render() {
+      var search = norm(searchInput.value || "");
+      var mainCat = mainSelect.value || "";
+      var filtered = allItems.filter(function (item) {
+        if (mainCat && item.mainCat !== mainCat) return false;
+        if (activeSubcat && item.subCat !== activeSubcat) return false;
+        if (search) {
+          var txt =
+            norm(item.nom) +
+            " " +
+            norm(item.desc) +
+            " " +
+            norm(item.subCat) +
+            " " +
+            norm(item.mainCat);
+          if (txt.indexOf(search) === -1) return false;
+        }
+        return true;
+      });
+
+      countLabel.textContent = filtered.length + " article" +
+        (filtered.length > 1 ? "s" : "");
+
+      if (filtered.length === 0) {
+        contentDiv.innerHTML = '<div class="bm-empty">Aucun résultat</div>';
+        return;
+      }
+
+      var html = "";
+      filtered.forEach(function (item) {
+        var pimpBtn = isPimpEligible(item) ? renderPimpButton(item.id) : "";
+        var armeBtn = isArmeAmeliorable(item)
+          ? renderArmeUpgradeButton(item.id)
+          : "";
+
+        html +=
+          '<div class="bm-item">' +
+          '<div class="bm-item-header">' +
+          '<div class="bm-item-name">' +
+          esc(item.nom) +
+          "</div>" +
+          '<div class="bm-item-price">' +
+          (item.prixNum != null
+            ? item.prixNum.toLocaleString("fr-FR") + " ¥"
+            : esc(item.prix)) +
+          "</div>" +
+          "</div>" +
+          '<div class="bm-item-sub">' +
+          esc(item.subCat) +
+          " — " +
+          esc(item.mainCat) +
+          "</div>" +
+          (item.desc
+            ? '<div class="bm-item-desc">' + esc(item.desc) + "</div>"
+            : "") +
+          (pimpBtn || armeBtn
+            ? '<div class="bm-item-actions">' + pimpBtn + armeBtn + "</div>"
+            : "") +
+          "</div>";
+      });
+
+      contentDiv.innerHTML = html;
+    }
+
+    // ===== EVENTS =====
+    searchInput.addEventListener("input", render);
+    mainSelect.addEventListener("change", function () {
+      activeSubcat = "";
+      renderSubcats(mainSelect.value);
+      render();
+    });
+
+    renderSubcats("");
+    render();
+
+    // Exposer pour les onclick inline
+    window.openPimpModal = openPimpModal;
+    window.closePimpModal = closePimpModal;
+    window.togglePimpUpgrade = togglePimpUpgrade;
+    window.decrementPimpUpgrade = decrementPimpUpgrade;
+    window.openArmeUpgradeModal = openArmeUpgradeModal;
+    window.closeArmeUpgradeModal = closeArmeUpgradeModal;
+    window.toggleArmeUpgrade = toggleArmeUpgrade;
+    
     </script>
   </body>
   <footer
