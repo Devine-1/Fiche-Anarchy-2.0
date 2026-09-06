@@ -34,7 +34,7 @@ const SHADOWRUN_GEAR = {
       "Atout": "Kit de survie en milieu hostile ",
       "Catégorie": "INFILTRATION",
       "COUT_Atout": "Atout 2",
-      "COUT_Yen": "10 000¥",
+      "COUT_Yen": "12 500¥",
       "EFFETS": "RR 1 aux tests  de Survie"
     },
 {
@@ -87,10 +87,24 @@ const SHADOWRUN_GEAR = {
       "EFFETS": "Hors des canaux légaux, on trouve des fausses licences pour tous types d’objets restreints et d’activités réglementées (la chasse, la possession d’armes, le port d’armes, le lancement de sort, certaines augmentations, etc.)"
       },
 {
-      "Atout": "Faux SIN",
+      "Atout": "Licence de port d’arme ",
       "Catégorie": "INFILTRATION",
-      "COUT_Atout": "Atout 3",
-      "COUT_Yen": "7 500¥",
+      "COUT_Atout": "Équipement",
+      "COUT_Yen": "2 500¥",
+      "EFFETS": "Utile si vous décidez de jouer avec ce niveau de détail…"
+      },
+{
+      "Atout": "Licence de mage",
+      "Catégorie": "INFILTRATION",
+      "COUT_Atout": "Équipement",
+      "COUT_Yen": "2 500¥",
+      "EFFETS": "Utile si vous décidez de jouer avec ce niveau de détail… "
+      },
+{
+      "Atout": "Fausse SIN supplémentaire",
+      "Catégorie": "INFILTRATION",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "2 500¥",
       "EFFETS": ""
       },
 {
@@ -105,29 +119,71 @@ const SHADOWRUN_GEAR = {
       "Catégorie": "INFILTRATION",
       "COUT_Atout": "Atout 1",
       "COUT_Yen": "2 500¥",
-      "EFFETS": "Permet de restreindre les mouvements d'une cible."
+      "EFFETS": "No kink shaming… Permet de restreindre les mouvements d'une cible."
       },
 {
       "Atout": "Menottes métalliques",
       "Catégorie": "INFILTRATION",
       "COUT_Atout": "Atout 1",
       "COUT_Yen": "2 500¥",
-      "EFFETS": "Permet de restreindre les mouvements d'une cible."
+      "EFFETS": "No kink shaming… Permet de restreindre les mouvements d'une cible."
       },
 {
       "Atout": "Mouleur d’empreintes",
       "Catégorie": "INFILTRATION",
       "COUT_Atout": "Atout 1",
       "COUT_Yen": "2 500¥",
-      "EFFETS": "Permet de créer un moule d’empreintes digitales. "
+      "EFFETS": "Permet de créer un moule d’empreintes digitales."
+      },
+{
+      "Atout": "Kit de maquillage",
+      "Catégorie": "INFILTRATION",
+      "COUT_Atout": "Atout 2",
+      "COUT_Yen": "12 500¥",
+      "EFFETS": "RR 1 Influence (imposture)"
+      },
+{
+      "Atout": "Dongle étourdissant",
+      "Catégorie": "INFILTRATION",
+      "COUT_Atout": "Atout 2",
+      "COUT_Yen": "12 500¥",
+      "EFFETS": "Permet d’intégrer un taser (VD 4, portée OK/-/-/-) à un commlink. Discret. "
+    },
+{
+      "Atout": "Nanocrème maquillage",
+      "Catégorie": "INFILTRATION",
+      "COUT_Atout": "Atout 4",
+      "COUT_Yen": "22 500¥",
+      "EFFETS": "RR 2 Influence (imposture)"
+      },
+{
+      "Atout": "Garde-robe fournie",
+      "Catégorie": "INFILTRATION",
+      "COUT_Atout": "Atout 2",
+      "COUT_Yen": "12 500¥",
+      "EFFETS": "RR 1 Influence (étiquette)"
+      },
+{
+      "Atout": "Cagoule de mage",
+      "Catégorie": "INFILTRATION",
+      "COUT_Atout": "Atout 2",
+      "COUT_Yen": "12 500¥",
+      "EFFETS": "No kink shaming on a dit… Cache la vue, envoi du son désagréable à fond dans les tympans… Inflige un désavantage à toutes les actions une fois portées. "
       },
 {
       "Atout": "Matériel de plongée",
       "Catégorie": "SURVIE",
-      "COUT_Atout": "Atout 2",
-      "COUT_Yen": "5 000¥",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "2 500¥",
       "EFFETS": "Équipement de plongée sous-marine, comprenant une combinaison, un masque avec tuba, un détendeur, une bouteille d’air fournissant 2 heures d’autonomie et un gilet stabilisateur pour gérer la flottabilité."
       },
+{
+        "Atout": "Bibliothèque bien remplie ",
+        "Catégorie": "SURVIE",
+        "COUT_Atout": "Équipement",
+        "COUT_Yen": "2 500¥",
+        "EFFETS": "Permet de bénéficier d’une connaissance universitaire pour la scène en échange d’un point d’Anarchy. "
+      },    
 {
         "Atout": "Combinaison NRBC (24h)",
         "Catégorie": "SURVIE",
@@ -142,19 +198,26 @@ const SHADOWRUN_GEAR = {
       "COUT_Yen": "2 500¥",
       "EFFETS": "Procure une immunité aux gaz et aux vapeurs toxiques. Permet de respirer dans des environnements toxiques."
     },
-  {
+{
       "Atout": "Philtre de Masque à gaz (1h) x25",
       "Catégorie": "SURVIE",
       "COUT_Atout": "Équipement",
       "COUT_Yen": "2 500¥",
       "EFFETS": "filtre de remplacement pour masque à gaz."
     },
-      {
+{
         "Atout": "Compteur Geiger",
         "Catégorie": "SURVIE",
         "COUT_Atout": "Équipement",
         "COUT_Yen": "2 500¥",
         "EFFETS": "Permet de détecter les radiations."
+      },
+{
+        "Atout": "Créditube certifié",
+        "Catégorie": "SURVIE",
+        "COUT_Atout": "Atout 1",
+        "COUT_Yen": "12 500¥",
+        "EFFETS": "RR 1 Influence (négociation)"
       },
 {
       "Atout": "Jumelles",
@@ -522,9 +585,108 @@ const SHADOWRUN_GEAR = {
       "EFFETS": "Permet d'obtenir un avantage sur un test de magie rituelle en échange d'un point d'Anarchy."
     }
     ]
+},
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  "9_programmes_legaux": {
+    "nom": "9. PROGRAMMES LÉGAUX",
+    "total": 7,
+    "donnees": [
+{
+      "Atout": "Assistant personnel Spinrad Lycos",
+      "COUT_Atout": "Atout +2",
+      "COUT_Yen": "12 500¥",
+      "EFFETS": "Adopte une personnalité artificielle, rédige des messages, gère le planning, assiste les recherches RR 1 Électronique (recherches matricielles)"
+    },
+{
+      "Atout": "Assistant personnel ETC Nate",
+      "COUT_Atout": "Atout +4",
+      "COUT_Yen": "22 500¥",
+      "EFFETS": "RR 2 Électronique (recherches matricielles)"
+    },
+{
+      "Atout": "Appli eParkour",
+      "COUT_Atout": "Atout +2",
+      "COUT_Yen": "12 500¥",
+      "EFFETS": "Analyse l’environnement et les possibilités de parkour en se basant sur le profil de compétence de l’utilisateur RR 1 Athlétisme (parkour)"
+    },
+{
+      "Atout": "Linguasoft",
+      "COUT_Atout": "Atout +1",
+      "COUT_Yen": "2 500¥",
+      "EFFETS": "Permet de traduire une langue (au choix) en temps réel."
+    },
+{
+      "Atout": "Mapsoft",
+      "COUT_Atout": "Atout +2",
+      "COUT_Yen": "12 500¥",
+      "EFFETS": "Carte d’un lieu, guidage RA RR 1 Survie (orientation)"
+    },
+{
+      "Atout": "Programme linguistique",
+      "COUT_Atout": "Atout +2",
+      "COUT_Yen": "12 500¥",
+      "EFFETS": "RR 1 Influence (étiquette)"
+    },
+{
+      "Atout": "Simshare",
+      "COUT_Atout": "Atout +1",
+      "COUT_Yen": "2 500¥",
+      "EFFETS": "Permet de partager un flux simsens avec d’autres utilisateurs"
+    },
+    ]
   },
-  "10_programmes_illegaux": {
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  "9.5_OPTIONS_DE_DECK": {
+    "nom": "9.5 Options de deck",
+    "total": 7,
+    "donnees": [
+{
+      "Atout": "Cyberdeck de base",
+      "COUT_Atout": "Atout +1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "Firewall 1 - Attaque 0"
+    },
+{
+      "Atout": "Firewall",
+      "COUT_Atout": "Atout +1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "+1 Firewall (max +4 pour un attribut Firewall max de 5 au total)"
+    },
+{
+      "Atout": "Attaque",
+      "COUT_Atout": "Atout +1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "+1 Attaque (max +5 pour un attribut Attaque max de 5 au total)"
+    },
+{
+      "Atout": "Accroissement de réponse Novatech eXtense",
+      "COUT_Atout": "Atout +1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "+1 point d’Anarchy par scène de piratage en RV, actions supplémentaires illimitées en échange de points d’Anarchy"
+    },
+{
+      "Atout": "Accroissement de réponse MCT-380",
+      "COUT_Atout": "Atout +3",
+      "COUT_Yen": "15 000¥",
+      "EFFETS": "+1 point d’Anarchy par scène de piratage en RV, +1 action par narration en RV, pas de limite au nombre d’actions supplémentaires par tour en RV"
+    },
+{
+      "Atout": "Accroissement de réponse Eastern Tiger Onyx",
+      "COUT_Atout": "Atout +4",
+      "COUT_Yen": "20 000¥",
+      "EFFETS": "+2 points d’Anarchy par scène de piratage en RV, +1 action par narration en RV, pas de limite au nombre d’actions supplémentaires par tour en RV"
+    },
+{
+      "Atout": "Filtre de biofeedback",
+      "COUT_Atout": "Atout +1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "Procure un point d’Armure contre les dommages de biofeedback"
+    },
+    ]
+  },
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+"10_programmes_illegaux": {
     "nom": "10. PROGRAMMES ILLÉGAUX",
     "total": 15,
     "donnees": [
@@ -1214,6 +1376,13 @@ const SHADOWRUN_GEAR = {
       "Pré_requis": "adepte"
     },
     {
+      "Atout": "Contre-attaque fulgurante",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "En échange d’un point d’Anarchy, le personnage obtient un Avantage à un test de Combat rapproché lorsqu’il se défend en tentant d’infliger des dégâts à l’attaquant.",
+      "Pré_requis": "adepte"
+    },
+    {
       "Atout": "Contrôle vocal",
       "COUT_Atout": "Atout 8",
       "COUT_Yen": "40 000¥",
@@ -1445,6 +1614,13 @@ const SHADOWRUN_GEAR = {
       "Pré_requis": "adepte"
     },
     {
+      "Atout": "Conscience empathique",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "Grâce à une forme limité de conscience magique, le personnage peut ressentir les émotions de ceux qu'il voit par le biais de sa vision normale. Permet, sur un test de Perception (astrale) (3) réussit, de connaître l’état émotionnel d’une cible sans avoir recours à la perception astrale. ",
+      "Pré_requis": "adepte"
+    },
+    {
       "Atout": "Sens magique",
       "COUT_Atout": "Atout 1",
       "COUT_Yen": "5 000¥",
@@ -1491,6 +1667,13 @@ const SHADOWRUN_GEAR = {
       "COUT_Atout": "Atout 3",
       "COUT_Yen": "15 000¥",
       "EFFETS": "RR 1 Influence (intimidation).",
+      "Pré_requis": "adepte"
+    },
+    {
+      "Atout": "Geas de pouvoir",
+      "COUT_Atout": "Atout -1",
+      "COUT_Yen": "-5 000¥",
+      "EFFETS": "Une contrainte conditionne l’utilisation du pouvoir à un contexte précis. Cela peut être lié à l’environnement du personnage (intérieur, rue, front de mer), un moment de la journée (nuit, jour, aube et crépuscule) à une météo particulière (pluie, tempête, canicule), un état de l’adepte (blessé, ivre, en perception astrale) … Cette restriction doit être réelle et ne pas en reproduire une que possède déjà le personnage. En cas de non-respect de cette condition, le pouvoir ne peut être utilisé.",
       "Pré_requis": "adepte"
     }
     ]
@@ -1829,6 +2012,79 @@ const SHADOWRUN_GEAR = {
     }
     ]
   },
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  "16.5_Loas": {
+    "nom": "16.5 loas (vaudou)",
+    "total": 9,
+    "donnees": [
+    {
+      "Atout": "Agwe (Loa de la mer)",
+      "COUT_Atout": "Atout 4*",
+      "COUT_Yen": "20 000¥*",
+      "EFFETS": "Choisir deux RR parmi : - RR 1 Influence (négociation); - RR 1 Sorcellerie (sorts d’illusion);  - RR 1 Conjuration (esprits de l’eau); Diplomate imprévisible (Comportement) : diplomate doux, mais capable de violences soudaines qu’il garde en dernier recours.",
+      "Pré_requis": "Eveille"
+    },
+    {
+      "Atout": "Azaca (Frère cadet des Loas )",
+      "COUT_Atout": "Atout 2*",
+      "COUT_Yen": "10 000¥*",
+      "EFFETS": "Choisir une RR parmi : - RR 1 Sorcellerie (sorts de santé);  - RR 1 Conjuration (esprits de la terre); Impulsif (Comportement) : s’implique toujours dans de nouvelle situation sur un coup de tête. ",
+      "Pré_requis": "Eveille"
+    },
+    {
+      "Atout": "Damballah (Grand serpent du ciel)",
+      "COUT_Atout": "Atout 4*",
+      "COUT_Yen": "20 000¥*",
+      "EFFETS": "Choisir deux RR parmi : - RR 1 Perception (astrale); - RR 1 Sorcellerie (sorts de détection);  - RR 1 Conjuration (esprits du ciel) Cachotier (Comportement) : a tendance à ne jamais révéler ses secrets. ",
+      "Pré_requis": "Eveille"
+    },
+    {
+      "Atout": "Erzullie (Loa de l’amour et de la passion)",
+      "COUT_Atout": "Atout 2*",
+      "COUT_Yen": "10 000¥*",
+      "EFFETS": "Choisir une RR parmi : - RR 1 Sorcellerie (sorts d’illusion);  - RR 1 Conjuration (esprits des aînés) Chic (Comportement) : déteste être mal habillé. ",
+      "Pré_requis": "Eveille"
+    },
+    {
+      "Atout": "Ghede (Loa de la mort et des défunts)",
+      "COUT_Atout": "Atout 4*",
+      "COUT_Yen": "20 000¥*",
+      "EFFETS": "Choisir deux RR parmi : - RR 1 Influence (bluff); - RR 1 Sorcellerie (sorts de santé);  - RR 1 Sorcellerie (sorts de manipulation)  Adepte de l’humour noir (Comportement) : ne respecte rien et s’amuse à choquer les gens. ",
+      "Pré_requis": "Eveille"
+    },
+    {
+      "Atout": "Legba (Messager divin des Loas)",
+      "COUT_Atout": "Atout 4*",
+      "COUT_Yen": "20 000¥*",
+      "EFFETS": "Choisir deux RR parmi : - RR 1 Influence (étiquette); - RR 1 Sorcellerie (sorts de détection);  - RR 1 Conjuration (esprits des aînés) Sagesse des anciens (Comportement) : sage et s’attend en conséquent à être écouté. ",
+      "Pré_requis": "Eveille"
+    },
+    {
+      "Atout": "Obatala (Loa de la pureté)",
+      "COUT_Atout": "Atout 4*",
+      "COUT_Yen": "20 000¥*",
+      "EFFETS": "Choisir deux RR parmi : - RR 1 Perception (astrale); - RR 1 Sorcellerie (contresort);  - RR 1 Conjuration (bannissement) Pureté immaculée (Comportement) : s’oppose aux forces du mal et à la corruption. ",
+      "Pré_requis": "Eveille"
+    },
+    {
+      "Atout": "Ogoun (Loa du fer et de la guerre )",
+      "COUT_Atout": "Atout 4*",
+      "COUT_Yen": "20 000¥*",
+      "EFFETS": "Choisir deux RR parmi : - RR 1 Combat rapproché (lames); - RR 1 Sorcellerie (sorts de combat);  - RR 1 Conjuration (esprit du feu) Confiant (Comportement) : ne doute jamais de ses capacités ni de ses choix. ",
+      "Pré_requis": "Eveille"
+    },
+    {
+      "Atout": "Shango (Loa de la foudre et des tempêtes)",
+      "COUT_Atout": "Atout 4*",
+      "COUT_Yen": "20 000¥*",
+      "EFFETS": "Choisir deux RR parmi : - RR 1 Combat rapproché (lames); - RR 1 Combat à distance (spécialisation au choix); - RR 1 Sorcellerie (tout sort de foudre quelle que soit sa catégorie)  - RR 1 Conjuration (esprits du vent) Aveuglé par la douleur (Comportement) : devient fou de rage lorsqu’il est blessé. ",
+      "Pré_requis": "Eveille"
+    },
+    ]
+
+  },
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   "17_sorts_combat": {
     "nom": "17. SORTS DE COMBAT",
     "total": 11,
@@ -2116,6 +2372,15 @@ const SHADOWRUN_GEAR = {
       "Seuil": "Vol + Cha"
     },
     {
+      "Atout": "Purification du corps",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "Permet d’annuler les effets d’une drogue ou toxine préalablement ingérée par la cible sans qu’elle en subisse de contre-coût. ",
+      "Pré_requis": "Eveille",
+      "Type": "Instantané",
+      "Seuil": "5"
+    },
+    {
       "Atout": "Réveil",
       "COUT_Atout": "Atout 1",
       "COUT_Yen": "5 000¥",
@@ -2141,15 +2406,6 @@ const SHADOWRUN_GEAR = {
       "Pré_requis": "Eveille",
       "Type": "Instantané",
       "Seuil": "2"
-    },
-    {
-      "Atout": "Purification du corps",
-      "COUT_Atout": "Atout 1",
-      "COUT_Yen": "5 000¥",
-      "EFFETS": "Permet d’annuler les effets d’une drogue ou toxine préalablement ingérée par la cible sans qu’elle en subisse de contre-coût.",
-      "Pré_requis": "Eveille",
-      "Type": "Instantané",
-      "Seuil": "5"
     },
     {
       "Atout": "Soin",
@@ -2383,6 +2639,12 @@ const SHADOWRUN_GEAR = {
       "COUT_Atout": "Atout 0",
       "COUT_Yen": "0¥*",
       "EFFETS": "Les commlink plantent, les armes s'enraillent, les systèmes électriques disjonctent… Que le personnage soit un manche pour utiliser la technologie ou qu'il n'ait jamais de chance, cela lui arrive tout le temps. Peut récupérer un point d'Anarchy lorsque cela arrive au mauvais moment. Peut dépenser un point d'Anarchy pour que cela se produise au bon moment. Note : peut aussi être l'objet d'un comportement ou d'une citation plutôt qu'être un trait."
+    },
+    {
+      "Atout": "Geas",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000¥*",
+      "EFFETS": "Permet à un éveillé d’ignorer la perte d’un point d’essence sur l’usage de ses capacités magiques (les malus liés à la magie commencent donc avec une essence inférieure ou égale à 4 au lieu de commencer avec une essence inférieure ou égale à 5) en échange de restrictions sur l’usage de sa magie (exemple : uniquement dans la rue, doit être en perception astrale, doit faire de grand geste sans entrave, seulement de nuit). Affecte toutes les activités magiques et ne doit pas reproduire une limitation que possède déjà le personnage. Subit les effets normaux de la perte de magie ainsi qu’un désavantage aux tests liés à la magie en cas de non-respect des restrictions. "
     },
     {
       "Atout": "Guérison rapide",
@@ -2674,6 +2936,15 @@ const SHADOWRUN_GEAR = {
       "Pré_requis": "Eveille",
       "Type": "psycho, Concentration",
       "Seuil": "Vol + Log -2"
+    },
+    {
+      "Atout": "Succube",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "La cible apparait comme l’objet du désir de l’observateur. Chaque observateur voit quelque chose de différent (une étudiante en minijupe, un homme nucouvert de chantilly ou un collègue apportant du café). ",
+      "Pré_requis": "Eveille",
+      "Type": "instantané",
+      "Seuil": "Selon aire d’effet "
     }
     ]
   },
@@ -2745,6 +3016,15 @@ const SHADOWRUN_GEAR = {
       "Seuil": "Aire +2"
     },
     {
+      "Atout": "Barrière élémentaire",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "Crée une barrière infranchissable dans le plan physique à moins de la détruire ou de la tromper. Les succès augmentent sa résistance. Inflige des dommages (VD égale aux succès net) à toute cible qui entre en contact avec la barrière. Déclenche l’effet élémentaire du sort (choisit au moment de l’apprentissage du sort) contre un point d’Anarchy.",
+      "Pré_requis": "Eveille",
+      "Type": "physique, Concentration",
+      "Seuil": "Aire +2"
+    },
+    {
       "Atout": "Brouillage",
       "COUT_Atout": "Atout 1",
       "COUT_Yen": "5 000¥",
@@ -2797,6 +3077,15 @@ const SHADOWRUN_GEAR = {
       "Pré_requis": "Eveille",
       "Type": "physique, Concentration",
       "Seuil": "Aire +3"
+    },
+    {
+      "Atout": "Impulsion",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "Emet une impulsion électromagnétique brève mais intense qui grille les marqueurs RFID standard et peut endommager les composants électroniques des appareils situés dans la zone (dégâts de base VD 0). Peut aussi créer du bruit et brouiller temporairement les communications ou éteindre les appareils situés dans la zone ciblé en échange d’un point d’Anarchy.",
+      "Pré_requis": "Eveille",
+      "Type": "instantané",
+      "Seuil": "Selon aire d’effet"
     },
     {
       "Atout": "Lianes",
@@ -3406,6 +3695,20 @@ const SHADOWRUN_GEAR = {
       "Perte_essence": "-1"
     },
     {
+      "Atout": "Simrig",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "Permet d’enregistrer en simsens Full-X, aussi utilisable pour créer des BTL. ",
+      "Perte_essence": "-1"
+    },
+    {
+      "Atout": "Synthlink",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000¥",
+      "EFFETS": "Améliore le lien entre un musicien et son instrument ",
+      "Perte_essence": "-1"
+    },
+    {
       "Atout": "Système d'orientation Renraku Navi",
       "COUT_Atout": "Atout 3",
       "COUT_Yen": "15 000¥",
@@ -3601,7 +3904,7 @@ const SHADOWRUN_GEAR = {
     {
       "Atout": "Armure dermique",
       "COUT_Atout": "Atout 2",
-      "COUT_Yen": "10000",
+      "COUT_Yen": "10 000",
       "EFFETS": "Armure +1",
       "Perte_essence": "-1"
     }
@@ -3668,6 +3971,13 @@ const SHADOWRUN_GEAR = {
       "Perte_essence": "-1"
     },
     {
+      "Atout": "Camouflage dermique",
+      "COUT_Atout": "Atout 5",
+      "COUT_Yen": "25 000",
+      "EFFETS": "Des polymères en ruthénium implantés sous la peau du personnage, ce qui lui permettent de prendre la teinte de son environnement. RR 2 en Furtivité (discrétion Physique) lorsque le personnage est nu.",
+      "Perte_essence": "-1"
+    },
+    {
       "Atout": "Modulateur vocal",
       "COUT_Atout": "Atout 3",
       "COUT_Yen": "15000",
@@ -3676,23 +3986,30 @@ const SHADOWRUN_GEAR = {
     },
     {
       "Atout": "Lames digitales rétractiles",
-      "COUT_Atout": "Atout 2",
-      "COUT_Yen": "12500",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "7 500",
       "EFFETS": "Lames de rasoirs de 2.5 cm rétractiles, implantées sous des ongles synthétiques (plus discret que des griffes rétractiles lors des contrôles). (VD F+1, OK/-/-/-)",
       "Perte_essence": "-1"
     },
     {
       "Atout": "Griffes rétractiles",
-      "COUT_Atout": "Atout 2",
-      "COUT_Yen": "12500",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "7 500",
       "EFFETS": "Lame implantées le long d'un os ou trois griffes sur le dos de la main. (VD F+2, OK/-/-/-)",
       "Perte_essence": "-1"
     },
     {
       "Atout": "Mains cyber avec système magnétique",
-      "COUT_Atout": "Atout 2",
-      "COUT_Yen": "10000",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000",
       "EFFETS": "Permet de s'accrocher à une structure métallique ou obtenir un avantage pour escalader une structure métallique en échange d'un point d'Anarchy.",
+      "Perte_essence": "-1"
+    },
+    {
+      "Atout": "Main taser Cavalier Arms",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "7 500",
+      "EFFETS": "Electro gant implanté (VD 5, OK/-/-/-, Dommages étourdissants).",
       "Perte_essence": "-1"
     },
     {
@@ -3735,6 +4052,20 @@ const SHADOWRUN_GEAR = {
       "COUT_Atout": "Atout 5",
       "COUT_Yen": "25000",
       "EFFETS": "Fait passer la portée des grenades de 'OK/OK/Dés/-' à 'OK/OK/OK/-'. RR 1 Combat à distance (armes de jet)",
+      "Perte_essence": "-1"
+    },
+    {
+      "Atout": "Bras cyber standard",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000",
+      "EFFETS": "Fait passer la portée des grenades de 'OK/OK/Dés/-' à 'OK/OK/OK/-'. RR 1 Combat à distance (armes de jet)",
+      "Perte_essence": "-1"
+    },
+    {
+      "Atout": "Bras cyber Standard débridés",
+      "COUT_Atout": "Atout 1",
+      "COUT_Yen": "5 000",
+      "EFFETS": "VD à mains nues +1, Sujet aux défaillances, doit prendre un risque fort ou extrême. ",
       "Perte_essence": "-1"
     },
     {
@@ -3835,10 +4166,31 @@ const SHADOWRUN_GEAR = {
       "Perte_essence": "-0,5"
     },
     {
+      "Atout": "Articulations améliorées",
+      "COUT_Atout": "Atout 2",
+      "COUT_Yen": "10 000¥",
+      "EFFETS": "Permet de se libérer de ses liens ou de passer par des passages étroits normalement inaccessibles en échange d’un point d’Anarchy. ",
+      "Perte_essence": "-0,5"
+    },
+    {
       "Atout": "Augmentation de la densité osseuse",
       "COUT_Atout": "Atout 6",
       "COUT_Yen": "30 000¥",
       "EFFETS": "+1 case de blessure légère ajoutée au moniteur d'état. VD à mains nues +1",
+      "Perte_essence": "-0,5"
+    },
+    {
+      "Atout": "Contrôleur de douleur ",
+      "COUT_Atout": "Atout 2",
+      "COUT_Yen": "10 000¥",
+      "EFFETS": "Permet d’ignorer le désavantage causé par un niveau de blessure (une grave ou deux légères – dès que le personnage à une blessure légère et une blessure grave de coché, il subit pleinement leurs effets), mais impose un Désavantage aux tests de Perception basé sur le touché une fois activé.",
+      "Perte_essence": "-0,5"
+    },
+    {
+      "Atout": "Défense pathogènes ",
+      "COUT_Atout": "Atout 2",
+      "COUT_Yen": "10 000¥",
+      "EFFETS": "Immunité à la plupart des maladies. ",
       "Perte_essence": "-0,5"
     },
     {

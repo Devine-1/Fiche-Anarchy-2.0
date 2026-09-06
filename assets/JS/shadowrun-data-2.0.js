@@ -1446,15 +1446,15 @@ const SHADOWRUN_DATA = {
       },
       {
         "Equipement": "Commlink (Bas de gamme)",
-        "Description": "Bas de gamme : Meta Link, Renraku Aguchi, Sony Angel, Transys Arthur, Sony Emporer, Leviathan Technical LT-2100, Microtronica Azteca Raptor, Xiao Technologies XT-2G, Common Denominator Element."
+        "Description": "Firewall 1, Bas de gamme : Meta Link, Renraku Aguchi, Sony Angel, Transys Arthur, Sony Emporer, Leviathan Technical LT-2100, Microtronica Azteca Raptor, Xiao Technologies XT-2G, Common Denominator Element."
       },
       {
         "Equipement": "Commlink (Haut de gamme )",
-        "Description": "Haut de gamme : Tansys Avalon, Pulse Wave, Fairlight Caliban, Fuchi Cyber-X7"
+        "Description": "Firewall 3, Haut de gamme : Tansys Avalon, Pulse Wave, Fairlight Caliban, Fuchi Cyber-X7"
       },
       {
         "Equipement": "Commlink (Moyen de gamme)",
-        "Description": "Moyen de gamme : Renraku Senseï, MCT-3500, Matrix Systems Gridgopher, Erika Elite, FTL Quark, Hermès Ikon, Novatech Netninja."
+        "Description": "Firewall 2, Moyen de gamme : Renraku Senseï, MCT-3500, Matrix Systems Gridgopher, Erika Elite, FTL Quark, Hermès Ikon, Novatech Netninja."
       },
       {
         "Equipement": "Contrat DocWagon (contrat standard )",

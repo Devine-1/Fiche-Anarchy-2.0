@@ -3653,9 +3653,9 @@ function renderStep6(container) {
 
   // Catégories par type de personnage
   const CATEGORIES_EMERGE = ['FLUX DE RESONNACE', 'SPRITES', 'CONSTRUCTS', 'MATÉRIEL MAGIQUE', 'FORMES COMPLEXES'];
-  const CATEGORIES_MAGICIEN = ["SORTS DE COMBAT", "SORTS DE DÉTECTION", "SORTS DE SANTÉ", "SORTS D'ILLUSION", "SORTS DE MANIPULATION", "FOCUS", "MATÉRIEL MAGIQUE", "IDOLES (ESPRITS MENTORS)"];
-  const CATEGORIES_ADEUTE = ["FOCUS", "MATÉRIEL MAGIQUE", "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", "IDOLES (ESPRITS MENTORS)"];
-  const CATEGORIES_ADEUTE_MYSTIQUE = ["SORTS DE COMBAT", "SORTS DE DÉTECTION", "SORTS DE SANTÉ", "SORTS D'ILLUSION", "SORTS DE MANIPULATION", "FOCUS", "MATÉRIEL MAGIQUE", "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", "IDOLES (ESPRITS MENTORS)"];
+  const CATEGORIES_MAGICIEN = ["SORTS DE COMBAT", "SORTS DE DÉTECTION", "SORTS DE SANTÉ", "SORTS D'ILLUSION", "SORTS DE MANIPULATION", "FOCUS", "MATÉRIEL MAGIQUE", "IDOLES (ESPRITS MENTORS)", "LOAS (VAUDOU))"];
+  const CATEGORIES_ADEUTE = ["FOCUS", "MATÉRIEL MAGIQUE", "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", "IDOLES (ESPRITS MENTORS)", "LOAS (VAUDOU)"];
+  const CATEGORIES_ADEUTE_MYSTIQUE = ["SORTS DE COMBAT", "SORTS DE DÉTECTION", "SORTS DE SANTÉ", "SORTS D'ILLUSION", "SORTS DE MANIPULATION", "FOCUS", "MATÉRIEL MAGIQUE", "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", "IDOLES (ESPRITS MENTORS)", "LOAS (VAUDOU)"];
   const CATEGORIES_CHANGELIN = ['Métagénétique positif', 'Métagénétique négatif'];
 
   // Déterminer le type de personnage
@@ -3716,7 +3716,7 @@ function renderStep6(container) {
   const catOrder = ['CYBERWARE', 'BIOWARE', 
                     'SORTS DE COMBAT', 'SORTS DE DÉTECTION', 'SORTS DE SANTÉ', "SORTS D'ILLUSION", 'SORTS DE MANIPULATION',
                     'FOCUS', 'MATÉRIEL MAGIQUE', 
-                    "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", 'IDOLES (ESPRITS MENTORS)',
+                    "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", 'IDOLES (ESPRITS MENTORS)', "LOAS (vaudou)",
                     'FORMES COMPLEXES', 'FLUX DE RESONNACE', 'SPRITES', 'CONSTRUCTS',
                     'ZOOCANTHROPES', 'Métagénétique positif', 'Métagénétique négatif',
                     'VVHMH I', 'VVHMH II', 'VVHMH III', 'VVHMH Ia',
@@ -4014,6 +4014,7 @@ function renderStep8(container) {
   // Catégories de matos rigger
   const RIGGER_CATEGORIES = [
     { key: '7_cyberdek', label: 'Cyberdecks' },
+    { key: '9_programmes_legaux', label: 'Programmes Légaux' },
     { key: '10_programmes_illegaux', label: 'Programmes Illégaux' },
     { key: '22_deux_roues', label: 'Deux Roues' },
     { key: '23_voitures', label: 'Voitures' },
@@ -5191,6 +5192,7 @@ function renderStep11(container) {
         '14_pouvoirs_adepte': 'Pouvoirs d\'Adepte',
         '15_voies_adepte': 'Voies d\'Adepte',
         '16_idoles': 'Idoles',
+        '16.5_Loas': 'Loas (vaudou)',
         '17_sorts_combat': 'Sorts de Combat',
         '18_sorts_detection': 'Sorts de Détection',
         '19_sorts_sante': 'Sorts de Santé',
