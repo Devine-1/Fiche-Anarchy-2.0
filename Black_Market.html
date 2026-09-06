@@ -900,119 +900,110 @@
     }
 
     // ===== EXTRACTION =====
-    var allItems = [];
-    var dynamicSubcats = {};
+      var allItems = [];
+      var dynamicSubcats = {}; // mainCat -> Set de sous-catégories découvertes
 
-    if (typeof SHADOWRUN_GEAR === "undefined") {
-      document.getElementById("bm-content").innerHTML =
-        '<div class="bm-empty">Erreur : shadowrun-matos-2.0.js non chargé</div>';
-      return;
-    }
-
-    var nextId = 0;
-
-    for (var mainCat in CATEGORY_MAP) {
-      if (!CATEGORY_MAP.hasOwnProperty(mainCat)) continue;
-      var cfg = CATEGORY_MAP[mainCat];
-      dynamicSubcats[mainCat] = new Set();
-
-      // Armures hardcodées
-      if (cfg.hardcoded) {
-        cfg.hardcoded.forEach(function (raw) {
-          allItems.push({
-            id: nextId++,
-            mainCat: mainCat,
-            subCat: "Armures",
-            nom: raw.nom,
-            prix: raw.prix,
-            prixNum: parseYen(raw.prix),
-            desc: raw.desc,
-            prerequis: "",
-            essence: "",
-            type: "",
-            seuil: "",
-            score: raw.score,
-          });
-          dynamicSubcats[mainCat].add("Armures");
-        });
-        continue;
+      if (typeof SHADOWRUN_GEAR === "undefined") {
+        document.getElementById("bm-content").innerHTML =
+          '<div class="bm-empty">Erreur : shadowrun-matos-2.0.js non chargé</div>';
+        return;
       }
 
-      // Données du fichier JS
-      (cfg.sections || []).forEach(function (secKey) {
-        var sec = SHADOWRUN_GEAR[secKey];
-        if (!sec || !sec.donnees) return;
+      var nextId = 0;
 
-        sec.donnees.forEach(function (raw) {
-          var yenStr = raw.COUT_Yen || raw["COUT_Yen"] || "";
-          if (!yenStr.toString().trim()) return;
+      for (var mainCat in CATEGORY_MAP) {
+        if (!CATEGORY_MAP.hasOwnProperty(mainCat)) continue;
+        var cfg = CATEGORY_MAP[mainCat];
+        dynamicSubcats[mainCat] = new Set();
 
-          var subCat = null;
-          if (cfg.dynamicSubcatField && raw[cfg.dynamicSubcatField]) {
-            subCat = raw[cfg.dynamicSubcatField];
-          } else if (cfg.filterByField && raw[cfg.filterByField]) {
-            subCat = raw[cfg.filterByField];
-          } else if (cfg.subcats) {
-            for (var sc in cfg.subcats) {
-              if (Array.isArray(cfg.subcats[sc]) &&
-                  cfg.subcats[sc].indexOf(secKey) !== -1) {
-                subCat = sc;
-                break;
+        // Données hardcodées (armures)
+        if (cfg.hardcoded) {
+          cfg.hardcoded.forEach(function (raw) {
+            allItems.push({
+              id: nextId++,
+              mainCat: mainCat,
+              subCat: "Armures",
+              nom: raw.nom,
+              prix: raw.prix,
+              prixNum: parseYen(raw.prix),
+              desc: raw.desc,
+              prerequis: "",
+              essence: "",
+              type: "",
+              seuil: "",
+              score: raw.score,
+            });
+            dynamicSubcats[mainCat].add("Armures");
+          });
+          continue;
+        }
+
+        // Données du fichier JS
+        cfg.sections.forEach(function (secKey) {
+          var sec = SHADOWRUN_GEAR[secKey];
+          if (!sec || !sec.donnees) return;
+
+          sec.donnees.forEach(function (raw) {
+            var yenStr = raw.COUT_Yen || raw["COUT_Yen"] || "";
+            if (!yenStr.toString().trim()) return;
+
+            var subCat = null;
+            if (cfg.dynamicSubcatField && raw[cfg.dynamicSubcatField]) {
+              subCat = raw[cfg.dynamicSubcatField];
+            } else if (cfg.filterByField && raw[cfg.filterByField]) {
+              subCat = raw[cfg.filterByField];
+            } else if (cfg.subcats) {
+              for (var sc in cfg.subcats) {
+                if (cfg.subcats[sc].indexOf(secKey) !== -1) {
+                  subCat = sc;
+                  break;
+                }
               }
             }
-          }
 
-          if (!subCat) subCat = sec.nom || secKey;
+            if (!subCat) subCat = sec.nom || secKey;
 
-          var subCatNorm = norm(subCat);
-          if (
-            subCatNorm === "munitions" ||
-            subCatNorm === "accessoires" ||
-            subCatNorm === "munition" ||
-            subCatNorm === "accessoire"
-          )
-            return;
+            var subCatNorm = norm(subCat);
+            if (
+              subCatNorm === "munitions" ||
+              subCatNorm === "accessoires" ||
+              subCatNorm === "munition" ||
+              subCatNorm === "accessoire"
+            )
+              return;
 
-          dynamicSubcats[mainCat].add(subCat);
+            dynamicSubcats[mainCat].add(subCat);
 
-          var item = {
-            id: nextId++,
-            mainCat: mainCat,
-            subCat: subCat,
-            sectionKey: secKey,
-            nom: raw.Atout || raw.Nom || "Sans nom",
-            prix: yenStr.toString().trim(),
-            prixNum: parseYen(yenStr),
-            desc: raw.EFFETS || raw.Description || "",
-            prerequis: raw.Pré_requis || raw["Pré-requis"] || "",
-            essence: raw.Perte_essence || "",
-            type: raw.Type || "",
-            seuil: raw.Seuil || "",
-          };
+            var item = {
+              id: nextId++,
+              mainCat: mainCat,
+              subCat: subCat,
+              sectionKey: secKey,
+              nom: raw.Atout || raw.Nom || "Sans nom",
+              prix: yenStr.toString().trim(),
+              prixNum: parseYen(yenStr),
+              desc: raw.EFFETS || raw.Description || "",
+              prerequis: raw.Pré_requis || raw["Pré-requis"] || "",
+              essence: raw.Perte_essence || "",
+              type: raw.Type || "",
+              seuil: raw.Seuil || "",
+            };
 
-          if (secKey === "33_arme") {
-            item.ameliorable =
-              String(raw.amélioraion || "").toUpperCase() === "OUI";
-          }
-
-          if (secKey === "13_materiel_magique") {
-            var focusName = raw.Atout || raw.Nom || "";
-            if (typeof FOCUS_TATOUABLES !== "undefined" &&
-                FOCUS_TATOUABLES.indexOf(focusName) !== -1) {
-              item.isFocus = true;
-              item.basePrixNum = item.prixNum;
+            // flag arme améliorable
+            if (secKey === "33_arme") {
+              item.ameliorable =
+                String(raw.amélioraion || "").toUpperCase() === "OUI";
             }
-          }
 
-          allItems.push(item);
+            allItems.push(item);
+          });
         });
-      });
-    }
+      }
 
-    // Tri par prix décroissant
-    allItems.sort(function (a, b) {
-      return (b.prixNum || 0) - (a.prixNum || 0);
-    });
+      // Trier par prix décroissant
+      allItems.sort(function (a, b) {
+        return (b.prixNum || 0) - (a.prixNum || 0);
+      });
 
     // ===== UI =====
     var searchInput = document.getElementById("bm-search");
@@ -1448,7 +1439,13 @@
     }
 
     function renderArmeUpgradeButton(itemId) {
-      var item = allItems.find(function (it) { return it.id === itemId; });
+      var item = null;
+      for (var i = 0; i < allItems.length; i++) {
+        if (allItems[i].id === itemId) {
+          item = allItems[i];
+          break;
+        }
+      }
       var count = 0;
       if (item && item.ameliorationCounts) {
         for (var k in item.ameliorationCounts) {
@@ -1459,7 +1456,8 @@
       return (
         '<button class="pimp-btn" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%); border-color: #B71C1C;" onclick="event.stopPropagation(); openArmeUpgradeModal(' +
         itemId +
-        ');">' +
+        ')">' +
+        '<span class="pimp-icon">⚙️</span>' +
         "<span>Améliorations d'arme" +
         (count > 0 ? " (" + count + ")" : "") +
         "</span>" +
