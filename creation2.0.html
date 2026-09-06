@@ -3653,19 +3653,25 @@ function renderStep6(container) {
 
   // Catégories par type de personnage
   const CATEGORIES_EMERGE = ['FLUX DE RESONNACE', 'SPRITES', 'CONSTRUCTS', 'MATÉRIEL MAGIQUE', 'FORMES COMPLEXES'];
-  const CATEGORIES_MAGICIEN = ["SORTS DE COMBAT", "SORTS DE DÉTECTION", "SORTS DE SANTÉ", "SORTS D'ILLUSION", "SORTS DE MANIPULATION", "FOCUS", "MATÉRIEL MAGIQUE", "IDOLES (ESPRITS MENTORS)", "LOAS (VAUDOU))"];
+  const CATEGORIES_MAGICIEN = ["SORTS DE COMBAT", "SORTS DE DÉTECTION", "SORTS DE SANTÉ", "SORTS D'ILLUSION", "SORTS DE MANIPULATION", "FOCUS", "MATÉRIEL MAGIQUE", "IDOLES (ESPRITS MENTORS)", "LOAS (VAUDOU)"];
   const CATEGORIES_ADEUTE = ["FOCUS", "MATÉRIEL MAGIQUE", "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", "IDOLES (ESPRITS MENTORS)", "LOAS (VAUDOU)"];
   const CATEGORIES_ADEUTE_MYSTIQUE = ["SORTS DE COMBAT", "SORTS DE DÉTECTION", "SORTS DE SANTÉ", "SORTS D'ILLUSION", "SORTS DE MANIPULATION", "FOCUS", "MATÉRIEL MAGIQUE", "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", "IDOLES (ESPRITS MENTORS)", "LOAS (VAUDOU)"];
   const CATEGORIES_CHANGELIN = ['Métagénétique positif', 'Métagénétique négatif'];
 
   // Déterminer le type de personnage
   const conceptType = character.concept ? character.concept.Type : '';
-  const conceptTypeLower = conceptType.toLowerCase().normalize('NFD').replace(/[̀-̏]/g, '');
+  //const conceptTypeLower = conceptType.toLowerCase().normalize('NFD').replace(/[̀-̏]/g, 
+  const conceptTypeLower = normalizeString(conceptType);
   const isNonEveille = conceptTypeLower.includes('non') && conceptTypeLower.includes('eveille');
   const isEmerge = conceptTypeLower.includes('emerge');
   const isMagicien = conceptTypeLower.includes('magicien');
   const isAdepteMystique = conceptTypeLower.includes('adepte') && conceptTypeLower.includes('mystique');
   const isAdepte = conceptTypeLower.includes('adepte') && !isAdepteMystique;
+  const isEveille = !isNonEveille && (
+  conceptTypeLower.includes('eveille') ||
+  conceptTypeLower.includes('magicien') ||
+  conceptTypeLower.includes('adepte')
+);
   const isEspritLibre = character.metatype && character.metatype.Métatype.toLowerCase().includes('esprit libre');
   const isChangelin = character.metatype && character.metatype.Métatype.toLowerCase().includes('changelin');
 
@@ -3716,7 +3722,7 @@ function renderStep6(container) {
   const catOrder = ['CYBERWARE', 'BIOWARE', 
                     'SORTS DE COMBAT', 'SORTS DE DÉTECTION', 'SORTS DE SANTÉ', "SORTS D'ILLUSION", 'SORTS DE MANIPULATION',
                     'FOCUS', 'MATÉRIEL MAGIQUE', 
-                    "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", 'IDOLES (ESPRITS MENTORS)', "LOAS (vaudou)",
+                    "POUVOIRS D'ADEPTE", "VOIES D'ADEPTE", 'IDOLES (ESPRITS MENTORS)', "LOAS (VAUDOU)",
                     'FORMES COMPLEXES', 'FLUX DE RESONNACE', 'SPRITES', 'CONSTRUCTS',
                     'ZOOCANTHROPES', 'Métagénétique positif', 'Métagénétique négatif',
                     'VVHMH I', 'VVHMH II', 'VVHMH III', 'VVHMH Ia',

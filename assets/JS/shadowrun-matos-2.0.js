@@ -2014,7 +2014,7 @@ const SHADOWRUN_GEAR = {
   },
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   "16.5_Loas": {
-    "nom": "16.5 loas (vaudou)",
+    "nom": "16.5 LOAS (VAUDOU)",
     "total": 9,
     "donnees": [
     {
@@ -5648,6 +5648,7 @@ function getAtouts() {
         '14_pouvoirs_adepte': "POUVOIRS D'ADEPTE",
         '15_voies_adepte': "VOIES D'ADEPTE",
         '16_idoles': 'IDOLES (ESPRITS MENTORS)',
+        '16.5_Loas': 'LOAS (VAUDOU)',
         '17_sorts_combat': 'SORTS DE COMBAT',
         '18_sorts_detection': 'SORTS DE DÉTECTION',
         '19_sorts_sante': 'SORTS DE SANTÉ',
