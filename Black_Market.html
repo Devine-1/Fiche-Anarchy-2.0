@@ -758,7 +758,7 @@
           },
         ];
 
-// ===== MAPPING DES BOUTIQUES =====
+        // ===== MAPPING DES BOUTIQUES =====
         var CATEGORY_MAP = {
           "Faire un tour chez le charcudoc": {
             sections: [
@@ -861,19 +861,18 @@
             },
           },
         };
-
         // Affichage des Nuyen transmis depuis la fiche
         var urlParams = new URLSearchParams(window.location.search);
         var nuyenParam = urlParams.get("nuyen");
         if (nuyenParam) {
           var nuyenDisplay = document.getElementById("bm-nuyen-display");
           if (nuyenDisplay) {
-            var formatted = parseInt(nuyenParam, 10).toLocaleString("fr-FR") + " ¥";
+            var formatted =
+              parseInt(nuyenParam, 10).toLocaleString("fr-FR") + " ¥";
             nuyenDisplay.textContent = formatted;
             nuyenDisplay.style.display = "inline";
           }
         }
-
         // ===== HELPERS =====
         function norm(str) {
           if (!str) return "";
@@ -883,14 +882,12 @@
             .normalize("NFD")
             .replace(/[\u0300-\u030f]/g, "");
         }
-
         function esc(text) {
           if (!text) return "";
           var d = document.createElement("div");
           d.textContent = text;
           return d.innerHTML;
         }
-
         function parseYen(yenStr) {
           if (!yenStr) return null;
           var s = String(yenStr);
@@ -906,97 +903,110 @@
         if (typeof SHADOWRUN_GEAR === "undefined") {
           document.getElementById("bm-content").innerHTML =
             '<div class="bm-empty">Erreur : shadowrun-matos-2.0.js non chargé</div>';
-        } else {
-          var nextId = 0;
+          return;
+        }
 
-          for (var mainCat in CATEGORY_MAP) {
-            if (!CATEGORY_MAP.hasOwnProperty(mainCat)) continue;
-            var cfg = CATEGORY_MAP[mainCat];
-            dynamicSubcats[mainCat] = new Set();
+        var nextId = 0;
 
-            // Données hardcodées (armures)
-            if (cfg.hardcoded) {
-              cfg.hardcoded.forEach(function (raw) {
-                allItems.push({
-                  id: nextId++,
-                  mainCat: mainCat,
-                  subCat: "Armures",
-                  nom: raw.nom,
-                  prix: raw.prix,
-                  prixNum: parseYen(raw.prix),
-                  desc: raw.desc,
-                  prerequis: "",
-                  essence: "",
-                  type: "",
-                  seuil: "",
-                  score: raw.score,
-                });
-                dynamicSubcats[mainCat].add("Armures");
+        for (var mainCat in CATEGORY_MAP) {
+          if (!CATEGORY_MAP.hasOwnProperty(mainCat)) continue;
+          var cfg = CATEGORY_MAP[mainCat];
+          dynamicSubcats[mainCat] = new Set();
+
+          // Données hardcodées (armures)
+          if (cfg.hardcoded) {
+            cfg.hardcoded.forEach(function (raw) {
+              allItems.push({
+                id: nextId++,
+                mainCat: mainCat,
+                subCat: "Armures",
+                nom: raw.nom,
+                prix: raw.prix,
+                prixNum: parseYen(raw.prix),
+                desc: raw.desc,
+                prerequis: "",
+                essence: "",
+                type: "",
+                seuil: "",
+                score: raw.score,
               });
-              continue;
-            }
-
-            // Données du fichier JS
-            cfg.sections.forEach(function (secKey) {
-              var sec = SHADOWRUN_GEAR[secKey];
-              if (!sec || !sec.donnees) return;
-
-              sec.donnees.forEach(function (raw) {
-                var yenStr = raw.COUT_Yen || raw["COUT_Yen"] || "";
-                if (!yenStr.toString().trim()) return;
-
-                var subCat = null;
-                if (cfg.dynamicSubcatField && raw[cfg.dynamicSubcatField]) {
-                  subCat = raw[cfg.dynamicSubcatField];
-                } else if (cfg.filterByField && raw[cfg.filterByField]) {
-                  subCat = raw[cfg.filterByField];
-                } else if (cfg.subcats) {
-                  for (var sc in cfg.subcats) {
-                    if (cfg.subcats[sc].indexOf(secKey) !== -1) {
-                      subCat = sc;
-                      break;
-                    }
-                  }
-                }
-
-                if (!subCat) subCat = sec.nom || secKey;
-
-                var subCatNorm = norm(subCat);
-                if (
-                  subCatNorm === "munitions" ||
-                  subCatNorm === "accessoires" ||
-                  subCatNorm === "munition" ||
-                  subCatNorm === "accessoire"
-                )
-                  return;
-
-                dynamicSubcats[mainCat].add(subCat);
-
-                var item = {
-                  id: nextId++,
-                  mainCat: mainCat,
-                  subCat: subCat,
-                  sectionKey: secKey,
-                  nom: raw.Atout || raw.Nom || "Sans nom",
-                  prix: yenStr.toString().trim(),
-                  prixNum: parseYen(yenStr),
-                  desc: raw.EFFETS || raw.Description || "",
-                  prerequis: raw.Pré_requis || raw["Pré-requis"] || "",
-                  essence: raw.Perte_essence || "",
-                  type: raw.Type || "",
-                  seuil: raw.Seuil || "",
-                };
-
-                allItems.push(item);
-              });
+              dynamicSubcats[mainCat].add("Armures");
             });
+            continue;
           }
 
-          // Trier par prix décroissant
-          allItems.sort(function (a, b) {
-            return (b.prixNum || 0) - (a.prixNum || 0);
+          // Données du fichier JS
+          cfg.sections.forEach(function (secKey) {
+            var sec = SHADOWRUN_GEAR[secKey];
+            if (!sec || !sec.donnees) return;
+            sec.donnees.forEach(function (raw) {
+              var yenStr = raw.COUT_Yen || raw["COUT_Yen"] || "";
+              if (!yenStr.toString().trim()) return;
+
+              var subCat = null;
+              if (cfg.dynamicSubcatField && raw[cfg.dynamicSubcatField]) {
+                subCat = raw[cfg.dynamicSubcatField];
+              } else if (cfg.filterByField && raw[cfg.filterByField]) {
+                subCat = raw[cfg.filterByField];
+              } else {
+                for (var sc in cfg.subcats) {
+                  if (cfg.subcats[sc].indexOf(secKey) !== -1) {
+                    subCat = sc;
+                    break;
+                  }
+                }
+              }
+              if (!subCat) subCat = sec.nom || secKey;
+
+              // Exclure Munitions et Accessoires (gérés par le système d'améliorations d'armes)
+              var subCatNorm = norm(subCat);
+              if (
+                subCatNorm === "munitions" ||
+                subCatNorm === "accessoires" ||
+                subCatNorm === "munition" ||
+                subCatNorm === "accessoire"
+              )
+                return;
+
+              dynamicSubcats[mainCat].add(subCat);
+
+              var item = {
+                id: nextId++,
+                mainCat: mainCat,
+                subCat: subCat,
+                sectionKey: secKey,
+                nom: raw.Atout || raw.Nom || "Sans nom",
+                prix: yenStr.toString().trim(),
+                prixNum: parseYen(yenStr),
+                desc: raw.EFFETS || raw.Description || "",
+                prerequis: raw.Pré_requis || raw["Pré-requis"] || "",
+                essence: raw.Perte_essence || "",
+                type: raw.Type || "",
+                seuil: raw.Seuil || "",
+              };
+
+              if (secKey === "33_arme") {
+                item.ameliorable =
+                  String(raw.amélioraion || "").toUpperCase() === "OUI";
+              }
+
+              if (secKey === "13_materiel_magique") {
+                var focusName = raw.Atout || raw.Nom || "";
+                if (FOCUS_TATOUABLES.indexOf(focusName) !== -1) {
+                  item.isFocus = true;
+                  item.basePrixNum = item.prixNum;
+                }
+              }
+
+              allItems.push(item);
+            });
           });
         }
+
+        // Trier par prix décroissant
+        allItems.sort(function (a, b) {
+          return (b.prixNum || 0) - (a.prixNum || 0);
+        });
 
         // ===== UI =====
         var searchInput = document.getElementById("bm-search");
@@ -1006,7 +1016,6 @@
         var countLabel = document.getElementById("bm-count");
         var activeSubcat = "";
 
-        // Remplir le select principal
         Object.keys(CATEGORY_MAP).forEach(function (cat) {
           var opt = document.createElement("option");
           opt.value = cat;
@@ -1044,16 +1053,24 @@
         }
 
         function getVehicleUpgradeCounts(itemId) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           return item && item.upgradeCounts ? item.upgradeCounts : {};
         }
 
         function calculateVehicleUpgradeCost(itemId) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item || !item.upgradeCounts) return 0;
           var allUpgrades = getPimpUpgrades();
           var total = 0;
@@ -1068,13 +1085,18 @@
         }
 
         function openPimpModal(itemId) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item || !isPimpEligible(item)) return;
 
           var upgrades = getPimpUpgrades();
-          var appliedCounts = item.upgradeCounts || {};
+          var appliedCounts =
+            item && item.upgradeCounts ? item.upgradeCounts : {};
           var currentCost = calculateVehicleUpgradeCost(itemId);
           var totalCount = 0;
           for (var k in appliedCounts) {
@@ -1125,7 +1147,9 @@
               costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
             else
               costDisplay =
-                (nuyenVal >= 0 ? "+" : "") + nuyenVal.toLocaleString("fr-FR") + " ¥";
+                (nuyenVal >= 0 ? "+" : "") +
+                nuyenVal.toLocaleString("fr-FR") +
+                " ¥";
             var negativeClass = nuyenVal < 0 ? "pimp-upgrade-negative" : "";
 
             modalHtml +=
@@ -1200,9 +1224,13 @@
         }
 
         function togglePimpUpgrade(itemId, upgradeIdx) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item) return;
           if (!item.upgradeCounts) item.upgradeCounts = {};
           item.upgradeCounts[upgradeIdx] =
@@ -1211,9 +1239,13 @@
         }
 
         function decrementPimpUpgrade(itemId, upgradeIdx) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item || !item.upgradeCounts) return;
           var current = item.upgradeCounts[upgradeIdx] || 0;
           if (current > 1) {
@@ -1225,9 +1257,13 @@
         }
 
         function renderPimpButton(itemId) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           var count = 0;
           if (item && item.upgradeCounts) {
             for (var k in item.upgradeCounts) {
@@ -1248,9 +1284,13 @@
         }
 
         function renderAppliedUpgrades(itemId) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item || !item.upgradeCounts) return "";
           var keys = Object.keys(item.upgradeCounts);
           if (keys.length === 0) return "";
@@ -1307,9 +1347,13 @@
         }
 
         function removePimpUpgrade(itemId, upgradeIdx) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item || !item.upgradeCounts) return;
           delete item.upgradeCounts[upgradeIdx];
           render();
@@ -1330,16 +1374,24 @@
         }
 
         function getArmeUpgradeCounts(itemId) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           return item && item.ameliorationCounts ? item.ameliorationCounts : {};
         }
 
         function calculateArmeUpgradeCost(itemId) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item || !item.ameliorationCounts) return 0;
           var allUpgrades = getArmeUpgrades();
           var total = 0;
@@ -1354,13 +1406,18 @@
         }
 
         function openArmeUpgradeModal(itemId) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item || !isArmeAmeliorable(item)) return;
 
           var upgrades = getArmeUpgrades();
-          var appliedCounts = item.ameliorationCounts || {};
+          var appliedCounts =
+            item && item.ameliorationCounts ? item.ameliorationCounts : {};
           var currentCost = calculateArmeUpgradeCost(itemId);
           var totalCount = 0;
           for (var k in appliedCounts) {
@@ -1411,7 +1468,9 @@
               costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
             else
               costDisplay =
-                (nuyenVal >= 0 ? "+" : "") + nuyenVal.toLocaleString("fr-FR") + " ¥";
+                (nuyenVal >= 0 ? "+" : "") +
+                nuyenVal.toLocaleString("fr-FR") +
+                " ¥";
             var negativeClass = nuyenVal < 0 ? "pimp-upgrade-negative" : "";
 
             modalHtml +=
@@ -1467,7 +1526,9 @@
             "</div>" +
             "</div>";
 
-          var existingModal = document.getElementById("armeUpgradeModalOverlay");
+          var existingModal = document.getElementById(
+            "armeUpgradeModalOverlay",
+          );
           if (existingModal) existingModal.remove();
 
           var modalDiv = document.createElement("div");
@@ -1486,9 +1547,13 @@
         }
 
         function toggleArmeUpgrade(itemId, upgradeIdx) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item) return;
           if (!item.ameliorationCounts) item.ameliorationCounts = {};
           item.ameliorationCounts[upgradeIdx] =
@@ -1497,9 +1562,13 @@
         }
 
         function decrementArmeUpgrade(itemId, upgradeIdx) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           if (!item || !item.ameliorationCounts) return;
           var current = item.ameliorationCounts[upgradeIdx] || 0;
           if (current > 1) {
@@ -1511,9 +1580,13 @@
         }
 
         function renderArmeUpgradeButton(itemId) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
           var count = 0;
           if (item && item.ameliorationCounts) {
             for (var k in item.ameliorationCounts) {
@@ -1522,133 +1595,321 @@
             }
           }
           return (
-            '<button class="pimp-btn" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%); border-color: #B71C1C;" onclick="event.stopPropagation(); openArmeUpgradeModal(' +
+            '<button class="pimp-btn" style="background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%); border-color: #B71C1C;" onclick="event.stopPropagation(); window.openArmeUpgradeModal(' +
             itemId +
             ');">' +
-            "<span>Améliorer l'arme" +
+            "<span>⚙️</span>" +
+            "<span>Améliorer" +
             (count > 0 ? " (" + count + ")" : "") +
             "</span>" +
             "</button>"
           );
         }
 
-        // ===== RENDER =====
-        function renderSubcats() {
-          var mainCat = mainSelect.value;
-          var set = dynamicSubcats[mainCat] || new Set();
+        function renderAppliedArmeUpgrades(itemId) {
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
+          if (!item || !item.ameliorationCounts) return "";
+          var keys = Object.keys(item.ameliorationCounts);
+          if (keys.length === 0) return "";
+
+          var allUpgrades = getArmeUpgrades();
+
+          var html =
+            '<div class="pimp-applied">' +
+            '<div class="pimp-applied-label" style="color: #B71C1C;">⚙️ Améliorations appliquées</div>' +
+            '<div class="pimp-applied-list">';
+
+          keys.forEach(function (idxStr) {
+            var upg = allUpgrades[parseInt(idxStr)];
+            if (!upg) return;
+            var count = item.ameliorationCounts[idxStr];
+            var nuyenVal = parseYen(upg.COUT_Yen) || 0;
+            var totalVal = nuyenVal * count;
+            var costDisplay = "";
+            if (totalVal > 0)
+              costDisplay = "+" + totalVal.toLocaleString("fr-FR") + " ¥";
+            else if (totalVal < 0)
+              costDisplay = totalVal.toLocaleString("fr-FR") + " ¥";
+
+            var countLabel =
+              count > 1
+                ? ' <span style="color:#B71C1C;font-weight:700;">×' +
+                  count +
+                  "</span>"
+                : "";
+
+            html +=
+              '<div class="pimp-applied-item" style="background: #FFEBEE; border-color: #EF9A9A;">' +
+              '<div class="pimp-applied-item-name" style="color: #B71C1C;">' +
+              esc(upg.Atout || upg.Nom || "Amélioration") +
+              countLabel +
+              (costDisplay
+                ? ' <span class="pimp-applied-item-cost">' +
+                  costDisplay +
+                  "</span>"
+                : "") +
+              ' <span class="pimp-remove" onclick="event.stopPropagation(); window.removeArmeUpgrade(' +
+              itemId +
+              ", " +
+              idxStr +
+              ')" title="Retirer tout">×</span></div>' +
+              '<div class="pimp-applied-item-desc">' +
+              esc(upg.EFFETS || "Pas de description") +
+              "</div>" +
+              "</div>";
+          });
+
+          html += "</div></div>";
+          return html;
+        }
+
+        function removeArmeUpgrade(itemId, upgradeIdx) {
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === itemId) {
+              item = allItems[i];
+              break;
+            }
+          }
+          if (!item || !item.ameliorationCounts) return;
+          delete item.ameliorationCounts[upgradeIdx];
+          render();
+        }
+
+        function renderSubcats(mainCat) {
           subcatsDiv.innerHTML = "";
+          activeSubcat = "";
+          if (!mainCat) return;
 
           var allBtn = document.createElement("button");
-          allBtn.className =
-            "bm-subcat-btn" + (activeSubcat === "" ? " bm-subcat-active" : "");
+          allBtn.className = "bm-subcat-btn active";
           allBtn.textContent = "Tout";
           allBtn.onclick = function () {
             activeSubcat = "";
+            updateActiveSubcat();
             render();
           };
           subcatsDiv.appendChild(allBtn);
 
-          Array.from(set)
+          var cats = dynamicSubcats[mainCat] || new Set();
+          // Ajouter aussi les subcats statiques définies dans le mapping
+          var cfg = CATEGORY_MAP[mainCat];
+          if (cfg && cfg.subcats) {
+            Object.keys(cfg.subcats).forEach(function (sc) {
+              cats.add(sc);
+            });
+          }
+
+          Array.from(cats)
             .sort()
             .forEach(function (sc) {
               var btn = document.createElement("button");
-              btn.className =
-                "bm-subcat-btn" +
-                (activeSubcat === sc ? " bm-subcat-active" : "");
+              btn.className = "bm-subcat-btn";
               btn.textContent = sc;
               btn.onclick = function () {
                 activeSubcat = sc;
+                updateActiveSubcat();
                 render();
               };
               subcatsDiv.appendChild(btn);
             });
         }
 
+        function updateActiveSubcat() {
+          var btns = subcatsDiv.querySelectorAll(".bm-subcat-btn");
+          btns.forEach(function (b) {
+            b.classList.toggle(
+              "active",
+              (activeSubcat === "" && b.textContent === "Tout") ||
+                b.textContent === activeSubcat,
+            );
+          });
+        }
+
+        function buildCard(item) {
+          var meta = "";
+          if (item.essence)
+            meta +=
+              '<span class="bm-tag essence">Essence ' +
+              esc(item.essence) +
+              "</span>";
+          if (item.prerequis)
+            meta +=
+              '<span class="bm-tag prereq">' + esc(item.prerequis) + "</span>";
+          if (item.type)
+            meta +=
+              '<span class="bm-tag type">' +
+              esc(item.type) +
+              (item.seuil ? " | Seuil " + esc(item.seuil) : "") +
+              "</span>";
+          if (item.score)
+            meta +=
+              '<span class="bm-tag score">Armure ' +
+              esc(item.score) +
+              "</span>";
+
+          var tatouageBtn = "";
+          if (item.isFocus) {
+            var isActive = item.tatouageActive;
+            var btnClass = isActive
+              ? "bm-tatouage-btn active"
+              : "bm-tatouage-btn";
+            var btnLabel = isActive
+              ? "Tatouage ✓ (+15 000¥)"
+              : "Tatouage +15 000¥";
+            tatouageBtn =
+              '<button class="' +
+              btnClass +
+              '" data-id="' +
+              item.id +
+              '">' +
+              btnLabel +
+              "</button>";
+          }
+
+          var pimpBtn = "";
+          var appliedUpgrades = "";
+          if (isPimpEligible(item)) {
+            pimpBtn = renderPimpButton(item.id);
+            appliedUpgrades = renderAppliedUpgrades(item.id);
+          }
+
+          var armeBtn = "";
+          var armeUpgrades = "";
+          if (isArmeAmeliorable(item)) {
+            armeBtn = renderArmeUpgradeButton(item.id);
+            armeUpgrades = renderAppliedArmeUpgrades(item.id);
+          }
+
+          // Prix avec upgrades (Pimp My Ride + Améliorations d'armes)
+          var prixTotal = item.prixNum || 0;
+          if (isPimpEligible(item)) {
+            prixTotal += calculateVehicleUpgradeCost(item.id);
+          }
+          if (isArmeAmeliorable(item)) {
+            prixTotal += calculateArmeUpgradeCost(item.id);
+          }
+          var prixDisplay =
+            prixTotal > 0 ? prixTotal.toLocaleString("fr-FR") + "¥" : item.prix;
+
+          return (
+            '<div class="bm-card">' +
+            '<div class="bm-card-header"><div class="bm-card-title">' +
+            esc(item.nom) +
+            '</div><div class="bm-card-price">' +
+            esc(prixDisplay) +
+            "</div></div>" +
+            '<div class="bm-card-cat">' +
+            esc(item.subCat) +
+            "</div>" +
+            '<div class="bm-card-desc">' +
+            esc(item.desc) +
+            "</div>" +
+            (meta ? '<div class="bm-card-meta">' + meta + "</div>" : "") +
+            tatouageBtn +
+            pimpBtn +
+            appliedUpgrades +
+            armeBtn +
+            armeUpgrades +
+            "</div>"
+          );
+        }
+
         function render() {
+          var q = norm(searchInput.value);
           var mainCat = mainSelect.value;
-          var q = norm(searchInput.value || "");
-          var items = allItems.filter(function (it) {
-            if (it.mainCat !== mainCat) return false;
+
+          var filtered = allItems.filter(function (it) {
+            if (mainCat && it.mainCat !== mainCat) return false;
             if (activeSubcat && it.subCat !== activeSubcat) return false;
-            if (!q) return true;
-            var hay =
-              norm(it.nom) +
-              " " +
-              norm(it.desc) +
-              " " +
-              norm(it.subCat) +
-              " " +
-              norm(it.mainCat);
-            return hay.indexOf(q) !== -1;
+            if (q) {
+              var txt = norm(
+                it.nom +
+                  " " +
+                  it.desc +
+                  " " +
+                  it.subCat +
+                  " " +
+                  it.mainCat +
+                  " " +
+                  it.prerequis,
+              );
+              return txt.indexOf(q) !== -1;
+            }
+            return true;
           });
 
-          countLabel.textContent = items.length + " article" + (items.length > 1 ? "s" : "");
-          if (!items.length) {
-            contentDiv.innerHTML =
-              '<div class="bm-empty">Aucun résultat</div>';
+          countLabel.textContent =
+            filtered.length + " article" + (filtered.length > 1 ? "s" : "");
+
+          if (filtered.length === 0) {
+            contentDiv.innerHTML = '<div class="bm-empty">Aucun résultat</div>';
             return;
           }
 
-          var html = "";
-          items.forEach(function (it) {
-            html +=
-              '<div class="bm-item">' +
-              '<div class="bm-item-header">' +
-              '<div class="bm-item-name">' +
-              esc(it.nom) +
-              "</div>" +
-              '<div class="bm-item-price">' +
-              esc(it.prix) +
-              "</div>" +
-              "</div>" +
-              '<div class="bm-item-meta">' +
-              "<span>" +
-              esc(it.mainCat) +
-              " / " +
-              esc(it.subCat) +
-              "</span>" +
-              (it.type ? " · <span>" + esc(it.type) + "</span>" : "") +
-              (it.seuil ? " · <span>Seuil " + esc(it.seuil) + "</span>" : "") +
-              "</div>" +
-              '<div class="bm-item-desc">' +
-              esc(it.desc || "Pas de description") +
-              "</div>";
-
-            if (isPimpEligible(it)) {
-              html += '<div class="bm-item-actions">' + renderPimpButton(it.id) + "</div>";
-              html += renderAppliedUpgrades(it.id);
-            }
-
-            if (isArmeAmeliorable(it)) {
-              html +=
-                '<div class="bm-item-actions">' +
-                renderArmeUpgradeButton(it.id) +
-                "</div>";
-            }
-
-            html += "</div>";
+          var groups = {};
+          filtered.forEach(function (it) {
+            if (!groups[it.subCat]) groups[it.subCat] = [];
+            groups[it.subCat].push(it);
           });
 
+          var html = "";
+          Object.keys(groups)
+            .sort()
+            .forEach(function (sub) {
+              html +=
+                '<div class="bm-section-title">' +
+                esc(sub) +
+                " <span style=\"font-size:11px;color:var(--gray-mid);font-family:'Roboto Mono',monospace;\">(" +
+                groups[sub].length +
+                ")</span></div>";
+              html += '<div class="bm-grid">';
+              groups[sub].forEach(function (it) {
+                html += buildCard(it);
+              });
+              html += "</div>";
+            });
           contentDiv.innerHTML = html;
         }
 
-        // Wiring
-        if (searchInput) {
-          searchInput.addEventListener("input", function () {
-            render();
-          });
-        }
-        if (mainSelect) {
-          mainSelect.addEventListener("change", function () {
-            activeSubcat = "";
-            renderSubcats();
-            render();
-          });
-        }
+        contentDiv.addEventListener("click", function (e) {
+          var btn = e.target.closest(".bm-tatouage-btn");
+          if (!btn) return;
+          e.stopPropagation();
+          var id = parseInt(btn.getAttribute("data-id"), 10);
+          var item = null;
+          for (var i = 0; i < allItems.length; i++) {
+            if (allItems[i].id === id) {
+              item = allItems[i];
+              break;
+            }
+          }
+          if (!item || !item.isFocus) return;
+          item.tatouageActive = !item.tatouageActive;
+          if (item.tatouageActive) {
+            item.prixNum = item.basePrixNum + 15000;
+          } else {
+            item.prixNum = item.basePrixNum;
+          }
+          item.prix = item.prixNum.toLocaleString("fr-FR") + "¥";
+          render();
+        });
 
-        // Initial render
-        renderSubcats();
+        searchInput.addEventListener("input", render);
+        mainSelect.addEventListener("change", function () {
+          renderSubcats(mainSelect.value);
+          render();
+        });
+
+        renderSubcats("");
         render();
+
         // Exposer les fonctions Pimp My Ride au scope global pour les onclick inline
         window.openPimpModal = openPimpModal;
         window.closePimpModal = closePimpModal;
@@ -1659,14 +1920,6 @@
         window.closeArmeUpgradeModal = closeArmeUpgradeModal;
         window.toggleArmeUpgrade = toggleArmeUpgrade;
         window.decrementArmeUpgrade = decrementArmeUpgrade;
-        function removeArmeUpgrade(itemId, upgradeIdx) {
-          var item = allItems.find(function (it) {
-            return it.id === itemId;
-          });
-          if (!item || !item.ameliorationCounts) return;
-          delete item.ameliorationCounts[upgradeIdx];
-          render();
-        }
         window.removeArmeUpgrade = removeArmeUpgrade;
       })();
     </script>
