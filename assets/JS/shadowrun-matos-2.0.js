@@ -32,7 +32,7 @@ const SHADOWRUN_GEAR = {
     },
 {
       "Atout": "Kit de survie en milieu hostile ",
-      "Catégorie": "INFILTRATION",
+      "Catégorie": "SURVIE",
       "COUT_Atout": "Atout 2",
       "COUT_Yen": "12 500¥",
       "EFFETS": "RR 1 aux tests  de Survie"
@@ -53,7 +53,7 @@ const SHADOWRUN_GEAR = {
     },
 {
       "Atout": "Bâtonnets luminescents x25",
-      "Catégorie": "INFILTRATION",
+      "Catégorie": "SURVIE",
       "COUT_Atout": "Atout 1",
       "COUT_Yen": "2 500¥",
       "EFFETS": "Permet d'éclairer une zone sans générer de bruit ni de chaleur. Durée : 8 heures."
