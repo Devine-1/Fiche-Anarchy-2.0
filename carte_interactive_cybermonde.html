@@ -25,6 +25,7 @@
   --glow-cyan:0 0 8px rgba(0,240,255,0.4), 0 0 20px rgba(0,240,255,0.1);
   --glow-magenta:0 0 8px rgba(255,0,255,0.4), 0 0 20px rgba(255,0,255,0.1);
   --glow-yellow:0 0 8px rgba(240,232,0,0.4), 0 0 20px rgba(240,232,0,0.1);
+  --map-label-font-size:0.75rem;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); overflow:hidden; height:100vh; width:100vw; background-image:radial-gradient(ellipse at 50% 0%, rgba(0,240,255,0.03) 0%, transparent 60%), radial-gradient(ellipse at 0% 100%, rgba(255,0,255,0.02) 0%, transparent 50%); }
@@ -82,6 +83,13 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 .sidebar-footer button:hover { background:var(--border); }
 .sidebar-footer .btn-export { background:rgba(5,255,161,0.12); color:var(--success); border-color:var(--success); }
 .sidebar-footer .btn-export:hover { background:rgba(5,255,161,0.22); color:var(--success-hover); }
+.export-modal { max-width:520px; }
+.export-options { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+.export-option { display:flex; flex-direction:column; align-items:flex-start; text-align:left; min-height:92px; padding:0.85rem 0.9rem; background:var(--bg-lighter); border:1px solid var(--border); color:var(--text); border-radius:8px; cursor:pointer; transition:all 0.15s; }
+.export-option:hover { background:var(--border); border-color:var(--accent); box-shadow:var(--glow-cyan); }
+.export-option strong { color:var(--accent); font-size:0.85rem; margin-bottom:0.35rem; }
+.export-option span { color:var(--text-muted); font-size:0.72rem; line-height:1.35; }
+@media (max-width:420px) { .export-options { grid-template-columns:1fr; } }
 
 /* MAP */
 .map-container { position:fixed; top:0; left:340px; right:0; bottom:0; overflow:hidden; cursor:grab; background:#020204; }
@@ -99,7 +107,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 .marker-pin { width:24px; height:24px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:2px solid var(--bg); box-shadow:0 0 12px currentColor, 0 2px 8px rgba(0,0,0,0.6); transition:transform 0.2s, box-shadow 0.2s; }
 .marker:hover .marker-pin { transform:rotate(-45deg) scale(1.2); box-shadow:0 0 20px currentColor, 0 4px 16px rgba(0,0,0,0.8); }
 .marker.selected .marker-pin { box-shadow:0 0 0 3px var(--accent), 0 0 20px var(--accent), 0 4px 16px rgba(0,0,0,0.8); }
-.marker-label { position:absolute; top:28px; left:50%; transform:translateX(-50%); background:rgba(5,5,8,0.92); color:var(--text); padding:0.2rem 0.6rem; border-radius:4px; font-size:0.75rem; white-space:nowrap; pointer-events:none; border:1px solid var(--border); text-shadow:0 0 6px var(--accent); font-family:'Consolas','Courier New',monospace; letter-spacing:0.03em; }
+.marker-label { position:absolute; top:28px; left:50%; transform:translateX(-50%); background:rgba(5,5,8,0.92); color:var(--text); padding:0.2rem 0.6rem; border-radius:4px; font-size:var(--map-label-font-size); white-space:nowrap; pointer-events:none; border:1px solid var(--border); text-shadow:0 0 6px var(--accent); font-family:'Consolas','Courier New',monospace; letter-spacing:0.03em; }
 
 
 /* TOOLTIP */
@@ -145,7 +153,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 
 /* MEASURE */
 .measure-line { position:absolute; height:2px; background:var(--accent); transform-origin:left center; pointer-events:none; z-index:5; }
-.measure-label { position:absolute; background:var(--accent); color:var(--bg); padding:0.15rem 0.4rem; border-radius:4px; font-size:0.7rem; font-weight:600; pointer-events:none; z-index:6; white-space:nowrap; }
+.measure-label { position:absolute; background:var(--accent); color:var(--bg); padding:0.15rem 0.4rem; border-radius:4px; font-size:var(--map-label-font-size); font-weight:600; pointer-events:none; z-index:6; white-space:nowrap; }
 
 /* GRID SETTINGS */
 .grid-settings { position:fixed; top:8rem; left:50%; transform:translateX(-50%); background:rgba(10,10,18,0.95); border:1px solid var(--border); border-radius:10px; padding:0.75rem 1rem; z-index:1001; display:none; gap:1rem; align-items:center; box-shadow:var(--glow-cyan), 0 4px 20px rgba(0,0,0,0.5); backdrop-filter:blur(12px); }
@@ -166,7 +174,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 .token:hover { transform:translate(-50%,-50%) scale(1.15); box-shadow:0 0 16px var(--border-color), 0 4px 16px rgba(0,0,0,0.7); z-index:20; }
 .token.dragging { cursor:grabbing; z-index:100; transform:translate(-50%,-50%) scale(1.2); }
 .token.selected { box-shadow:0 0 0 3px var(--accent), 0 0 20px var(--accent), 0 4px 16px rgba(0,0,0,0.8); z-index:25; }
-.token-label { position:absolute; top:calc(100% + 4px); left:50%; transform:translateX(-50%); background:rgba(5,5,8,0.92); color:var(--text); padding:0.15rem 0.5rem; border-radius:4px; font-size:0.7rem; white-space:nowrap; border:1px solid var(--border); font-family:'Consolas','Courier New',monospace; letter-spacing:0.03em; cursor:grab; }
+.token-label { position:absolute; top:calc(100% + 4px); left:50%; transform:translateX(-50%); background:rgba(5,5,8,0.92); color:var(--text); padding:0.15rem 0.5rem; border-radius:4px; font-size:var(--map-label-font-size); white-space:nowrap; border:1px solid var(--border); font-family:'Consolas','Courier New',monospace; letter-spacing:0.03em; cursor:grab; }
 .token-item { display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.75rem; border-radius:8px; cursor:pointer; transition:all 0.2s; margin-bottom:0.3rem; border:1px solid transparent; }
 .token-item:hover { background:var(--bg-lighter); border-color:var(--border); }
 .token-item.selected { background:rgba(255,0,255,0.08); border-color:var(--accent-secondary); box-shadow:var(--glow-magenta); }
@@ -472,9 +480,15 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
     </div>
   </div>
 
+  <div class="sidebar-section" id="labelFontSizeSection" style="padding:0.6rem 1rem; border-top:1px solid var(--border); display:flex; align-items:center; gap:0.5rem;">
+    <label for="labelFontSize" style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap;" title="Ajuste la taille du texte des points d'intérêt, des tokens et de l'outil mesure">🔠 Taille texte carte</label>
+    <input type="range" id="labelFontSize" min="10" max="24" step="1" value="12" style="flex:1;">
+    <span id="labelFontSizeVal" style="font-size:0.75rem; color:var(--accent); min-width:34px; text-align:right;">12px</span>
+  </div>
+
   <div class="sidebar-footer sidebar-section" id="sidebarFooter">
-    <button class="btn-export" id="btnExport">💾 EXPORT JSON</button>
-    <button id="btnImport">📂 IMPORT</button>
+    <button class="btn-export" id="btnExport">EXPORT</button>
+    <button id="btnImport">IMPORT JSON</button>
     <input type="file" id="importFile" accept=".json" style="display:none;">
   </div>
 </div>
@@ -566,6 +580,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
     </div>
     <div style="display:flex; gap:1rem; flex-wrap:wrap;">
       <div style="flex:1; min-width:200px;">
+    
         <div class="form-group">
           <label>Couleur de bordure</label>
           <div class="color-picker-row">
@@ -687,6 +702,35 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
   </div>
 </div>
 
+<!-- Modal Export JSON -->
+<div class="modal-overlay" id="exportModalOverlay">
+  <div class="modal export-modal" id="exportModal">
+    <h3>Exporter les données</h3>
+    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Choisissez le type de fichier JSON à créer.</p>
+    <div class="export-options">
+      <button class="export-option" id="exportComplete">
+        <strong>EXPORT COMPLET</strong>
+        <span>Sauvegarde de toute la carte, des points d'intérêt et des tokens.</span>
+      </button>
+      <button class="export-option" id="exportTokens">
+        <strong>EXPORT TOKENS</strong>
+        <span>Uniquement les tokens joueurs, pour les transférer sur une autre carte.</span>
+      </button>
+      <button class="export-option" id="exportMarkers">
+        <strong>EXPORT POINTS D'INTÉRÊT</strong>
+        <span>Les points d'intérêt et les types personnalisés.</span>
+      </button>
+      <button class="export-option" id="exportMap">
+        <strong>EXPORT DONNÉES DE CARTE</strong>
+        <span>Les paramètres de carte et les points d'intérêt, sans les tokens joueurs.</span>
+      </button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="exportModalCancel">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Change Map -->
 <div class="modal-overlay" id="mapModalOverlay">
   <div class="modal" id="mapModal">
@@ -729,6 +773,7 @@ function isBaseType(t) { return BASE_TYPE_COLORS.hasOwnProperty(t); }
 const state = {
   zoom:1, panX:0, panY:0, markers:[], tool:'select',
   dragging:false, dragStart:{x:0,y:0},
+  labelFontSize:12,
   mapWidth:0, mapHeight:0,
   selectedMarkerId:null, movingMarkerId:null,
   measureStart:null, measureEnd:null,
@@ -787,42 +832,6 @@ function centerOnMarker(m){
   state.panY = rect.height/2 - m.y*state.zoom;
   updateTransform();
 }
-function minimizeSidebar(){
-  if(state.sidebarCollapsed) return;
-  state.sidebarMinimized = true;
-  $('sidebar').classList.add('minimized');
-  mapContainer.style.left = '60px';
-  $('sidebarToggle').style.left = '60px';
-  // S'assurer que la sidebar n'est pas collapsed quand on minimize
-  $('sidebar').classList.remove('collapsed');
-  state.sidebarCollapsed = false;
-  $('sidebarToggle').textContent = '◀';
-  // Cacher aussi les détails pour revenir propre
-  hideMarkerDetail();
-  hideTokenDetail();
-  state.selectedMarkerId = null;
-  state.selectedTokenId = null;
-  state.tokenJustSelected = false;
-  renderMarkers();
-  renderTokenList();
-}
-function expandSidebar(){
-  state.sidebarMinimized = false;
-  const sidebar = $('sidebar');
-  sidebar.classList.remove('minimized');
-  // S'assurer qu'on n'est pas collapsed quand on expand
-  sidebar.classList.remove('collapsed');
-  state.sidebarCollapsed = false;
-  const w = window.innerWidth <= 768 ? 280 : 340;
-  mapContainer.style.left = w + 'px';
-  $('sidebarToggle').style.left = w + 'px';
-  $('sidebarToggle').textContent = '◀';
-  // Si aucun détail ouvert, réafficher les listes
-  if(!$('markerDetail').classList.contains('open') && !$('tokenDetail').classList.contains('open')){
-    document.querySelectorAll('.sidebar-section').forEach(el=>el.classList.remove('hidden'));
-  }
-}
-
 // ==================== GRID ====================
 function drawGrid(){
   if(!state.showGrid || !state.mapWidth){ gridCanvas.style.display='none'; return; }
@@ -1131,7 +1140,6 @@ function createTokenEl(token){
       state.selectedTokenId = token.id;
       state.selectedMarkerId = null;
       state.tokenJustSelected = true;
-      expandSidebar();
       hideMarkerDetail();
       showTokenDetail(token.id);
       renderTokens();
@@ -1168,7 +1176,6 @@ function renderTokenList(){
       hideMarkerDetail();
       showTokenDetail(token.id);
       centerOnToken(token);
-      setSidebarCollapsed(true);
       renderTokens();
       renderTokenList();
     });
@@ -1323,7 +1330,6 @@ function renderSidebar(){
     item.addEventListener('click', ()=>{
       state.selectedMarkerId = m.id;
       centerOnMarker(m);
-      setSidebarCollapsed(false);
       renderMarkers();
       showMarkerDetail(m.id);
     });
@@ -1369,7 +1375,8 @@ function saveToStorage(){
     customTypes:state.customTypes,
     scale:state.scale,
     tokens:state.tokens,
-    sidebarMinimized:state.sidebarMinimized
+    sidebarMinimized:state.sidebarMinimized,
+    labelFontSize:state.labelFontSize
   };
   localStorage.setItem('cyber_map_data', JSON.stringify(data));
 }
@@ -1386,6 +1393,8 @@ function loadFromStorage(){
       state.gridOpacity = data.gridOpacity!==undefined?data.gridOpacity:0.15;
       state.gridSize = data.gridSize||100;
       state.showGrid = data.showGrid||false;
+      applyLabelFontSize(data.labelFontSize||12);
+      $('labelFontSize').value = state.labelFontSize;
       if(data.scale){
         state.scale = data.scale;
       }
@@ -1407,36 +1416,76 @@ function loadFromStorage(){
 }
 
 // ==================== IMPORT/EXPORT ====================
-function exportJSON(){
-  const data = { version:1, markers:state.markers, mapWidth:state.mapWidth, mapHeight:state.mapHeight,
-    gridColor:state.gridColor, gridOpacity:state.gridOpacity, gridSize:state.gridSize, customTypes:state.customTypes, scale:state.scale, tokens:state.tokens, exportedAt:new Date().toISOString() };
+function downloadJSON(data, filename){
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href=url; a.download='carte_cyber_'+new Date().toISOString().slice(0,10)+'.json';
-  a.click(); URL.revokeObjectURL(url);
+  a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),100);
 }
+
+function exportJSON(type='complete'){
+  const date = new Date().toISOString().slice(0,10);
+  let data, filename;
+  if(type==='tokens'){
+    data = { type:'tokens', version:2, tokens:state.tokens, exportedAt:new Date().toISOString() };
+    filename = `tokens_joueurs_${date}.json`;
+  } else if(type==='markers'){
+    data = { type:'markers', version:2, markers:state.markers, customTypes:state.customTypes, exportedAt:new Date().toISOString() };
+    filename = `points_interet_${date}.json`;
+  } else if(type==='map'){
+    data = { type:'map', version:2, markers:state.markers, mapWidth:state.mapWidth, mapHeight:state.mapHeight,
+      gridColor:state.gridColor, gridOpacity:state.gridOpacity, gridSize:state.gridSize,
+      customTypes:state.customTypes, scale:state.scale, exportedAt:new Date().toISOString() };
+    filename = `donnees_carte_${date}.json`;
+  } else {
+    data = { type:'complete', version:2, markers:state.markers, mapWidth:state.mapWidth, mapHeight:state.mapHeight,
+      gridColor:state.gridColor, gridOpacity:state.gridOpacity, gridSize:state.gridSize,
+      customTypes:state.customTypes, scale:state.scale, tokens:state.tokens, exportedAt:new Date().toISOString() };
+    filename = `carte_cyber_complete_${date}.json`;
+  }
+  downloadJSON(data,filename);
+}
+
 function importJSON(file){
   const reader = new FileReader();
   reader.onload = e=>{
     try{
       const data = JSON.parse(e.target.result);
-      if(data.markers){ state.markers=data.markers; }
-      if(data.customTypes){
-        state.customTypes = data.customTypes;
-        Object.keys(state.customTypes).forEach(id=>{
-          const ct = state.customTypes[id];
-          TYPE_COLORS[id] = ct.color;
-          TYPE_ICONS[id] = ct.icon;
-          TYPE_LABELS[id] = ct.name;
-          state.activeFilters.add(id);
-        });
+      const type = data.type || 'complete';
+      if(!['tokens','markers','map','complete'].includes(type)) throw new Error('Type JSON inconnu');
+
+      if(type==='tokens'){
+        const replace = confirm(`Ce fichier contient ${Array.isArray(data.tokens)?data.tokens.length:0} token(s).\n\nOK = remplacer les tokens actuels\nAnnuler = ajouter les tokens`);
+        const incoming = Array.isArray(data.tokens)?data.tokens:[];
+        state.tokens = replace ? incoming : [...state.tokens,...incoming];
+      } else {
+        if(Array.isArray(data.markers)){
+          const replace = type==='complete' || confirm(`Ce fichier contient ${data.markers.length} point(s) d'intérêt.\n\nOK = remplacer les points actuels\nAnnuler = ajouter les points`);
+          state.markers = replace ? data.markers : [...state.markers,...data.markers];
+        }
+        if(data.customTypes){
+          state.customTypes = data.customTypes;
+          Object.keys(state.customTypes).forEach(id=>{
+            const ct = state.customTypes[id];
+            TYPE_COLORS[id] = ct.color; TYPE_ICONS[id] = ct.icon; TYPE_LABELS[id] = ct.name;
+            state.activeFilters.add(id);
+          });
+        }
+        if(type==='map' || type==='complete'){
+          if(data.mapWidth) state.mapWidth=data.mapWidth;
+          if(data.mapHeight) state.mapHeight=data.mapHeight;
+          if(data.gridColor) state.gridColor=data.gridColor;
+          if(data.gridOpacity!==undefined) state.gridOpacity=data.gridOpacity;
+          if(data.gridSize) state.gridSize=data.gridSize;
+          if(data.scale) state.scale=data.scale;
+        }
+        if(type==='complete' && Array.isArray(data.tokens)) state.tokens=data.tokens;
       }
-      if(data.scale) state.scale = data.scale;
-      if(data.tokens) state.tokens = data.tokens;
-      renderMarkers(); renderTokenList(); renderSidebar(); renderFilters(); renderTypeSelect(); hideMarkerDetail(); saveToStorage();
-      if(data.markers) alert('✅ '+data.markers.length+' signaux importés !');
-    }catch(err){ alert('❌ Fichier JSON invalide'); }
+      renderMarkers(); renderTokenList(); renderSidebar(); renderFilters(); renderTypeSelect(); hideMarkerDetail();
+      drawGrid(); saveToStorage();
+      alert('Import JSON terminé.');
+    }catch(err){ alert('Fichier JSON invalide ou incompatible.'); }
   };
   reader.readAsText(file);
 }
@@ -1485,7 +1534,8 @@ mapContainer.addEventListener('mousedown', e=>{
     }
     return;
   }
-  // Minimize sidebar when clicking empty map in select mode
+  // Un clic sur une zone vide ne modifie plus l'état de la sidebar.
+  // La sidebar ne se replie/déplie que via son bouton fixe.
   if(state.tool==='select' && !state.tokenJustSelected){
     state.selectedMarkerId = null;
     state.selectedTokenId = null;
@@ -1493,7 +1543,6 @@ mapContainer.addEventListener('mousedown', e=>{
     hideTokenDetail();
     renderMarkers();
     renderTokenList();
-    minimizeSidebar();
   }
   state.tokenJustSelected = false;
   state.dragging = true; state.dragStart = {x:e.clientX,y:e.clientY};
@@ -1509,7 +1558,6 @@ function onMarkerMouseDown(e,m){
   if(state.tool==='move'){ state.movingMarkerId=m.id; mapContainer.classList.add('move-mode'); return; }
   if(state.tool==='select'){
     state.selectedMarkerId = m.id;
-    setSidebarCollapsed(false);
     renderMarkers();
     showMarkerDetail(m.id);
   }
@@ -1589,6 +1637,16 @@ $('gridColor').addEventListener('input', e=>{ state.gridColor=e.target.value; dr
 $('gridOpacity').addEventListener('input', e=>{ state.gridOpacity=e.target.value/100; $('gridOpacityVal').textContent=e.target.value+'%'; drawGrid(); saveToStorage(); });
 $('gridSize').addEventListener('input', e=>{ state.gridSize=parseInt(e.target.value); $('gridSizeVal').textContent=formatGridSize(); drawGrid(); saveToStorage(); });
 
+function applyLabelFontSize(px){
+  state.labelFontSize = px;
+  document.documentElement.style.setProperty('--map-label-font-size', px+'px');
+  $('labelFontSizeVal').textContent = px+'px';
+}
+$('labelFontSize').addEventListener('input', e=>{
+  applyLabelFontSize(parseInt(e.target.value));
+  saveToStorage();
+});
+
 // Change map
 $('btnChangeMap').addEventListener('click', ()=>mapModalOverlay.classList.add('show'));
 $('mapModalCancel').addEventListener('click', ()=>mapModalOverlay.classList.remove('show'));
@@ -1599,23 +1657,23 @@ $('mapModal').addEventListener('drop', e=>{ e.preventDefault(); const f=e.dataTr
 
 // Sidebar toggle
 function setSidebarCollapsed(collapsed){
-  state.sidebarCollapsed = collapsed;
+  state.sidebarCollapsed = !!collapsed;
   const sidebar = $('sidebar');
-  sidebar.classList.toggle('collapsed', collapsed);
-  $('sidebarToggle').textContent = collapsed?'▶':'◀';
-  if(collapsed){
-    // En mode collapsed, on sort forcément du mode minimized
-    sidebar.classList.remove('minimized');
-    state.sidebarMinimized = false;
-    mapContainer.style.left = '0';
-    $('sidebarToggle').style.left = '0';
-  } else {
-    const w = window.innerWidth <= 768 ? 280 : 340;
-    mapContainer.style.left = w + 'px';
-    $('sidebarToggle').style.left = w + 'px';
-  }
+  const toggle = $('sidebarToggle');
+  const w = window.innerWidth <= 768 ? (window.innerWidth <= 480 ? 260 : 280) : 340;
+
+  // Un seul état pour la sidebar : ouverte ou repliée.
+  // Le bouton reste toujours fixé au bord de la zone de carte.
+  sidebar.classList.toggle('collapsed', state.sidebarCollapsed);
+  sidebar.classList.remove('minimized');
+  state.sidebarMinimized = false;
+  toggle.textContent = state.sidebarCollapsed ? '▶' : '◀';
+  mapContainer.style.left = state.sidebarCollapsed ? '0' : w + 'px';
+  toggle.style.left = state.sidebarCollapsed ? '0' : w + 'px';
 }
-$('sidebarToggle').addEventListener('click', ()=>setSidebarCollapsed(!state.sidebarCollapsed));
+$('sidebarToggle').addEventListener('click', ()=>{
+  setSidebarCollapsed(!state.sidebarCollapsed);
+});
 
 // Search
 $('searchInput').addEventListener('input', renderSidebar);
@@ -1903,17 +1961,6 @@ $('btnBackFromToken').addEventListener('click', ()=>{
   renderTokenList();
 });
 
-// Minimized bar button
-$('minimizedBarBtn').addEventListener('click', ()=>{
-  expandSidebar();
-  // Si un token est sélectionné, montrer son détail
-  if(state.selectedTokenId){
-    showTokenDetail(state.selectedTokenId);
-  } else if(state.selectedMarkerId){
-    showMarkerDetail(state.selectedMarkerId);
-  }
-});
-
 // Sidebar token buttons
 $('btnEditToken').addEventListener('click', ()=>{
   const token = state.tokens.find(t=>t.id===state.selectedTokenId);
@@ -1931,10 +1978,16 @@ uploadOverlay.addEventListener('dragover', e=>e.preventDefault());
 uploadOverlay.addEventListener('drop', e=>{ e.preventDefault(); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) loadMapImage(f); });
 
 // Import/Export
-$('btnExport').addEventListener('click', exportJSON);
+$('btnExport').addEventListener('click', ()=>$('exportModalOverlay').classList.add('show'));
+$('exportComplete').addEventListener('click', ()=>{ exportJSON('complete'); $('exportModalOverlay').classList.remove('show'); });
+$('exportTokens').addEventListener('click', ()=>{ exportJSON('tokens'); $('exportModalOverlay').classList.remove('show'); });
+$('exportMarkers').addEventListener('click', ()=>{ exportJSON('markers'); $('exportModalOverlay').classList.remove('show'); });
+$('exportMap').addEventListener('click', ()=>{ exportJSON('map'); $('exportModalOverlay').classList.remove('show'); });
+$('exportModalCancel').addEventListener('click', ()=>$('exportModalOverlay').classList.remove('show'));
+$('exportModalOverlay').addEventListener('click', e=>{ if(e.target===$('exportModalOverlay')) $('exportModalOverlay').classList.remove('show'); });
 $('btnImport').addEventListener('click', ()=>$('importFile').click());
 $('btnSaveImage').addEventListener('click', saveMapImage);
-$('importFile').addEventListener('change', e=>{ if(e.target.files[0]) importJSON(e.target.files[0]); });
+$('importFile').addEventListener('change', e=>{ if(e.target.files[0]) { importJSON(e.target.files[0]); e.target.value=''; } });
 
 // ==================== KEYBOARD ====================
 window.addEventListener('keydown', e=>{
@@ -1945,7 +1998,7 @@ window.addEventListener('keydown', e=>{
     case '0': e.preventDefault(); resetView(); break;
     case 'Escape':
       setTool('select'); state.measureStart=null; state.measureEnd=null; renderMarkers();
-      modalOverlay.classList.remove('show'); pnjModalOverlay.classList.remove('show'); mapModalOverlay.classList.remove('show');
+      modalOverlay.classList.remove('show'); pnjModalOverlay.classList.remove('show'); mapModalOverlay.classList.remove('show'); $('exportModalOverlay').classList.remove('show');
       state.editingMarkerId=null; state.tempMarkerPos=null; state.editingPnjId=null;
       break;
     case 'a': case 'A': setTool('add'); break;
@@ -2020,6 +2073,7 @@ async function saveMapImage() {
     ctx.fillStyle = 'rgba(13,17,23,0.9)';
     ctx.strokeStyle = '#30363d';
     ctx.lineWidth = 1;
+    ctx.font = state.labelFontSize + 'px "Segoe UI", sans-serif';
     const text = m.name;
     const metrics = ctx.measureText(text);
     const pad = 6;
@@ -2032,7 +2086,6 @@ async function saveMapImage() {
     ctx.fill();
     ctx.stroke();
     ctx.fillStyle = '#e6edf3';
-    ctx.font = '12px "Segoe UI", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, m.x, ly + th / 2);
@@ -2060,10 +2113,7 @@ function updateGridSettingsPosition() {
   gridSettings.style.top = (rect.bottom + 6) + 'px';
 }
 
-// Sur petit écran, collapse la sidebar par défaut au chargement
-if (window.innerWidth < 768) {
-  setSidebarCollapsed(true);
-}
+// La sidebar reste ouverte au chargement. Elle ne se replie que manuellement.
 
 // Mettre à jour la position des grid settings quand nécessaire
 const origToggleGrid = $('btnToggleGrid').onclick;
@@ -2079,6 +2129,7 @@ window.addEventListener('resize', () => {
 setTimeout(updateGridSettingsPosition, 100);
 
 // ==================== INIT ====================
+applyLabelFontSize(state.labelFontSize);
 initTokenEditor();
 renderFilters();
 renderTypeSelect();
@@ -2103,17 +2154,8 @@ if(loadFromStorage()){
   if(mapImage.complete && mapImage.naturalWidth) mapImage.onload();
 }
 window.addEventListener('resize', ()=>{
-  if(state.sidebarCollapsed){
-    mapContainer.style.left = '0';
-    $('sidebarToggle').style.left = '0';
-  } else if(state.sidebarMinimized){
-    mapContainer.style.left = '60px';
-    $('sidebarToggle').style.left = '60px';
-  } else {
-    const w = window.innerWidth <= 768 ? 280 : 340;
-    mapContainer.style.left = w + 'px';
-    $('sidebarToggle').style.left = w + 'px';
-  }
+  // Le redimensionnement ne doit jamais changer l'état ouvert/replié.
+  setSidebarCollapsed(state.sidebarCollapsed);
 });
 
 // ==================== TOKEN INIT ====================
