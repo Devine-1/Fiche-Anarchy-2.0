@@ -92,7 +92,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 @media (max-width:420px) { .export-options { grid-template-columns:1fr; } }
 
 /* MAP */
-.map-container { position:fixed; top:0; left:340px; right:0; bottom:0; overflow:hidden; cursor:grab; background:#020204; }
+.map-container { position:fixed; top:0; left:340px; right:0; bottom:0; overflow:hidden; cursor:grab; background:#020204; touch-action:none; }
 .map-container.panning { cursor:grabbing; }
 .map-container.add-mode { cursor:crosshair; }
 .map-container.delete-mode { cursor:not-allowed; }
@@ -103,7 +103,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 .grid-overlay { position:absolute; top:0; left:0; pointer-events:none; }
 
 /* MARKERS */
-.marker { position:absolute; transform:translate(-50%,-100%); cursor:pointer; z-index:10; user-select:none; }
+.marker { position:absolute; transform:translate(-50%,-100%); cursor:pointer; z-index:10; user-select:none; touch-action:none; }
 .marker-pin { width:24px; height:24px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:2px solid var(--bg); box-shadow:0 0 12px currentColor, 0 2px 8px rgba(0,0,0,0.6); transition:transform 0.2s, box-shadow 0.2s; }
 .marker:hover .marker-pin { transform:rotate(-45deg) scale(1.2); box-shadow:0 0 20px currentColor, 0 4px 16px rgba(0,0,0,0.8); }
 .marker.selected .marker-pin { box-shadow:0 0 0 3px var(--accent), 0 0 20px var(--accent), 0 4px 16px rgba(0,0,0,0.8); }
@@ -170,7 +170,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 ::-webkit-scrollbar-thumb:hover { background:var(--accent); }
 
 /* TOKENS */
-.token { position:absolute; transform:translate(-50%,-50%); border-radius:50%; cursor:grab; z-index:15; user-select:none; transition:transform 0.15s, box-shadow 0.15s; box-shadow:0 0 8px var(--border-color), 0 2px 8px rgba(0,0,0,0.5); background-size:cover; background-position:center; background-repeat:no-repeat; }
+.token { position:absolute; transform:translate(-50%,-50%); border-radius:50%; cursor:grab; z-index:15; user-select:none; touch-action:none; transition:transform 0.15s, box-shadow 0.15s; box-shadow:0 0 8px var(--border-color), 0 2px 8px rgba(0,0,0,0.5); background-size:cover; background-position:center; background-repeat:no-repeat; }
 .token:hover { transform:translate(-50%,-50%) scale(1.15); box-shadow:0 0 16px var(--border-color), 0 4px 16px rgba(0,0,0,0.7); z-index:20; }
 .token.dragging { cursor:grabbing; z-index:100; transform:translate(-50%,-50%) scale(1.2); }
 .token.selected { box-shadow:0 0 0 3px var(--accent), 0 0 20px var(--accent), 0 4px 16px rgba(0,0,0,0.8); z-index:25; }
@@ -194,7 +194,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
 
 /* TOKEN IMAGE EDITOR */
 .token-editor-wrap { display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem; }
-.token-editor-canvas-wrap { position:relative; width:240px; height:240px; margin:0 auto; border-radius:50%; border:3px solid var(--accent); overflow:hidden; background:var(--bg); box-shadow:var(--glow-cyan); cursor:grab; }
+.token-editor-canvas-wrap { position:relative; width:240px; height:240px; margin:0 auto; border-radius:50%; border:3px solid var(--accent); overflow:hidden; background:var(--bg); box-shadow:var(--glow-cyan); cursor:grab; touch-action:none; }
 .token-editor-canvas-wrap:active { cursor:grabbing; }
 .token-editor-canvas-wrap canvas { display:block; width:100%; height:100%; }
 .token-editor-preview-label { text-align:center; font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem; }
@@ -481,7 +481,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:
   </div>
 
   <div class="sidebar-section" id="labelFontSizeSection" style="padding:0.6rem 1rem; border-top:1px solid var(--border); display:flex; align-items:center; gap:0.5rem;">
-    <label for="labelFontSize" style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap;" title="Ajuste la taille du texte des points d'intérêt, des tokens et de l'outil mesure">🔠 Taille texte carte</label>
+    <label for="labelFontSize" style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap;" title="Ajuste la taille du texte des points d'intérêt, des tokens et de l'outil mesure">Taille texte</label>
     <input type="range" id="labelFontSize" min="10" max="24" step="1" value="12" style="flex:1;">
     <span id="labelFontSizeVal" style="font-size:0.75rem; color:var(--accent); min-width:34px; text-align:right;">12px</span>
   </div>
@@ -867,7 +867,7 @@ function createMarkerEl(m){
   el.appendChild(label);
   el.addEventListener('mouseenter', e => showTooltip(e,m));
   el.addEventListener('mouseleave', hideTooltip);
-  el.addEventListener('mousedown', e => onMarkerMouseDown(e,m));
+  el.addEventListener('pointerdown', e => { if(e.pointerType==='mouse' && e.button!==0) return; onMarkerMouseDown(e,m); });
   return el;
 }
 function renderMarkers(){
@@ -1133,7 +1133,8 @@ function createTokenEl(token){
   label.className = 'token-label';
   label.textContent = token.name;
   el.appendChild(label);
-  el.addEventListener('mousedown', e=>{
+  el.addEventListener('pointerdown', e=>{
+    if(e.pointerType==='mouse' && e.button!==0) return;
     e.stopPropagation();
     if(state.tool==='select' || state.tool==='token'){
       state.draggingTokenId = token.id;
@@ -1505,9 +1506,24 @@ function loadMapImage(file){
   reader.readAsDataURL(file);
 }
 
-// ==================== MOUSE EVENTS ====================
-mapContainer.addEventListener('mousedown', e=>{
-  if(e.button!==0) return;
+// ==================== POINTER EVENTS (souris + tactile) ====================
+const activePointers = new Map();
+let pinchStartDist = null;
+let pinchStartZoom = null;
+
+mapContainer.addEventListener('pointerdown', e=>{
+  activePointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  if(activePointers.size>=2){
+    // Passage en mode pincement (zoom à deux doigts) : on annule tout autre geste en cours
+    state.dragging=false; mapContainer.classList.remove('panning');
+    if(state.movingMarkerId){ state.movingMarkerId=null; mapContainer.classList.remove('move-mode'); }
+    state.draggingTokenId=null;
+    const pts=[...activePointers.values()].slice(0,2);
+    pinchStartDist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+    pinchStartZoom=state.zoom;
+    return;
+  }
+  if(e.pointerType==='mouse' && e.button!==0) return;
   const mp = screenToMap(e.clientX,e.clientY);
   if(state.tool==='add'){ openMarkerModal(false, {x:mp.x,y:mp.y}); setTool('select'); return; }
   if(state.tool==='token'){ openTokenModal(false, {x:mp.x,y:mp.y}); setTool('select'); return; }
@@ -1547,6 +1563,7 @@ mapContainer.addEventListener('mousedown', e=>{
   state.tokenJustSelected = false;
   state.dragging = true; state.dragStart = {x:e.clientX,y:e.clientY};
   mapContainer.classList.add('panning');
+  try{ mapContainer.setPointerCapture(e.pointerId); }catch(err){}
 });
 function onMarkerMouseDown(e,m){
   e.stopPropagation();
@@ -1562,7 +1579,15 @@ function onMarkerMouseDown(e,m){
     showMarkerDetail(m.id);
   }
 }
-window.addEventListener('mousemove', e=>{
+window.addEventListener('pointermove', e=>{
+  if(activePointers.has(e.pointerId)) activePointers.set(e.pointerId, {x:e.clientX,y:e.clientY});
+  if(activePointers.size>=2 && pinchStartDist){
+    const pts=[...activePointers.values()].slice(0,2);
+    const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+    const midX=(pts[0].x+pts[1].x)/2, midY=(pts[0].y+pts[1].y)/2;
+    zoomTo(pinchStartZoom*(dist/pinchStartDist), midX, midY);
+    return;
+  }
   const mp = screenToMap(e.clientX,e.clientY);
   let cx = Math.round(mp.x), cy = Math.round(mp.y);
   if(state.scale.pixelsPerUnit && state.scale.pixelsPerUnit > 0){
@@ -1600,11 +1625,17 @@ window.addEventListener('mousemove', e=>{
     mapWrapper.appendChild(line);
   }
 });
-window.addEventListener('mouseup', ()=>{
-  state.dragging = false; mapContainer.classList.remove('panning');
-  if(state.movingMarkerId){ state.movingMarkerId=null; mapContainer.classList.remove('move-mode'); saveToStorage(); }
-  if(state.draggingTokenId){ state.draggingTokenId=null; renderTokens(); saveToStorage(); }
-});
+function endPointer(e){
+  activePointers.delete(e.pointerId);
+  if(activePointers.size<2){ pinchStartDist=null; pinchStartZoom=null; }
+  if(activePointers.size===0){
+    state.dragging = false; mapContainer.classList.remove('panning');
+    if(state.movingMarkerId){ state.movingMarkerId=null; mapContainer.classList.remove('move-mode'); saveToStorage(); }
+    if(state.draggingTokenId){ state.draggingTokenId=null; renderTokens(); saveToStorage(); }
+  }
+}
+window.addEventListener('pointerup', endPointer);
+window.addEventListener('pointercancel', endPointer);
 function clearScaleDots(){
   mapWrapper.querySelectorAll('[data-scale-dot]').forEach(el=>el.remove());
 }
@@ -1805,13 +1836,14 @@ function initTokenEditor(){
     ctx.stroke();
   }
 
-  wrap.addEventListener('mousedown', e=>{
+  wrap.addEventListener('pointerdown', e=>{
     if(!tokenEditorImg) return;
     tokenEditorState.dragging = true;
     tokenEditorState.dragStart = { x:e.clientX, y:e.clientY };
     wrap.style.cursor = 'grabbing';
+    try{ wrap.setPointerCapture(e.pointerId); }catch(err){}
   });
-  window.addEventListener('mousemove', e=>{
+  window.addEventListener('pointermove', e=>{
     if(!tokenEditorState.dragging || !tokenEditorImg) return;
     const dx = e.clientX - tokenEditorState.dragStart.x;
     const dy = e.clientY - tokenEditorState.dragStart.y;
@@ -1820,7 +1852,7 @@ function initTokenEditor(){
     tokenEditorState.dragStart = { x:e.clientX, y:e.clientY };
     drawEditor();
   });
-  window.addEventListener('mouseup', ()=>{
+  window.addEventListener('pointerup', ()=>{
     tokenEditorState.dragging = false;
     wrap.style.cursor = 'grab';
   });
