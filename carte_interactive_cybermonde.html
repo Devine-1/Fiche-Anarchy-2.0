@@ -68,7 +68,10 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 .toolbar-btn:hover { background:var(--border); color:var(--text); border-color:var(--accent); box-shadow:var(--glow-cyan); }
 .toolbar-btn.active { background:rgba(0,240,255,0.12); color:var(--accent); border-color:var(--accent); font-weight:600; box-shadow:var(--glow-cyan); }
 .toolbar-btn.active:hover { background:rgba(0,240,255,0.2); color:var(--accent-hover); }
-.toolbar-collapse-btn,.toolbar-expand-btn{background:var(--bg-lighter);border:1px solid var(--border);color:var(--accent);border-radius:8px;cursor:pointer;font-family:var(--font-mono);transition:all .2s}.toolbar-collapse-btn{padding:.5rem .65rem;font-size:.85rem}.toolbar-expand-btn{position:fixed;top:.5rem;left:50%;transform:translateX(-50%);z-index:999;padding:.35rem .7rem;font-size:.75rem;display:none;box-shadow:var(--glow-cyan),0 4px 20px rgba(0,0,0,.6)}.toolbar-collapse-btn:hover,.toolbar-expand-btn:hover{border-color:var(--accent);color:var(--accent-hover);box-shadow:var(--glow-cyan)}.toolbar.collapsed{display:none}.toolbar-expand-btn.show{display:block}
+.toolbar-collapse-btn,.toolbar-expand-btn{background:var(--bg-lighter);border:1px solid var(--border);color:var(--accent);border-radius:8px;cursor:pointer;font-family:var(--font-mono);transition:all .2s}.toolbar-collapse-btn{padding:.5rem .65rem;font-size:.85rem}.toolbar-expand-btn{padding:.5rem .65rem;font-size:.85rem}.toolbar-collapse-btn:hover,.toolbar-expand-btn:hover{border-color:var(--accent);color:var(--accent-hover);box-shadow:var(--glow-cyan)}.toolbar.collapsed{display:none}
+.toolbar-mini{position:fixed;top:.5rem;left:50%;transform:translateX(-50%);z-index:999;display:none;gap:0.4rem;background:rgba(10,10,18,0.92);border:1px solid var(--border);border-radius:12px;padding:0.4rem;box-shadow:var(--glow-cyan),0 4px 20px rgba(0,0,0,.6);backdrop-filter:blur(12px);}
+.toolbar-mini.show{display:flex;}
+.toolbar-mini .toolbar-btn{padding:0.4rem 0.6rem;font-size:0.85rem;}
 .toolbar-sep { width:1px; background:var(--border); margin:0 0.2rem; }
 .theme-select { appearance:none; -webkit-appearance:none; -moz-appearance:none; padding-right:1.2rem; }
 .theme-select:focus { outline:none; border-color:var(--accent); }
@@ -354,7 +357,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 }
 
 @media (max-width: 640px) {
-  .toolbar-collapse-btn{padding:.35rem .5rem;font-size:.85rem}.toolbar-expand-btn{top:.35rem;padding:.3rem .6rem;font-size:.7rem}
+  .toolbar-collapse-btn{padding:.35rem .5rem;font-size:.85rem}.toolbar-expand-btn{padding:.3rem .5rem;font-size:.8rem}.toolbar-mini{top:.35rem;padding:.3rem;gap:0.3rem;}.toolbar-mini .toolbar-btn{padding:.3rem .45rem;font-size:.8rem;}
   .btn-text { display: none; }
   .toolbar-btn {
     padding: 0.35rem 0.45rem;
@@ -449,7 +452,12 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
   <button class="toolbar-btn" id="btnSaveImage" title="Extraire PNG (Ctrl+S)">💾 <span class="btn-text">EXPORT</span></button>
   <button class="toolbar-collapse-btn" id="toolbarCollapseBtn" title="Masquer le menu">▲</button>
 </div>
-<button class="toolbar-expand-btn" id="toolbarExpandBtn" title="Afficher le menu">▼ MENU</button>
+<div class="toolbar-mini" id="toolbarMiniBar">
+  <button class="toolbar-btn" id="btnZoomInMini" title="Zoom +">+</button>
+  <button class="toolbar-btn" id="btnZoomOutMini" title="Zoom -">-</button>
+  <button class="toolbar-btn" id="btnResetMini" title="Réinitialiser (0)">⌂</button>
+  <button class="toolbar-expand-btn" id="toolbarExpandBtn" title="Afficher le menu">▼</button>
+</div>
 
 <!-- Grid settings -->
 <div class="grid-settings" id="gridSettings">
@@ -1721,6 +1729,9 @@ function setTool(tool){
 $('btnZoomIn').addEventListener('click', ()=>{ const r=mapContainer.getBoundingClientRect(); zoomTo(state.zoom*1.3, r.left+r.width/2, r.top+r.height/2); });
 $('btnZoomOut').addEventListener('click', ()=>{ const r=mapContainer.getBoundingClientRect(); zoomTo(state.zoom/1.3, r.left+r.width/2, r.top+r.height/2); });
 $('btnReset').addEventListener('click', resetView);
+$('btnZoomInMini').addEventListener('click', ()=>{ const r=mapContainer.getBoundingClientRect(); zoomTo(state.zoom*1.3, r.left+r.width/2, r.top+r.height/2); });
+$('btnZoomOutMini').addEventListener('click', ()=>{ const r=mapContainer.getBoundingClientRect(); zoomTo(state.zoom/1.3, r.left+r.width/2, r.top+r.height/2); });
+$('btnResetMini').addEventListener('click', resetView);
 
 // Grid
 $('btnToggleGrid').addEventListener('click', ()=>{
@@ -2260,7 +2271,7 @@ window.addEventListener('resize', ()=>{
 // ==================== TOKEN INIT ====================
 renderTokenList();
 // Replier/afficher le menu supérieur
-(function(){const t=document.getElementById('toolbar'),c=document.getElementById('toolbarCollapseBtn'),e=document.getElementById('toolbarExpandBtn');if(!t||!c||!e)return;function set(v){t.classList.toggle('collapsed',v);e.classList.toggle('show',v);try{localStorage.setItem('cybermonde_toolbar_collapsed',v?'1':'0')}catch(x){}}c.onclick=x=>{x.stopPropagation();set(true)};e.onclick=x=>{x.stopPropagation();set(false)};let s=null;try{s=localStorage.getItem('cybermonde_toolbar_collapsed')}catch(x){}if(window.matchMedia('(max-width:640px)').matches&&s===null)set(true);else if(s==='1')set(true)})();
+(function(){const t=document.getElementById('toolbar'),c=document.getElementById('toolbarCollapseBtn'),e=document.getElementById('toolbarExpandBtn'),m=document.getElementById('toolbarMiniBar');if(!t||!c||!e||!m)return;function set(v){t.classList.toggle('collapsed',v);m.classList.toggle('show',v);try{localStorage.setItem('cybermonde_toolbar_collapsed',v?'1':'0')}catch(x){}}c.onclick=x=>{x.stopPropagation();set(true)};e.onclick=x=>{x.stopPropagation();set(false)};let s=null;try{s=localStorage.getItem('cybermonde_toolbar_collapsed')}catch(x){}if(window.matchMedia('(max-width:640px)').matches&&s===null)set(true);else if(s==='1')set(true)})();
 </script>
 </body>
 
