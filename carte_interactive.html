@@ -140,12 +140,6 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 .marker-label { position:absolute; top:calc(var(--marker-icon-size) + 4px); left:50%; transform:translateX(-50%); background:rgba(5,5,8,0.92); color:var(--text); padding:0.2rem 0.6rem; border-radius:4px; font-size:var(--map-label-font-size); white-space:nowrap; pointer-events:none; border:1px solid var(--border); text-shadow:0 0 6px var(--accent); font-family:'Consolas','Courier New',monospace; letter-spacing:0.03em; }
 
 
-/* TOOLTIP */
-.tooltip { position:fixed; background:rgba(10,10,18,0.97); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; z-index:2000; pointer-events:none; max-width:250px; box-shadow:var(--glow-cyan), 0 8px 32px rgba(0,0,0,0.6); display:none; backdrop-filter:blur(8px); }
-.tooltip-title { font-weight:600; color:var(--accent); margin-bottom:0.3rem; }
-.tooltip-type { font-size:0.75rem; color:var(--text-muted); text-transform:capitalize; margin-bottom:0.3rem; }
-.tooltip-desc { font-size:0.8rem; color:var(--text); line-height:1.4; }
-
 /* COORDS */
 .coords-panel { position:fixed; bottom:1rem; right:1rem; background:rgba(5,5,8,0.95); border:1px solid var(--border); border-radius:8px; padding:0.5rem 1rem; z-index:1000; font-family:'Consolas','Courier New',monospace; font-size:0.85rem; color:var(--accent); box-shadow:var(--glow-cyan); letter-spacing:0.05em; }
 .coords-panel span { color:var(--text-muted); }
@@ -240,26 +234,8 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 .token-editor-btns .btn-reset-img:hover { background:rgba(255,42,109,0.15); }
 
 
-/* SIDEBAR MINIMIZED */
-.sidebar.minimized { width:60px; }
-.sidebar.minimized .sidebar-header,
-.sidebar.minimized .sidebar-search,
-.sidebar.minimized .sidebar-filters,
-.sidebar.minimized .sidebar-list,
-.sidebar.minimized .marker-detail,
-.sidebar.minimized .token-detail,
-.sidebar.minimized .sidebar-footer { display:none; }
-.sidebar.minimized .minimized-bar { display:flex; }
-.sidebar.minimized + .sidebar-toggle { left:60px; }
-.minimized-bar { display:none; flex-direction:column; align-items:center; padding:0.5rem 0; gap:0.5rem; height:100%; }
-.minimized-bar-btn { writing-mode:vertical-rl; text-orientation:mixed; background:var(--bg-lighter); border:1px solid var(--border); color:var(--accent-secondary); padding:0.6rem 0.3rem; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'Consolas',monospace; letter-spacing:0.05em; transition:all 0.2s; white-space:nowrap; }
-.minimized-bar-btn:hover { border-color:var(--accent-secondary); box-shadow:var(--glow-magenta); color:var(--text); }
-.minimized-bar-indicator { width:8px; height:8px; border-radius:50%; background:var(--accent-secondary); box-shadow:var(--glow-magenta); animation:pulse 2s infinite; }
+
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-@media (max-width:768px) {
-  .sidebar.minimized { width:50px; }
-  .sidebar.minimized + .sidebar-toggle { left:50px; }
-}
 
 
 /* SIDEBAR NAVIGATION */
@@ -380,8 +356,6 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
   .sidebar.collapsed { transform: translateX(-260px); }
   .sidebar-toggle { left: 260px; }
   .map-container { left: 260px; }
-  .sidebar.minimized { width: 45px; }
-  .sidebar.minimized + .sidebar-toggle { left: 45px; }
   .toolbar {
     max-height: 35vh;
     top: 0.3rem;
@@ -456,10 +430,6 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-  <div class="minimized-bar" id="minimizedBar">
-    <div class="minimized-bar-indicator" id="minimizedIndicator" style="display:none;"></div>
-    <button class="minimized-bar-btn" id="minimizedBarBtn">▶ TOKENS</button>
-  </div>
   <div class="sidebar-header sidebar-section" id="sidebarHeader">
     <h2>◈ SIGNAUX</h2>
     <a href="index.html" class="toolbar-btn" style="font-weight: bold;">Fiche</a>
@@ -554,13 +524,6 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 <div class="coords-panel" id="coordsPanel">
   <span>X:</span> <span id="coordX">0</span> &nbsp;&nbsp;
   <span>Y:</span> <span id="coordY">0</span>
-</div>
-
-<!-- Tooltip -->
-<div class="tooltip" id="tooltip">
-  <div class="tooltip-title" id="tooltipTitle"></div>
-  <div class="tooltip-type" id="tooltipType"></div>
-  <div class="tooltip-desc" id="tooltipDesc"></div>
 </div>
 
 <!-- Modal Marker -->
@@ -844,7 +807,7 @@ const state = {
 const $ = id => document.getElementById(id);
 const mapContainer = $('mapContainer'), mapWrapper = $('mapWrapper');
 const mapImage = $('mapImage'), gridCanvas = $('gridCanvas');
-const tooltip = $('tooltip'), modalOverlay = $('modalOverlay');
+const modalOverlay = $('modalOverlay');
 const pnjModalOverlay = $('pnjModalOverlay'), mapModalOverlay = $('mapModalOverlay');
 const uploadOverlay = $('uploadOverlay'), markerDetail = $('markerDetail');
 
@@ -904,30 +867,9 @@ function centerOnMarker(m){
   state.panY = rect.height/2 - m.y*state.zoom;
   updateTransform();
 }
-function minimizeSidebar(){
-  if(state.sidebarCollapsed) return;
-  state.sidebarMinimized = true;
-  $('sidebar').classList.add('minimized');
-  mapContainer.style.left = '60px';
-  $('sidebarToggle').style.left = '60px';
-  // S'assurer que la sidebar n'est pas collapsed quand on minimize
-  $('sidebar').classList.remove('collapsed');
-  state.sidebarCollapsed = false;
-  $('sidebarToggle').textContent = '◀';
-  // Cacher aussi les détails pour revenir propre
-  hideMarkerDetail();
-  hideTokenDetail();
-  state.selectedMarkerId = null;
-  state.selectedTokenId = null;
-  state.tokenJustSelected = false;
-  renderMarkers();
-  renderTokenList();
-}
 function expandSidebar(){
-  state.sidebarMinimized = false;
   const sidebar = $('sidebar');
-  sidebar.classList.remove('minimized');
-  // S'assurer qu'on n'est pas collapsed quand on expand
+  // S'assurer qu'on n'est pas collapsed
   sidebar.classList.remove('collapsed');
   state.sidebarCollapsed = false;
   const w = window.innerWidth <= 768 ? 280 : 340;
@@ -977,8 +919,6 @@ function createMarkerEl(m){
   label.className = 'marker-label';
   label.textContent = m.name;
   el.appendChild(label);
-  el.addEventListener('mouseenter', e => showTooltip(e,m));
-  el.addEventListener('mouseleave', hideTooltip);
   el.addEventListener('mousedown', e => onMarkerMouseDown(e,m));
   return el;
 }
@@ -1090,24 +1030,6 @@ function deleteMarker(){
     modalOverlay.classList.remove('show');
     renderMarkers(); renderSidebar(); saveToStorage();
   }
-}
-
-// ==================== TOOLTIP ====================
-function showTooltip(e,m){
-  if(state.tool!=='select') return;
-  $('tooltipTitle').textContent = m.name;
-  $('tooltipType').textContent = (TYPE_ICONS[m.type]||'📌')+' '+(TYPE_LABELS[m.type]||m.type);
-  $('tooltipDesc').textContent = m.description || 'Aucune donnée';
-  tooltip.style.display='block';
-  positionTooltip(e.clientX,e.clientY);
-}
-function hideTooltip(){ tooltip.style.display='none'; }
-function positionTooltip(x,y){
-  const rect=tooltip.getBoundingClientRect();
-  let left=x+15, top=y+15;
-  if(left+rect.width>window.innerWidth) left=x-rect.width-10;
-  if(top+rect.height>window.innerHeight) top=y-rect.height-10;
-  tooltip.style.left=left+'px'; tooltip.style.top=top+'px';
 }
 
 // ==================== DETAIL PANEL ====================
@@ -1566,7 +1488,6 @@ function saveToStorage(){
     removedBaseTypes:state.removedBaseTypes,
     scale:state.scale,
     tokens:state.tokens,
-    sidebarMinimized:state.sidebarMinimized,
     labelFontSize:state.labelFontSize,
     markerIconSize:state.markerIconSize,
     theme:state.theme
@@ -1749,7 +1670,7 @@ mapContainer.addEventListener('mousedown', e=>{
     }
     return;
   }
-  // Minimize sidebar when clicking empty map in select mode
+  // Désélection en cliquant sur la carte vide en mode sélection
   if(state.tool==='select' && !state.tokenJustSelected){
     state.selectedMarkerId = null;
     state.selectedTokenId = null;
@@ -1757,7 +1678,6 @@ mapContainer.addEventListener('mousedown', e=>{
     hideTokenDetail();
     renderMarkers();
     renderTokenList();
-    minimizeSidebar();
   }
   state.tokenJustSelected = false;
   state.dragging = true; state.dragStart = {x:e.clientX,y:e.clientY};
@@ -1787,7 +1707,6 @@ window.addEventListener('mousemove', e=>{
   }
   $('coordX').textContent = cx;
   $('coordY').textContent = cy;
-  if(tooltip.style.display==='block') positionTooltip(e.clientX,e.clientY);
   if(state.dragging){
     state.panX += e.clientX-state.dragStart.x;
     state.panY += e.clientY-state.dragStart.y;
@@ -1889,9 +1808,6 @@ function setSidebarCollapsed(collapsed){
   sidebar.classList.toggle('collapsed', collapsed);
   $('sidebarToggle').textContent = collapsed?'▶':'◀';
   if(collapsed){
-    // En mode collapsed, on sort forcément du mode minimized
-    sidebar.classList.remove('minimized');
-    state.sidebarMinimized = false;
     mapContainer.style.left = '0';
     $('sidebarToggle').style.left = '0';
   } else {
@@ -2188,16 +2104,6 @@ $('btnBackFromToken').addEventListener('click', ()=>{
   renderTokenList();
 });
 
-// Minimized bar button
-$('minimizedBarBtn').addEventListener('click', ()=>{
-  expandSidebar();
-  // Si un token est sélectionné, montrer son détail
-  if(state.selectedTokenId){
-    showTokenDetail(state.selectedTokenId);
-  } else if(state.selectedMarkerId){
-    showMarkerDetail(state.selectedMarkerId);
-  }
-});
 
 // Sidebar token buttons
 $('btnEditToken').addEventListener('click', ()=>{
@@ -2411,9 +2317,6 @@ window.addEventListener('resize', ()=>{
   if(state.sidebarCollapsed){
     mapContainer.style.left = '0';
     $('sidebarToggle').style.left = '0';
-  } else if(state.sidebarMinimized){
-    mapContainer.style.left = '60px';
-    $('sidebarToggle').style.left = '60px';
   } else {
     const w = window.innerWidth <= 768 ? 280 : 340;
     mapContainer.style.left = w + 'px';
