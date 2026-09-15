@@ -2443,6 +2443,8 @@ function renderStep1(container) {
   // === OPTIONS SUPPLÉMENTAIRES DES OMBRES (Traditions Magiques) ===
   const conceptTypeNorm = normalizeString(character.concept ? character.concept.Type : '');
   const isEveille = conceptTypeNorm.includes('magicien') || 
+                    conceptTypeNorm.includes('sorcier') || 
+                    conceptTypeNorm.includes('conjurateur') || 
                     conceptTypeNorm.includes('adepte') || 
                     conceptTypeNorm === 'emerge' || 
                     conceptTypeNorm === 'eveille';
@@ -3209,6 +3211,8 @@ function renderStep5(container) {
       // Vérifier la restriction -comparaison normalisée (sans accents, minuscule)
       const conceptTypeNorm = normalizeString(character.concept ? character.concept.Type : '');
       const isEveille = conceptTypeNorm.includes('magicien') || 
+                        conceptTypeNorm.includes('sorcier') || 
+                        conceptTypeNorm.includes('conjurateur') || 
                         conceptTypeNorm.includes('adepte') || 
                         conceptTypeNorm.includes('eveille') ||
                         conceptTypeNorm.includes('eveil');
@@ -3664,12 +3668,16 @@ function renderStep6(container) {
   const conceptTypeLower = normalizeString(conceptType);
   const isNonEveille = conceptTypeLower.includes('non') && conceptTypeLower.includes('eveille');
   const isEmerge = conceptTypeLower.includes('emerge');
-  const isMagicien = conceptTypeLower.includes('magicien');
+  const isMagicien = conceptTypeLower.includes('magicien') ||
+                      conceptTypeLower.includes('sorcier') ||
+                      conceptTypeLower.includes('conjurateur');
   const isAdepteMystique = conceptTypeLower.includes('adepte') && conceptTypeLower.includes('mystique');
   const isAdepte = conceptTypeLower.includes('adepte') && !isAdepteMystique;
   const isEveille = !isNonEveille && (
   conceptTypeLower.includes('eveille') ||
   conceptTypeLower.includes('magicien') ||
+  conceptTypeLower.includes('sorcier') ||
+  conceptTypeLower.includes('conjurateur') ||
   conceptTypeLower.includes('adepte')
 );
   const isEspritLibre = character.metatype && character.metatype.Métatype.toLowerCase().includes('esprit libre');

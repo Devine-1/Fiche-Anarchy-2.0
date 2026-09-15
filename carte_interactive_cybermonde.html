@@ -26,6 +26,7 @@
   --glow-magenta:0 0 8px rgba(255,0,255,0.4), 0 0 20px rgba(255,0,255,0.1);
   --glow-yellow:0 0 8px rgba(240,232,0,0.4), 0 0 20px rgba(240,232,0,0.1);
   --map-label-font-size:0.75rem;
+  --marker-icon-size:24px;
   --font-body:'Segoe UI',system-ui,sans-serif;
   --font-mono:'Consolas','Courier New',monospace;
 }
@@ -60,7 +61,7 @@
   --font-mono:'Courier New',monospace;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:var(--font-body); background:var(--bg); color:var(--text); overflow:hidden; height:100vh; width:100vw; background-image:radial-gradient(ellipse at 50% 0%, var(--border-glow) 0%, transparent 60%), radial-gradient(ellipse at 0% 100%, var(--border-glow) 0%, transparent 50%); transition:background-color 0.3s ease, color 0.3s ease; }
+body { font-family:var(--font-body); background:var(--bg); color:var(--text); overflow:hidden; height:100vh; width:100vw; background-image:radial-gradient(ellipse at 50% 0%, rgba(0,240,255,0.03) 0%, transparent 60%), radial-gradient(ellipse at 0% 100%, rgba(255,0,255,0.02) 0%, transparent 50%); transition:background-color 0.3s ease, color 0.3s ease; }
 
 /* TOOLBAR */
 .toolbar { position:fixed; top:1rem; left:50%; transform:translateX(-50%); display:flex; gap:0.5rem; background:rgba(10,10,18,0.92); border:1px solid var(--border); border-radius:12px; padding:0.5rem; z-index:1000; box-shadow:var(--glow-cyan), 0 4px 30px rgba(0,0,0,0.7); backdrop-filter:blur(12px); flex-wrap:wrap; justify-content:center; }
@@ -68,30 +69,26 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 .toolbar-btn:hover { background:var(--border); color:var(--text); border-color:var(--accent); box-shadow:var(--glow-cyan); }
 .toolbar-btn.active { background:rgba(0,240,255,0.12); color:var(--accent); border-color:var(--accent); font-weight:600; box-shadow:var(--glow-cyan); }
 .toolbar-btn.active:hover { background:rgba(0,240,255,0.2); color:var(--accent-hover); }
-.toolbar-collapse-btn,.toolbar-expand-btn{background:var(--bg-lighter);border:1px solid var(--border);color:var(--accent);border-radius:8px;cursor:pointer;font-family:var(--font-mono);transition:all .2s}.toolbar-collapse-btn{padding:.5rem .65rem;font-size:.85rem}.toolbar-expand-btn{padding:.5rem .65rem;font-size:.85rem}.toolbar-collapse-btn:hover,.toolbar-expand-btn:hover{border-color:var(--accent);color:var(--accent-hover);box-shadow:var(--glow-cyan)}.toolbar.collapsed{display:none}
-.toolbar-mini{position:fixed;top:.5rem;left:50%;transform:translateX(-50%);z-index:999;display:none;gap:0.4rem;background:rgba(10,10,18,0.92);border:1px solid var(--border);border-radius:12px;padding:0.4rem;box-shadow:var(--glow-cyan),0 4px 20px rgba(0,0,0,.6);backdrop-filter:blur(12px);}
-.toolbar-mini.show{display:flex;}
-.toolbar-mini .toolbar-btn{padding:0.4rem 0.6rem;font-size:0.85rem;}
 .toolbar-sep { width:1px; background:var(--border); margin:0 0.2rem; }
 .theme-select { appearance:none; -webkit-appearance:none; -moz-appearance:none; padding-right:1.2rem; }
 .theme-select:focus { outline:none; border-color:var(--accent); }
 .theme-select option { background:var(--bg-lighter); color:var(--text); }
 
 /* SIDEBAR */
-.sidebar { position:fixed; left:0; top:0; width:340px; height:100vh; background:rgba(10,10,18,0.97); border-right:1px solid var(--border); z-index:900; display:flex; flex-direction:column; overflow-y:auto; transition:transform 0.3s ease; box-shadow:4px 0 30px rgba(0,0,0,0.5), inset -1px 0 0 rgba(0,240,255,0.05); backdrop-filter:blur(8px); }
+.sidebar { position:fixed; left:0; top:0; width:340px; height:100vh; background:rgba(10,10,18,0.97); border-right:1px solid var(--border); z-index:900; display:flex; flex-direction:column; transition:transform 0.3s ease; box-shadow:4px 0 30px rgba(0,0,0,0.5), inset -1px 0 0 rgba(0,240,255,0.05); backdrop-filter:blur(8px); }
 .sidebar.collapsed { transform:translateX(-340px); }
 .sidebar-header { padding:1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-.sidebar-header h2 { font-size:1rem; color:var(--accent); text-shadow:0 0 10px rgba(0,240,255,0.3); letter-spacing:0.05em; font-family:var(--font-mono); }
+.sidebar-header h2 { font-size:1rem; color:var(--accent); text-shadow:0 0 10px rgba(0,240,255,0.3); letter-spacing:0.05em; font-family:'Consolas','Courier New',monospace; }
 .sidebar-toggle { position:fixed; left:340px; top:50%; transform:translateY(-50%); background:var(--bg-light); border:1px solid var(--border); border-left:none; color:var(--text); padding:0.5rem 0.3rem; border-radius:0 8px 8px 0; cursor:pointer; z-index:901; font-size:1.2rem; transition:left 0.3s ease; }
 .sidebar.collapsed + .sidebar-toggle { left:0; }
 .sidebar-search { padding:0.75rem 1rem; border-bottom:1px solid var(--border); }
 .sidebar-search input { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:0.5rem 0.75rem; border-radius:6px; font-size:0.9rem; }
 .sidebar-search input:focus { outline:none; border-color:var(--accent); }
 .sidebar-filters { padding:0.5rem 1rem; border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; gap:0.3rem; }
-.filter-chip { background:var(--bg-lighter); border:1px solid var(--border); color:var(--text-muted); padding:0.2rem 0.5rem; border-radius:12px; font-size:0.75rem; cursor:pointer; transition:all 0.2s; font-family:var(--font-mono); }
+.filter-chip { background:var(--bg-lighter); border:1px solid var(--border); color:var(--text-muted); padding:0.2rem 0.5rem; border-radius:12px; font-size:0.75rem; cursor:pointer; transition:all 0.2s; font-family:'Consolas','Courier New',monospace; }
 .filter-chip:hover { color:var(--text); border-color:var(--accent); box-shadow:var(--glow-cyan); }
 .filter-chip.active { background:rgba(0,240,255,0.12); color:var(--accent); border-color:var(--accent); font-weight:600; box-shadow:var(--glow-cyan); }
-.sidebar-list { flex:1; min-height:0; overflow-y:auto; padding:0.5rem; }
+.sidebar-list { flex:1; overflow-y:auto; padding:0.5rem; }
 .marker-item { display:flex; align-items:center; gap:0.6rem; padding:0.6rem 0.75rem; border-radius:8px; cursor:pointer; transition:all 0.2s; margin-bottom:0.3rem; border:1px solid transparent; }
 .marker-item:hover { background:var(--bg-lighter); border-color:var(--border); }
 .marker-item.selected { background:rgba(0,240,255,0.08); border-color:var(--accent); box-shadow:var(--glow-cyan); }
@@ -103,11 +100,11 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 /* DETAIL PANEL */
 .marker-detail { padding:1rem; border-top:1px solid var(--border); background:var(--bg); max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease; }
 .marker-detail.open { max-height:700px; overflow-y:auto; }
-.marker-detail h3 { color:var(--accent); font-size:1rem; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; text-shadow:0 0 8px rgba(0,240,255,0.25); font-family:var(--font-mono); }
+.marker-detail h3 { color:var(--accent); font-size:1rem; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; text-shadow:0 0 8px rgba(0,240,255,0.25); font-family:'Consolas','Courier New',monospace; }
 .marker-detail-desc { font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem; line-height:1.4; white-space:pre-wrap; word-break:break-word; }
-.marker-detail-coords { font-family:var(--font-mono); font-size:0.75rem; color:var(--accent); margin-bottom:0.75rem; }
+.marker-detail-coords { font-family:'Consolas',monospace; font-size:0.75rem; color:var(--accent); margin-bottom:0.75rem; }
 .pnj-section { border-top:1px solid var(--border); padding-top:0.75rem; margin-top:0.75rem; }
-.pnj-section h4 { font-size:0.85rem; color:var(--accent-secondary); margin-bottom:0.5rem; display:flex; align-items:center; justify-content:space-between; text-shadow:0 0 8px rgba(255,0,255,0.2); font-family:var(--font-mono); }
+.pnj-section h4 { font-size:0.85rem; color:var(--accent-secondary); margin-bottom:0.5rem; display:flex; align-items:center; justify-content:space-between; text-shadow:0 0 8px rgba(255,0,255,0.2); font-family:'Consolas','Courier New',monospace; }
 .pnj-item { display:flex; flex-direction:column; gap:0.2rem; padding:0.5rem 0.6rem; background:var(--bg-lighter); border-radius:6px; margin-bottom:0.4rem; font-size:0.8rem; cursor:pointer; transition:all 0.2s; border:1px solid transparent; }
 .pnj-item:hover { background:var(--border); border-color:var(--accent-secondary); box-shadow:var(--glow-magenta); }
 .pnj-item-header { display:flex; align-items:center; gap:0.5rem; }
@@ -122,16 +119,9 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 .sidebar-footer button:hover { background:var(--border); }
 .sidebar-footer .btn-export { background:rgba(5,255,161,0.12); color:var(--success); border-color:var(--success); }
 .sidebar-footer .btn-export:hover { background:rgba(5,255,161,0.22); color:var(--success-hover); }
-.export-modal { max-width:520px; }
-.export-options { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
-.export-option { display:flex; flex-direction:column; align-items:flex-start; text-align:left; min-height:92px; padding:0.85rem 0.9rem; background:var(--bg-lighter); border:1px solid var(--border); color:var(--text); border-radius:8px; cursor:pointer; transition:all 0.15s; }
-.export-option:hover { background:var(--border); border-color:var(--accent); box-shadow:var(--glow-cyan); }
-.export-option strong { color:var(--accent); font-size:0.85rem; margin-bottom:0.35rem; }
-.export-option span { color:var(--text-muted); font-size:0.72rem; line-height:1.35; }
-@media (max-width:420px) { .export-options { grid-template-columns:1fr; } }
 
 /* MAP */
-.map-container { position:fixed; top:0; left:340px; right:0; bottom:0; overflow:hidden; cursor:grab; background:#020204; touch-action:none; }
+.map-container { position:fixed; top:0; left:340px; right:0; bottom:0; overflow:hidden; cursor:grab; background:#020204; }
 .map-container.panning { cursor:grabbing; }
 .map-container.add-mode { cursor:crosshair; }
 .map-container.delete-mode { cursor:not-allowed; }
@@ -142,11 +132,12 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 .grid-overlay { position:absolute; top:0; left:0; pointer-events:none; }
 
 /* MARKERS */
-.marker { position:absolute; transform:translate(-50%,-100%); cursor:pointer; z-index:10; user-select:none; touch-action:none; }
-.marker-pin { width:24px; height:24px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:2px solid var(--bg); box-shadow:0 0 12px currentColor, 0 2px 8px rgba(0,0,0,0.6); transition:transform 0.2s, box-shadow 0.2s; }
+.marker { position:absolute; transform:translate(-50%,-100%); cursor:pointer; z-index:10; user-select:none; }
+.marker-pin { width:var(--marker-icon-size); height:var(--marker-icon-size); border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:2px solid var(--bg); box-shadow:0 0 12px currentColor, 0 2px 8px rgba(0,0,0,0.6); transition:transform 0.2s, box-shadow 0.2s; display:flex; align-items:center; justify-content:center; }
+.marker-pin-icon { transform:rotate(45deg); font-size:calc(var(--marker-icon-size) * 0.5); line-height:1; user-select:none; }
 .marker:hover .marker-pin { transform:rotate(-45deg) scale(1.2); box-shadow:0 0 20px currentColor, 0 4px 16px rgba(0,0,0,0.8); }
 .marker.selected .marker-pin { box-shadow:0 0 0 3px var(--accent), 0 0 20px var(--accent), 0 4px 16px rgba(0,0,0,0.8); }
-.marker-label { position:absolute; top:28px; left:50%; transform:translateX(-50%); background:rgba(5,5,8,0.92); color:var(--text); padding:0.2rem 0.6rem; border-radius:4px; font-size:var(--map-label-font-size); white-space:nowrap; pointer-events:none; border:1px solid var(--border); text-shadow:0 0 6px var(--accent); font-family:var(--font-mono); letter-spacing:0.03em; }
+.marker-label { position:absolute; top:calc(var(--marker-icon-size) + 4px); left:50%; transform:translateX(-50%); background:rgba(5,5,8,0.92); color:var(--text); padding:0.2rem 0.6rem; border-radius:4px; font-size:var(--map-label-font-size); white-space:nowrap; pointer-events:none; border:1px solid var(--border); text-shadow:0 0 6px var(--accent); font-family:'Consolas','Courier New',monospace; letter-spacing:0.03em; }
 
 
 /* TOOLTIP */
@@ -156,14 +147,14 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 .tooltip-desc { font-size:0.8rem; color:var(--text); line-height:1.4; }
 
 /* COORDS */
-.coords-panel { position:fixed; bottom:1rem; right:1rem; background:rgba(5,5,8,0.95); border:1px solid var(--border); border-radius:8px; padding:0.5rem 1rem; z-index:1000; font-family:var(--font-mono); font-size:0.85rem; color:var(--accent); box-shadow:var(--glow-cyan); letter-spacing:0.05em; }
+.coords-panel { position:fixed; bottom:1rem; right:1rem; background:rgba(5,5,8,0.95); border:1px solid var(--border); border-radius:8px; padding:0.5rem 1rem; z-index:1000; font-family:'Consolas','Courier New',monospace; font-size:0.85rem; color:var(--accent); box-shadow:var(--glow-cyan); letter-spacing:0.05em; }
 .coords-panel span { color:var(--text-muted); }
 
 /* MODALS */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:3000; display:none; align-items:center; justify-content:center; }
 .modal-overlay.show { display:flex; }
 .modal { background:rgba(10,10,18,0.98); border:1px solid var(--border); border-radius:12px; width:90%; max-width:460px; padding:1.5rem; box-shadow:var(--glow-cyan), 0 20px 60px rgba(0,0,0,0.8); backdrop-filter:blur(16px); }
-.modal h3 { color:var(--accent); margin-bottom:1rem; font-size:1.1rem; text-shadow:0 0 10px rgba(0,240,255,0.3); font-family:var(--font-mono); letter-spacing:0.03em; }
+.modal h3 { color:var(--accent); margin-bottom:1rem; font-size:1.1rem; text-shadow:0 0 10px rgba(0,240,255,0.3); font-family:'Consolas','Courier New',monospace; letter-spacing:0.03em; }
 .form-group { margin-bottom:1rem; }
 .form-group label { display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem; }
 .form-group input, .form-group select, .form-group textarea { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:0.6rem 0.75rem; border-radius:6px; font-size:0.9rem; font-family:inherit; transition:all 0.2s; }
@@ -209,11 +200,11 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 ::-webkit-scrollbar-thumb:hover { background:var(--accent); }
 
 /* TOKENS */
-.token { position:absolute; transform:translate(-50%,-50%); border-radius:50%; cursor:grab; z-index:15; user-select:none; touch-action:none; transition:transform 0.15s, box-shadow 0.15s; box-shadow:0 0 8px var(--border-color), 0 2px 8px rgba(0,0,0,0.5); background-size:cover; background-position:center; background-repeat:no-repeat; }
+.token { position:absolute; transform:translate(-50%,-50%); border-radius:50%; cursor:grab; z-index:15; user-select:none; transition:transform 0.15s, box-shadow 0.15s; box-shadow:0 0 8px var(--border-color), 0 2px 8px rgba(0,0,0,0.5); background-size:cover; background-position:center; background-repeat:no-repeat; }
 .token:hover { transform:translate(-50%,-50%) scale(1.15); box-shadow:0 0 16px var(--border-color), 0 4px 16px rgba(0,0,0,0.7); z-index:20; }
 .token.dragging { cursor:grabbing; z-index:100; transform:translate(-50%,-50%) scale(1.2); }
 .token.selected { box-shadow:0 0 0 3px var(--accent), 0 0 20px var(--accent), 0 4px 16px rgba(0,0,0,0.8); z-index:25; }
-.token-label { position:absolute; top:calc(100% + 4px); left:50%; transform:translateX(-50%); background:rgba(5,5,8,0.92); color:var(--text); padding:0.15rem 0.5rem; border-radius:4px; font-size:var(--map-label-font-size); white-space:nowrap; border:1px solid var(--border); font-family:var(--font-mono); letter-spacing:0.03em; cursor:grab; }
+.token-label { position:absolute; top:calc(100% + 4px); left:50%; transform:translateX(-50%); background:rgba(5,5,8,0.92); color:var(--text); padding:0.15rem 0.5rem; border-radius:4px; font-size:var(--map-label-font-size); white-space:nowrap; border:1px solid var(--border); font-family:'Consolas','Courier New',monospace; letter-spacing:0.03em; cursor:grab; }
 .token-item { display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.75rem; border-radius:8px; cursor:pointer; transition:all 0.2s; margin-bottom:0.3rem; border:1px solid transparent; }
 .token-item:hover { background:var(--bg-lighter); border-color:var(--border); }
 .token-item.selected { background:rgba(255,0,255,0.08); border-color:var(--accent-secondary); box-shadow:var(--glow-magenta); }
@@ -233,7 +224,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 
 /* TOKEN IMAGE EDITOR */
 .token-editor-wrap { display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem; }
-.token-editor-canvas-wrap { position:relative; width:240px; height:240px; margin:0 auto; border-radius:50%; border:3px solid var(--accent); overflow:hidden; background:var(--bg); box-shadow:var(--glow-cyan); cursor:grab; touch-action:none; }
+.token-editor-canvas-wrap { position:relative; width:240px; height:240px; margin:0 auto; border-radius:50%; border:3px solid var(--accent); overflow:hidden; background:var(--bg); box-shadow:var(--glow-cyan); cursor:grab; }
 .token-editor-canvas-wrap:active { cursor:grabbing; }
 .token-editor-canvas-wrap canvas { display:block; width:100%; height:100%; }
 .token-editor-preview-label { text-align:center; font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem; }
@@ -261,7 +252,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 .sidebar.minimized .minimized-bar { display:flex; }
 .sidebar.minimized + .sidebar-toggle { left:60px; }
 .minimized-bar { display:none; flex-direction:column; align-items:center; padding:0.5rem 0; gap:0.5rem; height:100%; }
-.minimized-bar-btn { writing-mode:vertical-rl; text-orientation:mixed; background:var(--bg-lighter); border:1px solid var(--border); color:var(--accent-secondary); padding:0.6rem 0.3rem; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:var(--font-mono); letter-spacing:0.05em; transition:all 0.2s; white-space:nowrap; }
+.minimized-bar-btn { writing-mode:vertical-rl; text-orientation:mixed; background:var(--bg-lighter); border:1px solid var(--border); color:var(--accent-secondary); padding:0.6rem 0.3rem; border-radius:8px; cursor:pointer; font-size:0.8rem; font-family:'Consolas',monospace; letter-spacing:0.05em; transition:all 0.2s; white-space:nowrap; }
 .minimized-bar-btn:hover { border-color:var(--accent-secondary); box-shadow:var(--glow-magenta); color:var(--text); }
 .minimized-bar-indicator { width:8px; height:8px; border-radius:50%; background:var(--accent-secondary); box-shadow:var(--glow-magenta); animation:pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
@@ -274,10 +265,10 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 /* SIDEBAR NAVIGATION */
 .sidebar-section { transition: all 0.3s ease; }
 .sidebar-section.hidden { display:none !important; }
-.detail-back-btn { background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.85rem; font-family:var(--font-mono); padding:0.3rem 0.6rem; border-radius:6px; transition:all 0.15s; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem; }
+.detail-back-btn { background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.85rem; font-family:'Consolas',monospace; padding:0.3rem 0.6rem; border-radius:6px; transition:all 0.15s; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem; }
 .detail-back-btn:hover { background:rgba(0,240,255,0.1); text-shadow:0 0 8px rgba(0,240,255,0.4); }
 .marker-detail, .token-detail { transition: max-height 0.3s ease, padding 0.3s ease; }
-.marker-detail.full, .token-detail.full { max-height:none; flex:1; min-height:0; overflow-y:auto; display:flex; flex-direction:column; }
+.marker-detail.full, .token-detail.full { max-height:none; flex:1; overflow-y:auto; display:flex; flex-direction:column; }
 
 
 /* === AJOUTS RESPONSIVE === */
@@ -357,7 +348,6 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 }
 
 @media (max-width: 640px) {
-  .toolbar-collapse-btn{padding:.35rem .5rem;font-size:.85rem}.toolbar-expand-btn{padding:.3rem .5rem;font-size:.8rem}.toolbar-mini{top:.35rem;padding:.3rem;gap:0.3rem;}.toolbar-mini .toolbar-btn{padding:.3rem .45rem;font-size:.8rem;}
   .btn-text { display: none; }
   .toolbar-btn {
     padding: 0.35rem 0.45rem;
@@ -428,20 +418,20 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 
 <!-- Toolbar -->
 <div class="toolbar" id="toolbar">
-  <button class="toolbar-btn active" data-tool="select" title="Sélectionner (V)">🖱️ <span class="btn-text">SÉLECTION</span></button>
-  <button class="toolbar-btn" data-tool="add" title="Ajouter un point (A)">📍 <span class="btn-text">AJOUTER</span></button>
-  <button class="toolbar-btn" data-tool="move" title="Déplacer un point (M)">↔️ <span class="btn-text">DÉPLACER</span></button>
-  <button class="toolbar-btn" data-tool="delete" title="Supprimer un point (S)">🗑️ <span class="btn-text">SUPPRIMER</span></button>
-  <button class="toolbar-btn" data-tool="measure" title="Mesurer distance (R)">📏 <span class="btn-text">MESURER</span></button>
-  <button class="toolbar-btn" data-tool="scale" title="Définir l'échelle (E)">⚖️ <span class="btn-text">ÉCHELLE</span></button>
-  <button class="toolbar-btn" data-tool="token" title="Ajouter un token (T)">👤 <span class="btn-text">TOKEN</span></button>
+  <button class="toolbar-btn active" data-tool="select" title="Sélectionner (V)"><span class="btn-text">SÉLECTION</span></button>
+  <button class="toolbar-btn" data-tool="add" title="Ajouter un point (A)"><span class="btn-text">AJOUTER</span></button>
+  <button class="toolbar-btn" data-tool="move" title="Déplacer un point (M)"><span class="btn-text">DÉPLACER</span></button>
+  <button class="toolbar-btn" data-tool="delete" title="Supprimer un point (S)"><span class="btn-text">SUPPRIMER</span></button>
+  <button class="toolbar-btn" data-tool="measure" title="Mesurer distance (R)"><span class="btn-text">MESURER</span></button>
+  <button class="toolbar-btn" data-tool="scale" title="Définir l'échelle (E)"><span class="btn-text">ÉCHELLE</span></button>
+  <button class="toolbar-btn" data-tool="token" title="Ajouter un token (T)"><span class="btn-text">TOKEN</span></button>
   <div class="toolbar-sep"></div>
   <button class="toolbar-btn" id="btnZoomIn" title="Zoom +">+</button>
-  <button class="toolbar-btn" id="btnZoomOut" title="Zoom -">-</button>
+  <button class="toolbar-btn" id="btnZoomOut" title="Zoom −">−</button>
   <button class="toolbar-btn" id="btnReset" title="Réinitialiser (0)">⌂</button>
   <div class="toolbar-sep"></div>
   <button class="toolbar-btn" id="btnToggleGrid" title="Grille (G)">⊞ <span class="btn-text">GRILLE</span></button>
-  <button class="toolbar-btn" id="btnChangeMap" title="Changer de carte">🗺️ <span class="btn-text">CARTE</span></button>
+  <button class="toolbar-btn" id="btnChangeMap" title="Changer de carte"><span class="btn-text">CARTE</span></button>
   <div class="toolbar-sep"></div>
   <select id="themeSelect" class="toolbar-btn theme-select" title="Changer le thème visuel">
     <option value="cybermonde">CYBERMONDE</option>
@@ -450,13 +440,6 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
   </select>
   <div class="toolbar-sep"></div>
   <button class="toolbar-btn" id="btnSaveImage" title="Extraire PNG (Ctrl+S)">💾 <span class="btn-text">EXPORT</span></button>
-  <button class="toolbar-collapse-btn" id="toolbarCollapseBtn" title="Masquer le menu">▲</button>
-</div>
-<div class="toolbar-mini" id="toolbarMiniBar">
-  <button class="toolbar-btn" id="btnZoomInMini" title="Zoom +">+</button>
-  <button class="toolbar-btn" id="btnZoomOutMini" title="Zoom -">-</button>
-  <button class="toolbar-btn" id="btnResetMini" title="Réinitialiser (0)">⌂</button>
-  <button class="toolbar-expand-btn" id="toolbarExpandBtn" title="Afficher le menu">▼</button>
 </div>
 
 <!-- Grid settings -->
@@ -493,7 +476,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 
   <!-- Token section -->
   <div class="sidebar-section" id="tokenSectionHeader" style="padding:0.5rem 1rem; border-top:1px solid var(--border); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:var(--bg-light);">
-    <h3 style="font-size:0.85rem; color:var(--accent-secondary); font-family:var(--font-mono); margin:0;">👤 TOKENS</h3>
+    <h3 style="font-size:0.85rem; color:var(--accent-secondary); font-family:'Consolas','Courier New',monospace; margin:0;">👤 TOKENS</h3>
     <span id="tokenCount" style="color:var(--text-muted); font-size:0.75rem;">0</span>
   </div>
   <div class="sidebar-list sidebar-section" id="tokenList" style="max-height:200px; padding:0.5rem;"></div>
@@ -513,7 +496,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
       </h4>
       <div id="pnjList"></div>
     </div>
-  </div>
+  </div> 
 
   <!-- Token detail panel -->
   <div class="marker-detail" id="tokenDetail">
@@ -529,6 +512,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
     </div>
     <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
       <button class="btn-secondary" id="btnEditToken" style="flex:1; padding:0.4rem; font-size:0.8rem; border-radius:6px; border:1px solid var(--border); background:var(--bg-lighter); color:var(--text); cursor:pointer;">✏️ ÉDITER</button>
+      <button class="btn-secondary" id="btnDuplicateToken" title="Ajouter un autre token identique (numéroté) sur la carte" style="flex:0 0 auto; padding:0.4rem 0.7rem; font-size:0.9rem; font-weight:700; border-radius:6px; border:1px solid var(--accent); background:rgba(0,229,255,0.12); color:var(--accent); cursor:pointer;">➕</button>
       <button class="btn-danger" id="btnDeleteToken" style="flex:1; padding:0.4rem; font-size:0.8rem; border-radius:6px; border:1px solid var(--danger); background:rgba(255,42,109,0.15); color:var(--danger); cursor:pointer;">🗑️ <span class="btn-text">SUPPRIMER</span></button>
     </div>
   </div>
@@ -538,11 +522,22 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
     <input type="range" id="labelFontSize" min="10" max="24" step="1" value="12" style="flex:1;">
     <span id="labelFontSizeVal" style="font-size:0.75rem; color:var(--accent); min-width:34px; text-align:right;">12px</span>
   </div>
+  <div class="sidebar-section" id="markerIconSizeSection" style="padding:0.6rem 1rem; border-top:1px solid var(--border); display:flex; align-items:center; gap:0.5rem;">
+    <label for="markerIconSize" style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap;" title="Ajuste la taille des icônes (logos) des signaux sur la carte">Taille signaux</label>
+    <input type="range" id="markerIconSize" min="16" max="64" step="2" value="24" style="flex:1;">
+    <span id="markerIconSizeVal" style="font-size:0.75rem; color:var(--accent); min-width:34px; text-align:right;">24px</span>
+  </div>
 
-  <div class="sidebar-footer sidebar-section" id="sidebarFooter">
-    <button class="btn-export" id="btnExport">EXPORT</button>
-    <button id="btnImport">IMPORT JSON</button>
-    <input type="file" id="importFile" accept=".json" style="display:none;">
+  <div class="sidebar-footer sidebar-section" id="sidebarFooter" style="flex-direction:column; gap:0.4rem;">
+    <div style="display:flex; gap:0.4rem; width:100%;">
+      <button class="btn-export" id="btnExportFull" title="Export complet : points, tokens, grille, échelle, types perso...">💾 TOUT</button>
+      <button id="btnExportTokens" title="Exporter uniquement les tokens (ex: tokens joueurs)">💾 TOKENS</button>
+      <button id="btnExportMarkers" title="Exporter uniquement les points d'intérêt">💾 POINTS</button>
+    </div>
+    <div style="display:flex; gap:0.4rem; width:100%;">
+      <button id="btnImport">📂 IMPORTER UN JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;">
+    </div>
   </div>
 </div>
 <button class="sidebar-toggle" id="sidebarToggle">◀</button>
@@ -699,7 +694,8 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
     <div class="form-group">
       <label>Icône (emoji)</label>
       <input type="text" id="typeModalIcon" placeholder="🏥" maxlength="4" style="font-size:1.2rem; width:60px; text-align:center;">
-      <span style="font-size:0.75rem; color:var(--text-muted);">Un seul emoji recommandé</span>
+      <span style="font-size:0.75rem; color:var(--text-muted);">Collez un emoji ou choisissez ci-dessous</span>
+      <div id="typeModalIconPresets" style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.5rem;"></div>
     </div>
     <div class="form-group">
       <label>Couleur du signal</label>
@@ -718,7 +714,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
 <!-- Modal Échelle -->
 <div class="modal-overlay" id="scaleModalOverlay">
   <div class="modal" id="scaleModal">
-    <h3>⚖️ Définir l'échelle</h3>
+    <h3>Définir l'échelle</h3>
     <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">
       Cliquez sur <strong>2 points</strong> de la carte correspondant à une distance connue, puis renseignez la valeur.
     </p>
@@ -755,39 +751,10 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); ov
   </div>
 </div>
 
-<!-- Modal Export JSON -->
-<div class="modal-overlay" id="exportModalOverlay">
-  <div class="modal export-modal" id="exportModal">
-    <h3>Exporter les données</h3>
-    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Choisissez le type de fichier JSON à créer.</p>
-    <div class="export-options">
-      <button class="export-option" id="exportComplete">
-        <strong>EXPORT COMPLET</strong>
-        <span>Sauvegarde de toute la carte, des points d'intérêt et des tokens.</span>
-      </button>
-      <button class="export-option" id="exportTokens">
-        <strong>EXPORT TOKENS</strong>
-        <span>Uniquement les tokens joueurs, pour les transférer sur une autre carte.</span>
-      </button>
-      <button class="export-option" id="exportMarkers">
-        <strong>EXPORT POINTS D'INTÉRÊT</strong>
-        <span>Les points d'intérêt et les types personnalisés.</span>
-      </button>
-      <button class="export-option" id="exportMap">
-        <strong>EXPORT DONNÉES DE CARTE</strong>
-        <span>Les paramètres de carte et les points d'intérêt, sans les tokens joueurs.</span>
-      </button>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" id="exportModalCancel">Annuler</button>
-    </div>
-  </div>
-</div>
-
 <!-- Modal Change Map -->
 <div class="modal-overlay" id="mapModalOverlay">
   <div class="modal" id="mapModal">
-    <h3>🗺️ Changer de carte de fond</h3>
+    <h3>Changer de carte de fond</h3>
     <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Cela remplacera la carte actuelle. Les marqueurs seront conservés.</p>
     <div class="upload-box" id="changeMapBox" style="padding:1.5rem 2rem; margin-bottom:1rem;">
       <p>📁 Cliquez ou glissez une nouvelle image ici</p>
@@ -819,6 +786,37 @@ let TYPE_COLORS = { ...BASE_TYPE_COLORS };
 let TYPE_ICONS  = { ...BASE_TYPE_ICONS };
 let TYPE_LABELS = { ...BASE_TYPE_LABELS };
 
+// Palette d'emoji suggérés à la création d'un type (clic pour insérer, collage toujours possible)
+// Palette d'emoji suggérés à la création d'un type, regroupée par univers (clic pour insérer, collage toujours possible)
+const ICON_PRESET_GROUPS = {
+  'Cyberpunk': ['🏙️','🏘️','🏭','💾','🍸','🏢','☢️','🏥','🔫','🚔','🚨','🛰️','📡','🏦','🎰','🕶️','⚡','🌆','🔧','🧪','📍'],
+  'Médiéval':  ['🏰','👑','⚔️','🛡️','🐉','🏹','🪓','🧙','📜','🐴','⛪','🗡️','💰','🪙','💎','🌲','⛰️','🍺','🏯','🗝️'],
+  'Horreur':   ['💀','👻','🩸','🕷️','🦇','⚰️','🪦','🌙','🎃','🧟','🕯️','😈','🐺','🌫️','🔪','🩹','👁️','🚪','🏚️']
+};
+const ICON_PRESETS = Object.values(ICON_PRESET_GROUPS).flat();
+function renderIconPresets(){
+  const c = $('typeModalIconPresets');
+  if(!c) return;
+  c.innerHTML = '';
+  Object.entries(ICON_PRESET_GROUPS).forEach(([groupName, icons])=>{
+    const groupLabel = document.createElement('div');
+    groupLabel.textContent = groupName;
+    groupLabel.style.cssText = 'width:100%; font-size:0.7rem; color:var(--text-muted); margin-top:0.3rem; letter-spacing:0.05em; text-transform:uppercase;';
+    c.appendChild(groupLabel);
+    icons.forEach(ic=>{
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = ic;
+      b.title = 'Utiliser cet emoji';
+      b.style.cssText = 'font-size:1.05rem; padding:0.2rem 0.4rem; border-radius:6px; border:1px solid var(--border); background:var(--bg-lighter); cursor:pointer;';
+      b.addEventListener('mouseenter', ()=>{ b.style.borderColor='var(--accent)'; });
+      b.addEventListener('mouseleave', ()=>{ b.style.borderColor='var(--border)'; });
+      b.addEventListener('click', ()=>{ $('typeModalIcon').value = ic; });
+      c.appendChild(b);
+    });
+  });
+}
+
 function getAllTypes() { return Object.keys(TYPE_COLORS); }
 function isBaseType(t) { return BASE_TYPE_COLORS.hasOwnProperty(t); }
 
@@ -827,6 +825,8 @@ const state = {
   zoom:1, panX:0, panY:0, markers:[], tool:'select',
   dragging:false, dragStart:{x:0,y:0},
   labelFontSize:12,
+  markerIconSize:24,
+  theme:'cybermonde',
   mapWidth:0, mapHeight:0,
   selectedMarkerId:null, movingMarkerId:null,
   measureStart:null, measureEnd:null,
@@ -835,9 +835,9 @@ const state = {
   gridColor:'#d4a853', gridOpacity:0.15, gridSize:100,
   editingPnjId:null,
   customTypes:{},  // { id: {name, icon, color} }
+  removedBaseTypes:[],  // ids de types de base retirés par l'utilisateur
   scale:{ pixelsPerUnit:null, unitName:'m', points:[] },
-  tokens:[], selectedTokenId:null, draggingTokenId:null,
-  theme:'cybermonde'
+  tokens:[], selectedTokenId:null, draggingTokenId:null
 };
 
 // ==================== DOM ====================
@@ -849,6 +849,13 @@ const pnjModalOverlay = $('pnjModalOverlay'), mapModalOverlay = $('mapModalOverl
 const uploadOverlay = $('uploadOverlay'), markerDetail = $('markerDetail');
 
 // ==================== UTILS ====================
+function screenToMap(sx, sy) {
+  const rect = mapContainer.getBoundingClientRect();
+  return { x:(sx-rect.left-state.panX)/state.zoom, y:(sy-rect.top-state.panY)/state.zoom };
+}
+function clamp(v,mn,mx){ return Math.max(mn,Math.min(mx,v)); }
+
+// ==================== THÈMES ====================
 const THEMES = {
   cybermonde: { title:'CARTE INTERACTIVE // CYBERPUNK' },
   medieval:   { title:'CARTE INTERACTIVE // ROYAUME' },
@@ -865,11 +872,6 @@ function applyTheme(themeId, persist=true){
   if(select) select.value = themeId;
   if(persist) localStorage.setItem('cyber_map_theme', themeId);
 }
-function screenToMap(sx, sy) {
-  const rect = mapContainer.getBoundingClientRect();
-  return { x:(sx-rect.left-state.panX)/state.zoom, y:(sy-rect.top-state.panY)/state.zoom };
-}
-function clamp(v,mn,mx){ return Math.max(mn,Math.min(mx,v)); }
 function genId(){ return 'm_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
 function genPnjId(){ return 'p_'+Date.now()+'_'+Math.random().toString(36).slice(2,5); }
 
@@ -902,6 +904,42 @@ function centerOnMarker(m){
   state.panY = rect.height/2 - m.y*state.zoom;
   updateTransform();
 }
+function minimizeSidebar(){
+  if(state.sidebarCollapsed) return;
+  state.sidebarMinimized = true;
+  $('sidebar').classList.add('minimized');
+  mapContainer.style.left = '60px';
+  $('sidebarToggle').style.left = '60px';
+  // S'assurer que la sidebar n'est pas collapsed quand on minimize
+  $('sidebar').classList.remove('collapsed');
+  state.sidebarCollapsed = false;
+  $('sidebarToggle').textContent = '◀';
+  // Cacher aussi les détails pour revenir propre
+  hideMarkerDetail();
+  hideTokenDetail();
+  state.selectedMarkerId = null;
+  state.selectedTokenId = null;
+  state.tokenJustSelected = false;
+  renderMarkers();
+  renderTokenList();
+}
+function expandSidebar(){
+  state.sidebarMinimized = false;
+  const sidebar = $('sidebar');
+  sidebar.classList.remove('minimized');
+  // S'assurer qu'on n'est pas collapsed quand on expand
+  sidebar.classList.remove('collapsed');
+  state.sidebarCollapsed = false;
+  const w = window.innerWidth <= 768 ? 280 : 340;
+  mapContainer.style.left = w + 'px';
+  $('sidebarToggle').style.left = w + 'px';
+  $('sidebarToggle').textContent = '◀';
+  // Si aucun détail ouvert, réafficher les listes
+  if(!$('markerDetail').classList.contains('open') && !$('tokenDetail').classList.contains('open')){
+    document.querySelectorAll('.sidebar-section').forEach(el=>el.classList.remove('hidden'));
+  }
+}
+
 // ==================== GRID ====================
 function drawGrid(){
   if(!state.showGrid || !state.mapWidth){ gridCanvas.style.display='none'; return; }
@@ -930,6 +968,10 @@ function createMarkerEl(m){
   const pin = document.createElement('div');
   pin.className = 'marker-pin';
   pin.style.background = m.color || TYPE_COLORS[m.type] || TYPE_COLORS.autre;
+  const pinIcon = document.createElement('span');
+  pinIcon.className = 'marker-pin-icon';
+  pinIcon.textContent = TYPE_ICONS[m.type] || '📍';
+  pin.appendChild(pinIcon);
   el.appendChild(pin);
   const label = document.createElement('div');
   label.className = 'marker-label';
@@ -937,7 +979,7 @@ function createMarkerEl(m){
   el.appendChild(label);
   el.addEventListener('mouseenter', e => showTooltip(e,m));
   el.addEventListener('mouseleave', hideTooltip);
-  el.addEventListener('pointerdown', e => { if(e.pointerType==='mouse' && e.button!==0) return; onMarkerMouseDown(e,m); });
+  el.addEventListener('mousedown', e => onMarkerMouseDown(e,m));
   return el;
 }
 function renderMarkers(){
@@ -1182,6 +1224,45 @@ function deletePnjFromModal(){
 // ==================== TOKENS ====================
 function genTokenId(){ return 't_'+Date.now()+'_'+Math.random().toString(36).slice(2,5); }
 
+// Extrait le nom de base d'un token en retirant un éventuel suffixe " #N"
+function tokenBaseName(name){
+  const m = name.match(/^(.*?)\s*#(\d+)$/);
+  return m ? m[1].trim() : name.trim();
+}
+// Trouve le prochain numéro libre pour un nom de base donné (#1, #2, #3...)
+function nextTokenNumber(baseName){
+  let max = 0;
+  state.tokens.forEach(t=>{
+    const m = t.name.match(/^(.*?)\s*#(\d+)$/);
+    if(m && tokenBaseName(t.name)===baseName){
+      max = Math.max(max, parseInt(m[2],10));
+    }
+  });
+  return max+1;
+}
+// Duplique un token existant : même apparence, nom numéroté, légèrement décalé sur la carte
+function duplicateToken(tokenId){
+  const src = state.tokens.find(t=>t.id===tokenId);
+  if(!src) return;
+  const base = tokenBaseName(src.name);
+  const n = nextTokenNumber(base);
+  const offset = Math.max(20, Math.round((src.size||40)*0.5));
+  const clone = {
+    ...src,
+    id: genTokenId(),
+    name: base+' #'+n,
+    x: clamp(src.x+offset, 0, state.mapWidth||src.x+offset),
+    y: clamp(src.y+offset, 0, state.mapHeight||src.y+offset)
+  };
+  state.tokens.push(clone);
+  state.selectedTokenId = clone.id;
+  renderTokens();
+  renderTokenList();
+  showTokenDetail(clone.id);
+  centerOnToken(clone);
+  saveToStorage();
+}
+
 function createTokenEl(token){
   const el = document.createElement('div');
   el.className = 'token'+(token.id===state.selectedTokenId?' selected':'')+(token.id===state.draggingTokenId?' dragging':'');
@@ -1203,14 +1284,14 @@ function createTokenEl(token){
   label.className = 'token-label';
   label.textContent = token.name;
   el.appendChild(label);
-  el.addEventListener('pointerdown', e=>{
-    if(e.pointerType==='mouse' && e.button!==0) return;
+  el.addEventListener('mousedown', e=>{
     e.stopPropagation();
     if(state.tool==='select' || state.tool==='token'){
       state.draggingTokenId = token.id;
       state.selectedTokenId = token.id;
       state.selectedMarkerId = null;
       state.tokenJustSelected = true;
+      expandSidebar();
       hideMarkerDetail();
       showTokenDetail(token.id);
       renderTokens();
@@ -1247,6 +1328,7 @@ function renderTokenList(){
       hideMarkerDetail();
       showTokenDetail(token.id);
       centerOnToken(token);
+      setSidebarCollapsed(true);
       renderTokens();
       renderTokenList();
     });
@@ -1401,6 +1483,7 @@ function renderSidebar(){
     item.addEventListener('click', ()=>{
       state.selectedMarkerId = m.id;
       centerOnMarker(m);
+      setSidebarCollapsed(false);
       renderMarkers();
       showMarkerDetail(m.id);
     });
@@ -1425,7 +1508,23 @@ function renderFilters(){
   getAllTypes().forEach(type=>{
     const chip = document.createElement('div');
     chip.className = 'filter-chip'+(state.activeFilters.has(type)?' active':'');
-    chip.textContent = (TYPE_ICONS[type]||'📌')+' '+(TYPE_LABELS[type]||type);
+    chip.style.display = 'inline-flex';
+    chip.style.alignItems = 'center';
+    chip.style.gap = '0.3rem';
+
+    const label = document.createElement('span');
+    label.textContent = (TYPE_ICONS[type]||'📌')+' '+(TYPE_LABELS[type]||type);
+    chip.appendChild(label);
+
+    const del = document.createElement('span');
+    del.textContent = '×';
+    del.title = 'Retirer ce type de la liste';
+    del.style.cssText = 'font-weight:700; opacity:0.55; cursor:pointer; padding:0 0.15rem;';
+    del.addEventListener('mouseenter', ()=>{ del.style.opacity='1'; del.style.color='var(--danger)'; });
+    del.addEventListener('mouseleave', ()=>{ del.style.opacity='0.55'; del.style.color=''; });
+    del.addEventListener('click', e=>{ e.stopPropagation(); removeType(type); });
+    chip.appendChild(del);
+
     chip.addEventListener('click', ()=>{
       if(state.activeFilters.has(type)) state.activeFilters.delete(type);
       else state.activeFilters.add(type);
@@ -1436,6 +1535,26 @@ function renderFilters(){
   });
 }
 
+// Retire un type (base ou personnalisé) de toutes les listes, si plus aucun signal ne l'utilise
+function removeType(type){
+  const count = state.markers.filter(m=>m.type===type).length;
+  if(count>0){
+    alert('❌ Impossible de retirer ce type : '+count+' signal(aux) l\'utilise(nt) encore.\nSupprimez-les ou changez leur type avant.');
+    return;
+  }
+  if(!confirm('Retirer définitivement le type "'+(TYPE_LABELS[type]||type)+'" de la liste ?')) return;
+  if(isBaseType(type)){
+    if(!state.removedBaseTypes.includes(type)) state.removedBaseTypes.push(type);
+  } else {
+    delete state.customTypes[type];
+  }
+  delete TYPE_COLORS[type];
+  delete TYPE_ICONS[type];
+  delete TYPE_LABELS[type];
+  state.activeFilters.delete(type);
+  renderFilters(); renderTypeSelect(); renderSidebar(); saveToStorage();
+}
+
 // ==================== STORAGE ====================
 function saveToStorage(){
   const data = {
@@ -1444,10 +1563,12 @@ function saveToStorage(){
     gridColor:state.gridColor, gridOpacity:state.gridOpacity,
     gridSize:state.gridSize, showGrid:state.showGrid,
     customTypes:state.customTypes,
+    removedBaseTypes:state.removedBaseTypes,
     scale:state.scale,
     tokens:state.tokens,
     sidebarMinimized:state.sidebarMinimized,
     labelFontSize:state.labelFontSize,
+    markerIconSize:state.markerIconSize,
     theme:state.theme
   };
   localStorage.setItem('cyber_map_data', JSON.stringify(data));
@@ -1467,7 +1588,9 @@ function loadFromStorage(){
       state.showGrid = data.showGrid||false;
       applyLabelFontSize(data.labelFontSize||12);
       $('labelFontSize').value = state.labelFontSize;
-      if(data.theme) applyTheme(data.theme);
+      applyMarkerIconSize(data.markerIconSize||24);
+      $('markerIconSize').value = state.markerIconSize;
+      applyTheme(data.theme||'cybermonde', false);
       if(data.scale){
         state.scale = data.scale;
       }
@@ -1482,6 +1605,16 @@ function loadFromStorage(){
           state.activeFilters.add(id);
         });
       }
+      // Restaurer les types de base retirés par l'utilisateur
+      if(data.removedBaseTypes){
+        state.removedBaseTypes = data.removedBaseTypes;
+        state.removedBaseTypes.forEach(id=>{
+          delete TYPE_COLORS[id];
+          delete TYPE_ICONS[id];
+          delete TYPE_LABELS[id];
+          state.activeFilters.delete(id);
+        });
+      }
       return true;
     }
   }catch(e){}
@@ -1489,77 +1622,85 @@ function loadFromStorage(){
 }
 
 // ==================== IMPORT/EXPORT ====================
-function downloadJSON(data, filename){
+function buildExportPayload(scope){
+  const base = { version:1, exportedAt:new Date().toISOString() };
+  if(scope==='tokens'){
+    return { ...base, type:'tokens', tokens:state.tokens };
+  }
+  if(scope==='markers'){
+    return { ...base, type:'markers', markers:state.markers, customTypes:state.customTypes };
+  }
+  // scope 'full' : sauvegarde/restauration complète de la carte
+  return { ...base, type:'full', markers:state.markers, mapWidth:state.mapWidth, mapHeight:state.mapHeight,
+    gridColor:state.gridColor, gridOpacity:state.gridOpacity, gridSize:state.gridSize,
+    customTypes:state.customTypes, scale:state.scale, tokens:state.tokens, labelFontSize:state.labelFontSize, markerIconSize:state.markerIconSize, theme:state.theme };
+}
+function downloadJSON(data, filenamePrefix){
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),100);
+  a.href=url; a.download=filenamePrefix+'_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); URL.revokeObjectURL(url);
 }
-
-function exportJSON(type='complete'){
-  const date = new Date().toISOString().slice(0,10);
-  let data, filename;
-  if(type==='tokens'){
-    data = { type:'tokens', version:2, tokens:state.tokens, exportedAt:new Date().toISOString() };
-    filename = `tokens_joueurs_${date}.json`;
-  } else if(type==='markers'){
-    data = { type:'markers', version:2, markers:state.markers, customTypes:state.customTypes, exportedAt:new Date().toISOString() };
-    filename = `points_interet_${date}.json`;
-  } else if(type==='map'){
-    data = { type:'map', version:2, markers:state.markers, mapWidth:state.mapWidth, mapHeight:state.mapHeight,
-      gridColor:state.gridColor, gridOpacity:state.gridOpacity, gridSize:state.gridSize,
-      customTypes:state.customTypes, scale:state.scale, theme:state.theme, exportedAt:new Date().toISOString() };
-    filename = `donnees_carte_${date}.json`;
-  } else {
-    data = { type:'complete', version:2, markers:state.markers, mapWidth:state.mapWidth, mapHeight:state.mapHeight,
-      gridColor:state.gridColor, gridOpacity:state.gridOpacity, gridSize:state.gridSize,
-      customTypes:state.customTypes, scale:state.scale, tokens:state.tokens, theme:state.theme, exportedAt:new Date().toISOString() };
-    filename = `carte_cyber_complete_${date}.json`;
-  }
-  downloadJSON(data,filename);
-}
+function exportJSON(){ downloadJSON(buildExportPayload('full'), 'carte_cyber_complet'); }
+function exportTokensJSON(){ downloadJSON(buildExportPayload('tokens'), 'carte_cyber_tokens'); }
+function exportMarkersJSON(){ downloadJSON(buildExportPayload('markers'), 'carte_cyber_points'); }
 
 function importJSON(file){
   const reader = new FileReader();
   reader.onload = e=>{
     try{
       const data = JSON.parse(e.target.result);
-      const type = data.type || 'complete';
-      if(!['tokens','markers','map','complete'].includes(type)) throw new Error('Type JSON inconnu');
+      // Rétrocompatibilité : les anciens exports n'ont pas de champ "type" -> traités comme "full"
+      const type = data.type || 'full';
 
-      if(type==='tokens'){
-        const replace = confirm(`Ce fichier contient ${Array.isArray(data.tokens)?data.tokens.length:0} token(s).\n\nOK = remplacer les tokens actuels\nAnnuler = ajouter les tokens`);
-        const incoming = Array.isArray(data.tokens)?data.tokens:[];
-        state.tokens = replace ? incoming : [...state.tokens,...incoming];
-      } else {
-        if(Array.isArray(data.markers)){
-          const replace = type==='complete' || confirm(`Ce fichier contient ${data.markers.length} point(s) d'intérêt.\n\nOK = remplacer les points actuels\nAnnuler = ajouter les points`);
-          state.markers = replace ? data.markers : [...state.markers,...data.markers];
+      if(type === 'tokens'){
+        const incoming = (data.tokens||[]).map(t=>({ ...t, id:genTokenId() }));
+        state.tokens.push(...incoming);
+        renderTokenList(); renderMarkers(); saveToStorage();
+        alert('✅ '+incoming.length+' token(s) ajouté(s) à la carte !');
+
+      } else if(type === 'markers'){
+        if(data.customTypes){
+          Object.keys(data.customTypes).forEach(id=>{
+            if(!state.customTypes[id]){
+              const ct = data.customTypes[id];
+              state.customTypes[id] = ct;
+              TYPE_COLORS[id] = ct.color;
+              TYPE_ICONS[id] = ct.icon;
+              TYPE_LABELS[id] = ct.name;
+            }
+            state.activeFilters.add(id);
+          });
         }
+        const incoming = (data.markers||[]).map(m=>({ ...m, id:genId() }));
+        state.markers.push(...incoming);
+        incoming.forEach(m=>state.activeFilters.add(m.type));
+        renderMarkers(); renderSidebar(); renderFilters(); renderTypeSelect(); saveToStorage();
+        alert('✅ '+incoming.length+' point(s) d\'intérêt ajouté(s) à la carte !');
+
+      } else {
+        // Import complet : remplace l'état actuel (comportement historique)
+        if(data.markers){ state.markers=data.markers; }
         if(data.customTypes){
           state.customTypes = data.customTypes;
           Object.keys(state.customTypes).forEach(id=>{
             const ct = state.customTypes[id];
-            TYPE_COLORS[id] = ct.color; TYPE_ICONS[id] = ct.icon; TYPE_LABELS[id] = ct.name;
+            TYPE_COLORS[id] = ct.color;
+            TYPE_ICONS[id] = ct.icon;
+            TYPE_LABELS[id] = ct.name;
             state.activeFilters.add(id);
           });
         }
-        if(type==='map' || type==='complete'){
-          if(data.mapWidth) state.mapWidth=data.mapWidth;
-          if(data.mapHeight) state.mapHeight=data.mapHeight;
-          if(data.gridColor) state.gridColor=data.gridColor;
-          if(data.gridOpacity!==undefined) state.gridOpacity=data.gridOpacity;
-          if(data.gridSize) state.gridSize=data.gridSize;
-          if(data.scale) state.scale=data.scale;
-          if(data.theme) applyTheme(data.theme);
-        }
-        if(type==='complete' && Array.isArray(data.tokens)) state.tokens=data.tokens;
+        if(data.scale) state.scale = data.scale;
+        if(data.tokens) state.tokens = data.tokens;
+        if(data.labelFontSize){ applyLabelFontSize(data.labelFontSize); $('labelFontSize').value = data.labelFontSize; }
+        if(data.markerIconSize){ applyMarkerIconSize(data.markerIconSize); $('markerIconSize').value = data.markerIconSize; }
+        if(data.theme) applyTheme(data.theme);
+        renderMarkers(); renderTokenList(); renderSidebar(); renderFilters(); renderTypeSelect(); hideMarkerDetail(); saveToStorage();
+        if(data.markers) alert('✅ '+data.markers.length+' signaux importés !');
       }
-      renderMarkers(); renderTokenList(); renderSidebar(); renderFilters(); renderTypeSelect(); hideMarkerDetail();
-      drawGrid(); saveToStorage();
-      alert('Import JSON terminé.');
-    }catch(err){ alert('Fichier JSON invalide ou incompatible.'); }
+    }catch(err){ alert('❌ Fichier JSON invalide'); }
   };
   reader.readAsText(file);
 }
@@ -1579,24 +1720,9 @@ function loadMapImage(file){
   reader.readAsDataURL(file);
 }
 
-// ==================== POINTER EVENTS (souris + tactile) ====================
-const activePointers = new Map();
-let pinchStartDist = null;
-let pinchStartZoom = null;
-
-mapContainer.addEventListener('pointerdown', e=>{
-  activePointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
-  if(activePointers.size>=2){
-    // Passage en mode pincement (zoom à deux doigts) : on annule tout autre geste en cours
-    state.dragging=false; mapContainer.classList.remove('panning');
-    if(state.movingMarkerId){ state.movingMarkerId=null; mapContainer.classList.remove('move-mode'); }
-    state.draggingTokenId=null;
-    const pts=[...activePointers.values()].slice(0,2);
-    pinchStartDist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
-    pinchStartZoom=state.zoom;
-    return;
-  }
-  if(e.pointerType==='mouse' && e.button!==0) return;
+// ==================== MOUSE EVENTS ====================
+mapContainer.addEventListener('mousedown', e=>{
+  if(e.button!==0) return;
   const mp = screenToMap(e.clientX,e.clientY);
   if(state.tool==='add'){ openMarkerModal(false, {x:mp.x,y:mp.y}); setTool('select'); return; }
   if(state.tool==='token'){ openTokenModal(false, {x:mp.x,y:mp.y}); setTool('select'); return; }
@@ -1623,8 +1749,7 @@ mapContainer.addEventListener('pointerdown', e=>{
     }
     return;
   }
-  // Un clic sur une zone vide ne modifie plus l'état de la sidebar.
-  // La sidebar ne se replie/déplie que via son bouton fixe.
+  // Minimize sidebar when clicking empty map in select mode
   if(state.tool==='select' && !state.tokenJustSelected){
     state.selectedMarkerId = null;
     state.selectedTokenId = null;
@@ -1632,11 +1757,11 @@ mapContainer.addEventListener('pointerdown', e=>{
     hideTokenDetail();
     renderMarkers();
     renderTokenList();
+    minimizeSidebar();
   }
   state.tokenJustSelected = false;
   state.dragging = true; state.dragStart = {x:e.clientX,y:e.clientY};
   mapContainer.classList.add('panning');
-  try{ mapContainer.setPointerCapture(e.pointerId); }catch(err){}
 });
 function onMarkerMouseDown(e,m){
   e.stopPropagation();
@@ -1648,19 +1773,12 @@ function onMarkerMouseDown(e,m){
   if(state.tool==='move'){ state.movingMarkerId=m.id; mapContainer.classList.add('move-mode'); return; }
   if(state.tool==='select'){
     state.selectedMarkerId = m.id;
+    setSidebarCollapsed(false);
     renderMarkers();
     showMarkerDetail(m.id);
   }
 }
-window.addEventListener('pointermove', e=>{
-  if(activePointers.has(e.pointerId)) activePointers.set(e.pointerId, {x:e.clientX,y:e.clientY});
-  if(activePointers.size>=2 && pinchStartDist){
-    const pts=[...activePointers.values()].slice(0,2);
-    const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
-    const midX=(pts[0].x+pts[1].x)/2, midY=(pts[0].y+pts[1].y)/2;
-    zoomTo(pinchStartZoom*(dist/pinchStartDist), midX, midY);
-    return;
-  }
+window.addEventListener('mousemove', e=>{
   const mp = screenToMap(e.clientX,e.clientY);
   let cx = Math.round(mp.x), cy = Math.round(mp.y);
   if(state.scale.pixelsPerUnit && state.scale.pixelsPerUnit > 0){
@@ -1698,17 +1816,11 @@ window.addEventListener('pointermove', e=>{
     mapWrapper.appendChild(line);
   }
 });
-function endPointer(e){
-  activePointers.delete(e.pointerId);
-  if(activePointers.size<2){ pinchStartDist=null; pinchStartZoom=null; }
-  if(activePointers.size===0){
-    state.dragging = false; mapContainer.classList.remove('panning');
-    if(state.movingMarkerId){ state.movingMarkerId=null; mapContainer.classList.remove('move-mode'); saveToStorage(); }
-    if(state.draggingTokenId){ state.draggingTokenId=null; renderTokens(); saveToStorage(); }
-  }
-}
-window.addEventListener('pointerup', endPointer);
-window.addEventListener('pointercancel', endPointer);
+window.addEventListener('mouseup', ()=>{
+  state.dragging = false; mapContainer.classList.remove('panning');
+  if(state.movingMarkerId){ state.movingMarkerId=null; mapContainer.classList.remove('move-mode'); saveToStorage(); }
+  if(state.draggingTokenId){ state.draggingTokenId=null; renderTokens(); saveToStorage(); }
+});
 function clearScaleDots(){
   mapWrapper.querySelectorAll('[data-scale-dot]').forEach(el=>el.remove());
 }
@@ -1729,9 +1841,6 @@ function setTool(tool){
 $('btnZoomIn').addEventListener('click', ()=>{ const r=mapContainer.getBoundingClientRect(); zoomTo(state.zoom*1.3, r.left+r.width/2, r.top+r.height/2); });
 $('btnZoomOut').addEventListener('click', ()=>{ const r=mapContainer.getBoundingClientRect(); zoomTo(state.zoom/1.3, r.left+r.width/2, r.top+r.height/2); });
 $('btnReset').addEventListener('click', resetView);
-$('btnZoomInMini').addEventListener('click', ()=>{ const r=mapContainer.getBoundingClientRect(); zoomTo(state.zoom*1.3, r.left+r.width/2, r.top+r.height/2); });
-$('btnZoomOutMini').addEventListener('click', ()=>{ const r=mapContainer.getBoundingClientRect(); zoomTo(state.zoom/1.3, r.left+r.width/2, r.top+r.height/2); });
-$('btnResetMini').addEventListener('click', resetView);
 
 // Grid
 $('btnToggleGrid').addEventListener('click', ()=>{
@@ -1754,8 +1863,19 @@ $('labelFontSize').addEventListener('input', e=>{
   saveToStorage();
 });
 
+function applyMarkerIconSize(px){
+  state.markerIconSize = px;
+  document.documentElement.style.setProperty('--marker-icon-size', px+'px');
+  $('markerIconSizeVal').textContent = px+'px';
+}
+$('markerIconSize').addEventListener('input', e=>{
+  applyMarkerIconSize(parseInt(e.target.value));
+  saveToStorage();
+});
+
 // Change map
 $('btnChangeMap').addEventListener('click', ()=>mapModalOverlay.classList.add('show'));
+$('themeSelect').addEventListener('change', e=>{ applyTheme(e.target.value); saveToStorage(); });
 $('mapModalCancel').addEventListener('click', ()=>mapModalOverlay.classList.remove('show'));
 $('changeMapBox').addEventListener('click', ()=>$('changeMapFile').click());
 $('changeMapFile').addEventListener('change', e=>{ if(e.target.files[0]) loadMapImage(e.target.files[0]); });
@@ -1764,23 +1884,23 @@ $('mapModal').addEventListener('drop', e=>{ e.preventDefault(); const f=e.dataTr
 
 // Sidebar toggle
 function setSidebarCollapsed(collapsed){
-  state.sidebarCollapsed = !!collapsed;
+  state.sidebarCollapsed = collapsed;
   const sidebar = $('sidebar');
-  const toggle = $('sidebarToggle');
-  const w = window.innerWidth <= 768 ? (window.innerWidth <= 480 ? 260 : 280) : 340;
-
-  // Un seul état pour la sidebar : ouverte ou repliée.
-  // Le bouton reste toujours fixé au bord de la zone de carte.
-  sidebar.classList.toggle('collapsed', state.sidebarCollapsed);
-  sidebar.classList.remove('minimized');
-  state.sidebarMinimized = false;
-  toggle.textContent = state.sidebarCollapsed ? '▶' : '◀';
-  mapContainer.style.left = state.sidebarCollapsed ? '0' : w + 'px';
-  toggle.style.left = state.sidebarCollapsed ? '0' : w + 'px';
+  sidebar.classList.toggle('collapsed', collapsed);
+  $('sidebarToggle').textContent = collapsed?'▶':'◀';
+  if(collapsed){
+    // En mode collapsed, on sort forcément du mode minimized
+    sidebar.classList.remove('minimized');
+    state.sidebarMinimized = false;
+    mapContainer.style.left = '0';
+    $('sidebarToggle').style.left = '0';
+  } else {
+    const w = window.innerWidth <= 768 ? 280 : 340;
+    mapContainer.style.left = w + 'px';
+    $('sidebarToggle').style.left = w + 'px';
+  }
 }
-$('sidebarToggle').addEventListener('click', ()=>{
-  setSidebarCollapsed(!state.sidebarCollapsed);
-});
+$('sidebarToggle').addEventListener('click', ()=>setSidebarCollapsed(!state.sidebarCollapsed));
 
 // Search
 $('searchInput').addEventListener('input', renderSidebar);
@@ -1912,14 +2032,13 @@ function initTokenEditor(){
     ctx.stroke();
   }
 
-  wrap.addEventListener('pointerdown', e=>{
+  wrap.addEventListener('mousedown', e=>{
     if(!tokenEditorImg) return;
     tokenEditorState.dragging = true;
     tokenEditorState.dragStart = { x:e.clientX, y:e.clientY };
     wrap.style.cursor = 'grabbing';
-    try{ wrap.setPointerCapture(e.pointerId); }catch(err){}
   });
-  window.addEventListener('pointermove', e=>{
+  window.addEventListener('mousemove', e=>{
     if(!tokenEditorState.dragging || !tokenEditorImg) return;
     const dx = e.clientX - tokenEditorState.dragStart.x;
     const dy = e.clientY - tokenEditorState.dragStart.y;
@@ -1928,7 +2047,7 @@ function initTokenEditor(){
     tokenEditorState.dragStart = { x:e.clientX, y:e.clientY };
     drawEditor();
   });
-  window.addEventListener('pointerup', ()=>{
+  window.addEventListener('mouseup', ()=>{
     tokenEditorState.dragging = false;
     wrap.style.cursor = 'grab';
   });
@@ -2069,10 +2188,24 @@ $('btnBackFromToken').addEventListener('click', ()=>{
   renderTokenList();
 });
 
+// Minimized bar button
+$('minimizedBarBtn').addEventListener('click', ()=>{
+  expandSidebar();
+  // Si un token est sélectionné, montrer son détail
+  if(state.selectedTokenId){
+    showTokenDetail(state.selectedTokenId);
+  } else if(state.selectedMarkerId){
+    showMarkerDetail(state.selectedMarkerId);
+  }
+});
+
 // Sidebar token buttons
 $('btnEditToken').addEventListener('click', ()=>{
   const token = state.tokens.find(t=>t.id===state.selectedTokenId);
   if(token) openTokenModal(true, token);
+});
+$('btnDuplicateToken').addEventListener('click', ()=>{
+  if(state.selectedTokenId) duplicateToken(state.selectedTokenId);
 });
 $('btnDeleteToken').addEventListener('click', ()=>{
   const token = state.tokens.find(t=>t.id===state.selectedTokenId);
@@ -2086,17 +2219,12 @@ uploadOverlay.addEventListener('dragover', e=>e.preventDefault());
 uploadOverlay.addEventListener('drop', e=>{ e.preventDefault(); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) loadMapImage(f); });
 
 // Import/Export
-$('btnExport').addEventListener('click', ()=>$('exportModalOverlay').classList.add('show'));
-$('exportComplete').addEventListener('click', ()=>{ exportJSON('complete'); $('exportModalOverlay').classList.remove('show'); });
-$('exportTokens').addEventListener('click', ()=>{ exportJSON('tokens'); $('exportModalOverlay').classList.remove('show'); });
-$('exportMarkers').addEventListener('click', ()=>{ exportJSON('markers'); $('exportModalOverlay').classList.remove('show'); });
-$('exportMap').addEventListener('click', ()=>{ exportJSON('map'); $('exportModalOverlay').classList.remove('show'); });
-$('exportModalCancel').addEventListener('click', ()=>$('exportModalOverlay').classList.remove('show'));
-$('exportModalOverlay').addEventListener('click', e=>{ if(e.target===$('exportModalOverlay')) $('exportModalOverlay').classList.remove('show'); });
-$('themeSelect').addEventListener('change', e=>{ applyTheme(e.target.value); saveToStorage(); });
+$('btnExportFull').addEventListener('click', exportJSON);
+$('btnExportTokens').addEventListener('click', exportTokensJSON);
+$('btnExportMarkers').addEventListener('click', exportMarkersJSON);
 $('btnImport').addEventListener('click', ()=>$('importFile').click());
 $('btnSaveImage').addEventListener('click', saveMapImage);
-$('importFile').addEventListener('change', e=>{ if(e.target.files[0]) { importJSON(e.target.files[0]); e.target.value=''; } });
+$('importFile').addEventListener('change', e=>{ if(e.target.files[0]) importJSON(e.target.files[0]); });
 
 // ==================== KEYBOARD ====================
 window.addEventListener('keydown', e=>{
@@ -2107,7 +2235,7 @@ window.addEventListener('keydown', e=>{
     case '0': e.preventDefault(); resetView(); break;
     case 'Escape':
       setTool('select'); state.measureStart=null; state.measureEnd=null; renderMarkers();
-      modalOverlay.classList.remove('show'); pnjModalOverlay.classList.remove('show'); mapModalOverlay.classList.remove('show'); $('exportModalOverlay').classList.remove('show');
+      modalOverlay.classList.remove('show'); pnjModalOverlay.classList.remove('show'); mapModalOverlay.classList.remove('show');
       state.editingMarkerId=null; state.tempMarkerPos=null; state.editingPnjId=null;
       break;
     case 'a': case 'A': setTool('add'); break;
@@ -2166,6 +2294,7 @@ async function saveMapImage() {
     const color = m.color || TYPE_COLORS[m.type] || TYPE_COLORS.autre;
 
     // Pin (forme goutte)
+    const r = state.markerIconSize/2;
     ctx.save();
     ctx.translate(m.x, m.y);
     ctx.rotate(-45 * Math.PI / 180);
@@ -2173,9 +2302,19 @@ async function saveMapImage() {
     ctx.strokeStyle = '#0d1117';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(0, -12, 12, 0, Math.PI * 2);
+    ctx.arc(0, -r, r, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
+    // Icône du type, redressée (annule la rotation du pin)
+    ctx.save();
+    ctx.translate(0, -r);
+    ctx.rotate(45 * Math.PI / 180);
+    ctx.font = Math.round(state.markerIconSize*0.55)+'px "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#0d1117';
+    ctx.fillText(TYPE_ICONS[m.type] || '📍', 0, 1);
+    ctx.restore();
     ctx.restore();
 
     // Label
@@ -2222,7 +2361,10 @@ function updateGridSettingsPosition() {
   gridSettings.style.top = (rect.bottom + 6) + 'px';
 }
 
-// La sidebar reste ouverte au chargement. Elle ne se replie que manuellement.
+// Sur petit écran, collapse la sidebar par défaut au chargement
+if (window.innerWidth < 768) {
+  setSidebarCollapsed(true);
+}
 
 // Mettre à jour la position des grid settings quand nécessaire
 const origToggleGrid = $('btnToggleGrid').onclick;
@@ -2238,8 +2380,10 @@ window.addEventListener('resize', () => {
 setTimeout(updateGridSettingsPosition, 100);
 
 // ==================== INIT ====================
-applyTheme(localStorage.getItem('cyber_map_theme') || 'cybermonde', false);
 applyLabelFontSize(state.labelFontSize);
+applyMarkerIconSize(state.markerIconSize);
+applyTheme('cybermonde', false);
+renderIconPresets();
 initTokenEditor();
 renderFilters();
 renderTypeSelect();
@@ -2264,14 +2408,21 @@ if(loadFromStorage()){
   if(mapImage.complete && mapImage.naturalWidth) mapImage.onload();
 }
 window.addEventListener('resize', ()=>{
-  // Le redimensionnement ne doit jamais changer l'état ouvert/replié.
-  setSidebarCollapsed(state.sidebarCollapsed);
+  if(state.sidebarCollapsed){
+    mapContainer.style.left = '0';
+    $('sidebarToggle').style.left = '0';
+  } else if(state.sidebarMinimized){
+    mapContainer.style.left = '60px';
+    $('sidebarToggle').style.left = '60px';
+  } else {
+    const w = window.innerWidth <= 768 ? 280 : 340;
+    mapContainer.style.left = w + 'px';
+    $('sidebarToggle').style.left = w + 'px';
+  }
 });
 
 // ==================== TOKEN INIT ====================
 renderTokenList();
-// Replier/afficher le menu supérieur
-(function(){const t=document.getElementById('toolbar'),c=document.getElementById('toolbarCollapseBtn'),e=document.getElementById('toolbarExpandBtn'),m=document.getElementById('toolbarMiniBar');if(!t||!c||!e||!m)return;function set(v){t.classList.toggle('collapsed',v);m.classList.toggle('show',v);try{localStorage.setItem('cybermonde_toolbar_collapsed',v?'1':'0')}catch(x){}}c.onclick=x=>{x.stopPropagation();set(true)};e.onclick=x=>{x.stopPropagation();set(false)};let s=null;try{s=localStorage.getItem('cybermonde_toolbar_collapsed')}catch(x){}if(window.matchMedia('(max-width:640px)').matches&&s===null)set(true);else if(s==='1')set(true)})();
 </script>
 </body>
 
